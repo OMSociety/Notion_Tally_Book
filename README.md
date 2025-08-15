@@ -9,7 +9,7 @@
 - 作者原版新的的0.8.0的版本还是很漂亮的, 可惜没有开源. 叹
 
 ## 新功能
-- 能力来源于阿里云, 需要申请阿里百炼的账户: [阿里百炼控制台](https://bailian.console.aliyun.com/?tab=globalset#/efm/api_key)
+- ai能力来源于阿里云, 需要申请阿里百炼的账户: [阿里百炼控制台](https://bailian.console.aliyun.com/?tab=globalset#/efm/api_key)
 - 短信能力基于安卓, 但是需要一些敏感权限, 还有短信内容需要遵守一定的规则
 - 在原版的0.6.2版本的基础上增加了些新功能:
 
