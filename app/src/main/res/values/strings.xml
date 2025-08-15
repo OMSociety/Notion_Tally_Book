@@ -180,8 +180,8 @@
     <string name="tally_about_wechat_copied">微信公众号已复制</string>
     <string name="tally_about_title_source_code">源代码</string>
     <string name="tally_about_source_code_content">
-        原作者代码已托管在 GitHub(https://github.com/coderpage/Mine)
-        我的代码在 Gitee(https://gitee.com/rocks-by-the-lake/mine)
+        我的代码在 Gitee( https://gitee.com/rocks-by-the-lake/mine )
+        原作者代码已托管在 GitHub( https://github.com/coderpage/Mine )
     </string>
     <string name="tyOther">其他</string>
     <string name="tyFoodAndBeverage">餐饮</string>
