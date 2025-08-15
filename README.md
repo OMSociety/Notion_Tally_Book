@@ -1,6 +1,7 @@
 # Mine
 - 自己写的一个记账本应用, 简单干净.
 - 应用中使用的图标来自 [iconfont](http://iconfont.cn/) 和 [material-design-icons](https://github.com/google/material-design-icons)
+- 原作者微信公众号 搜索:MINE应用
 
 ## 我的想法
 - 我其实非常喜欢这个项目,用了大概有2年时间. 期间没有遇到问题, 但是觉得打开输入金额, 标签, 真的太麻烦了. 我想要让他自动记录, 简单记录.
