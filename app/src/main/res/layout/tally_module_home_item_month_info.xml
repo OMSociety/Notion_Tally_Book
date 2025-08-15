@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data class=".tally.module.home.MonthInfoItemBinding">
+
+        <import type="com.coderpage.mine.common.Font" />
+
+        <variable
+            name="activity"
+            type="android.app.Activity" />
+
+        <variable
+            name="data"
+            type="com.coderpage.mine.app.tally.module.home.model.HomeMonthModel" />
+
+        <variable
+            name="vm"
+            type="com.coderpage.mine.app.tally.module.home.HomeMonthInfoViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding_normal"
+        android:layout_marginTop="@dimen/recycler_item_divider"
+        android:layout_marginRight="@dimen/padding_normal"
+        android:background="@drawable/bg_common_card_white"
+        android:onClick="@{() -> vm.onMonthInfoClick(activity)}"
+        android:padding="@dimen/padding_normal">
+
+        <TextView
+            android:id="@+id/tvMonthExpenseLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/tally_current_month_expense_amount"
+            android:textColor="@color/appTextColorThird"
+            android:textSize="@dimen/app_text_size_small"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvMonthExpense"
+            textTypeFace="@{Font.QUICKSAND_BOLD}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="@dimen/spacing_normal"
+            android:paddingBottom="@dimen/spacing_normal"
+            android:text="@{vm.expenseMoney}"
+            android:textColor="@color/appTextColorPrimary"
+            android:textSize="32sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMonthExpenseLabel"
+            tools:text="￥100.90" />
+
+        <TextView
+            android:id="@+id/tvMonthIncomeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/spacing_normal"
+            android:text="@string/tally_current_month_income_amount"
+            android:textColor="@color/appTextColorThird"
+            android:textSize="@dimen/app_text_size_small"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMonthExpense" />
+
+        <TextView
+            android:id="@+id/tvMonthIncome"
+            textTypeFace="@{Font.QUICKSAND_MEDIUM}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:text="@{vm.incomeMoney}"
+            android:textColor="@color/appTextColorPrimary"
+            android:textSize="@dimen/app_text_size_medium"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvMonthIncomeLabel"
+            app:layout_constraintStart_toEndOf="@id/tvMonthIncomeLabel"
+            tools:text="￥10000.00" />
+
+        <TextView
+            android:id="@+id/tvMonthBudgetLeftLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginEnd="@dimen/spacing_normal"
+            android:gravity="end"
+            android:onClick="@{() -> vm.onBudgetMoneyClick(activity)}"
+            android:text="@string/tally_module_home_budget_label"
+            android:textColor="@color/appTextColorThird"
+            android:textSize="@dimen/app_text_size_small"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvMonthIncomeLabel"
+            app:layout_constraintEnd_toStartOf="@id/tvMonthBudgetLeft"
+            app:layout_constraintStart_toEndOf="@id/tvMonthIncome" />
+
+        <TextView
+            android:id="@+id/tvMonthBudgetLeft"
+            textTypeFace="@{Font.QUICKSAND_MEDIUM}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:onClick="@{() -> vm.onBudgetMoneyClick(activity)}"
+            android:text="@{vm.budgetLeftMoney}"
+            android:textColor="@color/appTextColorPrimary"
+            android:textSize="@dimen/app_text_size_medium"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvMonthIncomeLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="￥10000.00" />
+
+        <android.support.v7.widget.AppCompatImageView
+            selected="@{!safeUnbox(vm.hideMoney)}"
+            android:layout_width="60dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_clickable_view_40dp"
+            android:onClick="@{() -> vm.onShowOrHideMoneyClick()}"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            app:layout_constraintBottom_toBottomOf="@id/tvMonthExpense"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvMonthExpense"
+            app:srcCompat="@drawable/ic_eye_selector"
+            tools:src="@drawable/ic_eye_open" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/ivChart"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:tint="@color/colorAccent"
+            app:layout_constraintEnd_toStartOf="@id/tvChartTip"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMonthIncome"
+            app:srcCompat="@drawable/ic_chart" />
+
+        <TextView
+            android:id="@+id/tvChartTip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tally_module_home_check_chart"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/app_text_size_small"
+            app:layout_constraintBottom_toBottomOf="@id/ivChart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivChart"
+            app:layout_constraintTop_toTopOf="@id/ivChart" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

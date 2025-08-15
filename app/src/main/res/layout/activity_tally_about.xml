@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/main_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".app.tally.module.about.AboutActivity">
+
+    <ScrollView
+        android:id="@+id/lyContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/spacing_micro"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/toolbar_height">
+
+        <LinearLayout
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_normal"
+                android:text="@string/tally_about_title_app_info"
+                android:textColor="@color/appTextColorLabel"
+                android:textSize="@dimen/app_text_size_medium"/>
+
+            <FrameLayout
+                android:id="@+id/lyAppInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_micro">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tally_about_title_version"
+                        android:textColor="@color/appTextColorPrimary"
+                        android:textSize="@dimen/app_text_size_normal"/>
+
+                    <TextView
+                        android:id="@+id/tvAppVersion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/spacing_normal"
+                        android:textColor="@color/appTextColorSecondary"
+                        android:textSize="@dimen/app_text_size_medium"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvCheckNewVersion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right|center_vertical"
+                    android:gravity="center"
+                    android:text="@string/tally_about_check_new_version"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="@dimen/app_text_size_medium"/>
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_micro">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tally_about_title_about_app"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="@dimen/app_text_size_normal"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/spacing_normal"
+                    android:text="@string/tally_about_about_app_content"
+                    android:textColor="@color/appTextColorSecondary"
+                    android:textSize="@dimen/app_text_size_medium"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_normal"
+                android:text="@string/tally_about_title_developer_info"
+                android:textColor="@color/appTextColorLabel"
+                android:textSize="@dimen/app_text_size_medium"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_micro">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tally_about_title_about_me"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="@dimen/app_text_size_normal"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/spacing_normal"
+                    android:text="@string/tally_about_about_me_content"
+                    android:textColor="@color/appTextColorSecondary"
+                    android:textSize="@dimen/app_text_size_medium"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_micro">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tally_about_title_send_email"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="@dimen/app_text_size_normal"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="email"
+                    android:paddingTop="@dimen/spacing_normal"
+                    android:text="@string/tally_about_send_email_content"
+                    android:textColor="@color/appTextColorSecondary"
+                    android:textSize="@dimen/app_text_size_medium"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyWeChatInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_micro">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tally_about_title_wechat"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="@dimen/app_text_size_normal"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/spacing_normal"
+                    android:text="@string/tally_about_wechat_content"
+                    android:textColor="@color/appTextColorSecondary"
+                    android:textSize="@dimen/app_text_size_medium"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_micro">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tally_about_title_source_code"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="@dimen/app_text_size_normal"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autoLink="web"
+                    android:paddingTop="@dimen/spacing_normal"
+                    android:text="@string/tally_about_source_code_content"
+                    android:textColor="@color/appTextColorSecondary"
+                    android:textSize="@dimen/app_text_size_medium"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <include
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"/>
+
+</FrameLayout>

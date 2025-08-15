@@ -1,0 +1,149 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    defaultConfig {
+        applicationId rootProject.applicationId
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode rootProject.appVersionCode
+        versionName rootProject.appVersionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary true
+        multiDexEnabled true
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+    }
+    packagingOptions {
+        pickFirst 'META-INF/okio.kotlin_module'
+    }
+
+    signingConfigs {
+        release {
+            keyAlias rootProject.keyAlias
+            keyPassword rootProject.keyPassword
+            storeFile file(rootProject.keyStore)
+            storePassword rootProject.storePassword
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'TALKING_DATA_APP_ID', "\"$rootProject.talkingDataId\""
+        }
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'TALKING_DATA_APP_ID', "\"$rootProject.talkingDataId\""
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        checkReleaseBuilds true
+        abortOnError false
+    }
+
+    flavorDimensions 'channel'
+
+    productFlavors {
+
+        qh360 {
+            dimension 'channel'
+        }
+        yingyongbao {
+            dimension 'channel'
+        }
+        xiaomi {
+            dimension 'channel'
+        }
+        huawei {
+            dimension 'channel'
+        }
+        official {
+            dimension 'channel'
+        }
+    }
+
+    // APK 文件名称格式 mine-version-channel.apk
+    applicationVariants.all { variant ->
+
+        // 渠道名称
+        def productFlavorNames = variant.productFlavors.collect { it.name }
+        if (productFlavorNames.isEmpty()) {
+            productFlavorNames = [""]
+        }
+        def productFlavorName = productFlavorNames.join('')
+        // 版本号
+        def versionName = variant.mergedFlavor.versionName
+
+        def fileName
+        variant.outputs.all {
+            if (variant.buildType.name.equals('release')) {
+                fileName = "mine-${productFlavorName}-${versionName}.apk"
+            } else if (variant.buildType.name.equals('debug')) {
+                fileName = "mine-${productFlavorNames}-${versionName}-debug.apk"
+            }
+            outputFileName = fileName
+        }
+    }
+}
+
+apply plugin: 'com.coderpage.app'
+
+uploader {
+    apiServer = 'http://app.coderpage.com'
+    token = rootProject.releaseToken
+    appName = '我的记账本'
+    changeLog = file("${rootDir}/source/changelog/${rootProject.appVersionName}").text;
+    isRelease = true
+}
+
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    api project(':libbase')
+    api project(':libupdate')
+    api rootProject.appCompat
+    api rootProject.recyclerview
+    api rootProject.design
+    api rootProject.percentLayout
+    api rootProject.cardView
+    api rootProject.materialCalendarview
+    api rootProject.mpAndroidChart
+    api rootProject.fastjson
+    api rootProject.retrofit
+    api rootProject.retrofitConverterFastjson
+    api rootProject.okhttp3InterceptorLogging
+    api rootProject.eventBus
+    api rootProject.archRoomRuntime
+    api rootProject.archLifecycleExtension
+    api rootProject.archViewmodel
+    api rootProject.archLiveData
+    api rootProject.archLifecycleRuntime
+    api rootProject.refreshLayout
+    api rootProject.constraintLayout
+    api rootProject.arounter
+
+    api rootProject.dashscopeSdk
+    api rootProject.multidex
+    api rootProject.archWork
+    compileOnly rootProject.lombok
+    annotationProcessor rootProject.lombok
+
+    annotationProcessor rootProject.archLifecycleCompiler
+    annotationProcessor rootProject.archRoomCompiler
+    annotationProcessor rootProject.arounterProcessor
+    testImplementation rootProject.junit
+}

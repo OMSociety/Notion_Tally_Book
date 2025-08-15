@@ -1,0 +1,236 @@
+<resources>
+    <!-- app name -->
+    <string name="app_name">我的记账本</string>
+    <string name="searchable_label">mine</string>
+    <string name="searchable_hint">搜索</string>
+
+    <string name="drag_2_order">拖拽排序</string>
+    <string name="complete">完成</string>
+    <string name="delete">删除</string>
+    <string name="modify">修改</string>
+    <string name="place_holder">--</string>
+    <string name="string_format_date_y_m" formatted="false">%d年%d月</string>
+
+    <string name="permission_request_failed_read_external_storage">请授予读取手机存储权限</string>
+    <string name="permission_request_failed_write_external_storage">请授予写入手机存储权限</string>
+
+    <string name="refresh_message_pull_2_refresh">下拉刷新</string>
+    <string name="refresh_message_release_2_refresh">释放刷新</string>
+    <string name="refresh_message_refreshing">正在刷新&#8230;</string>
+    <string name="refresh_message_push_2_load_more">上拉加载更多</string>
+    <string name="refresh_message_release_2_load_more">释放加载更多</string>
+    <string name="refresh_message_loading_more">正在加载&#8230;</string>
+
+    <string name="loading_layout_message_empty">数据为空，点我重试~</string>
+    <string name="loading_layout_message_error">额&#8230;出错了~</string>
+    <string name="loading_layout_button_positive_text_empty">再试一次</string>
+    <string name="loading_layout_button_positive_text_error">再试一次</string>
+
+    <string name="err_category_already_exist">该分类已存在</string>
+
+    <string name="date_format_y_m_d_hh_mm">yyyy年MM月dd日 HH:mm</string>
+    <string name="date_format_y_m_d">yyyy年MM月dd日</string>
+    <string name="date_format_m_d">MM月dd日</string>
+    <string name="date_format_y_m">yyyy年MM月</string>
+    <string name="date_format_y">yyyy年</string>
+    <string name="date_format_today">今天</string>
+    <string name="date_format_today_time">今天 HH:mm</string>
+    <string name="date_format_yesterday">昨天</string>
+    <string name="date_format_date_format_yesterday_time">昨天 HH:mm</string>
+
+    <!-- Menu item open About Activity -->
+    <string name="menu_tall_about">关于</string>
+    <string name="menu_tally_records">账单记录</string>
+    <string name="menu_tally_setting">设置</string>
+    <string name="menu_tally_chart">账单详情</string>
+    <string name="menu_tally_search">搜索</string>
+    <string name="menu_tally_date_range_select">选择日期</string>
+    <string name="menu_tally_sort_category">排序</string>
+    <string name="menu_tally_debug">DEBUG</string>
+    <string name="menu_tally_manager">管理</string>
+
+    <!--  toolbar title of tally main activity -->
+    <string name="tally_toolbar_title_main">@string/app_name</string>
+    <string name="tally_toolbar_title_about">关于</string>
+    <string name="tally_toolbar_title_chart">账单详情</string>
+    <string name="tally_toolbar_title_records">账单记录</string>
+    <string name="tally_toolbar_title_setting">设置</string>
+    <string name="tally_toolbar_title_detail">详情</string>
+    <string name="tally_toolbar_title_debug">DEBUG</string>
+    <string name="tally_toolbar_title_backup_file">备份文件</string>
+    <string name="tally_toolbar_title_backup_file_manager">备份文件管理</string>
+
+    <!-- tally home activity -->
+    <string name="tally_module_home_non_expense_place_holder">暂无支出</string>
+    <string name="tally_module_home_non_income_place_holder">暂无收入</string>
+    <string name="tally_module_home_budget_label">预算剩余</string>
+    <string name="tally_module_home_non_budget_place_holder">未设置预算</string>
+    <string name="tally_module_home_recent3day_tip">今日支出 %s&#160;&#160;&#160;收入 %s</string>
+    <string name="tally_module_home_check_chart">查看图表分析</string>
+
+    <!-- tally chart activity -->
+
+    <string name="tally_month_info_format" formatted="false">%s年%s月</string>
+    <string name="tally_day_info_format" formatted="false">%s年%s月%s日</string>
+    <string name="tally_income_and_expense_format" formatted="false">收入 %s, 支出 %s</string>
+    <string name="tally_checkbox_expense">支出</string>
+    <string name="tally_checkbox_income">收入</string>
+    <string name="tally_switch_to_daily_chart">切换日账单</string>
+    <string name="tally_switch_to_yearly_chart">切换年账单</string>
+    <string name="tally_month_format">%d月</string>
+    <string name="tally_chart_empty_tip">暂无数据&#8230;</string>
+    <string name="tally_bill_of_year_format" formatted="false">%s年账单</string>
+    <string name="tally_bill_of_month_format" formatted="false">%s年%s月账单</string>
+    <string name="tally_expense_data_format" formatted="false">共%s笔支出，%s</string>
+    <string name="tally_income_data_format" formatted="false">共%s笔收入，%s</string>
+
+    <!-- setting activity -->
+    <string name="backup_time">备份时间</string>
+    <string name="backup_device">备份设备</string>
+    <string name="backup_count">备份条数</string>
+    <string name="backup_version">备份版本</string>
+    <string name="backup_file_size">文件大小</string>
+
+    <string name="tally_setting_btn_data_export">导出数据</string>
+    <string name="tally_setting_btn_data_export_tip">将账单数据备份到手机SD卡中，用于数据迁移</string>
+    <string name="tally_setting_btn_data_import">导入数据</string>
+    <string name="tally_setting_btn_data_import_tip">从手机SD卡中读取备份的账单数据</string>
+
+
+
+    <string name="tally_setting_ai_title">AI识别</string>
+    <string name="tally_setting_ai_key">key</string>
+    <string name="tally_setting_ai_key_hint">请输入API密钥</string>
+    <string name="tally_setting_ai_description">使用阿里云百炼ai的密钥还有模型名称</string>
+    <string name="tally_setting_ai_model">model</string>
+    <string name="tally_setting_ai_model_name">请输入模型名称</string>
+
+    <string name="tally_alert_backup">备份数据</string>
+    <string name="tally_backup_status_enabled">已开启</string>
+    <string name="tally_backup_status_disabled">已关闭</string>
+    <string name="tally_alert_restore_data">恢复数据</string>
+    <string name="tally_alert_check_data_format">校验数据</string>
+    <string name="tally_alert_reading_db_data">读取数据&#8230;</string>
+    <string name="tally_alert_write_data_2_file">写入数据到文件&#8230;</string>
+    <string name="tally_alert_reading_backup_file">读取备份文件&#8230;</string>
+    <string name="tally_alert_backup_success">备份成功!</string>
+    <string name="tally_alert_backup_failure">备份失败!</string>
+    <string name="tally_alert_restore_data_success">数据恢复成功</string>
+    <string name="tally_alert_restore_data_failure">数据恢复失败</string>
+    <string name="tally_alert_read_data_success">读取数据成功</string>
+    <string name="tally_alert_read_data_failure">读取数据失败</string>
+    <string name="tally_toast_illegal_path">非法路径</string>
+
+    <!--消费记录详情-->
+    <string name="tally_time">时间</string>
+
+    <string name="edit_category">编辑分类</string>
+    <string name="add_category">添加分类</string>
+    <string name="expense_category">支出</string>
+    <string name="income_category">收入</string>
+    <string name="save">保存</string>
+    <string name="setting">设置</string>
+    <string name="hour">时</string>
+    <string name="minute">分</string>
+    <string name="dialog_data_pick_time_input_label">请输入时间（24小时制）</string>
+
+    <!-- toast msg -->
+
+    <!-- dialog -->
+    <string name="dialog_btn_cancel">取消</string>
+    <string name="dialog_btn_choose_local_file">选择本地文件</string>
+    <string name="dialog_btn_delete">删除</string>
+    <string name="dialog_title_delete_confirm">确定删除？</string>
+    <string name="dialog_budget_set_title">设置预算</string>
+    <string name="dialog_budget_edit_hint">输入本月预算</string>
+    <string name="dialog_budget_error_illegal_input">预算金额必须大于0</string>
+
+    <!-- toolbar title of tall expense record add activity -->
+    <string name="tally_add_record">记一笔&#8230;</string>
+    <string name="tally_calendar_title_format" formatted="false">%d年%d月</string>
+    <string name="tally_expense_note">备注</string>
+    <string name="tally_add_record_note">添加备注</string>
+    <string name="tally_check_month_expense">查看月账单</string>
+    <string name="tally_current_month_expense_amount">本月支出</string>
+    <string name="tally_current_month_income_amount">本月收入</string>
+
+    <!-- record edit activity -->
+    <string name="tally_edit_title_expense">支出</string>
+    <string name="tally_edit_title_income">收入</string>
+    <string name="tally_edit_category_name_hint">请输入分类名称</string>
+
+    <!-- search activity -->
+    <string name="tally_clear_search_history">清除所有</string>
+    <string name="tally_search_et_hint">搜索消费记录</string>
+
+    <!-- about activity -->
+    <string name="tally_about_title_app_info">应用信息</string>
+    <string name="tally_about_title_version">版本</string>
+    <string name="tally_about_check_new_version">检查更新</string>
+    <string name="tally_about_find_new_version" formatted="false">新版本 %s(%d)</string>
+    <string name="tally_about_title_about_app">关于应用</string>
+    <string name="tally_about_about_app_content">这个版本是开源的项目Mine0.6.2版本修改而来，由于是web程序员非安卓开发者，水平有限只能这样了。由于每次使用的时候都要输入太多东西，所以我增加了ai相关的能力，只需要截图分享到这个记事本就可以自动帮你记录。</string>
+    <string name="tally_about_title_developer_info">开发者</string>
+    <string name="tally_about_title_about_me">关于我</string>
+    <string name="tally_about_about_me_content">web 程序员</string>
+    <string name="tally_about_title_send_email">发送邮件</string>
+    <string name="tally_about_send_email_content">原作者个人邮箱 codenobug@163.com。</string>
+    <string name="tally_about_title_wechat">微信公众号</string>
+    <string name="tally_about_wechat_content">微信公众号：MINE应用；可以通过公众号反馈意见或者BUG</string>
+    <string name="tally_about_wechat_copied">微信公众号已复制</string>
+    <string name="tally_about_title_source_code">源代码</string>
+    <string name="tally_about_source_code_content">原作者代码已托管在 GitHub(https://github.com/coderpage/Mine)。我的代码在Gitee(https://gitee.com/rocks-by-the-lake/mine)</string>
+
+    <string name="tyOther">其他</string>
+    <string name="tyFoodAndBeverage">餐饮</string>
+    <string name="tyTraffic">交通</string>
+    <string name="tyShopping">购物</string>
+    <string name="tyClothes">服饰</string>
+    <string name="tyDailyNecessities">日用品</string>
+    <string name="tyEntertainment">娱乐</string>
+    <string name="tyFoodIngredients">食材</string>
+    <string name="tySnacks">零食</string>
+    <string name="tyTobaccoAnTea">烟酒茶</string>
+    <string name="tyStudy">学习</string>
+    <string name="tyMedical">医疗</string>
+    <string name="tyHouse">住房</string>
+    <string name="tyWaterElectricityCoal">水电煤</string>
+    <string name="tyCommunication">通讯</string>
+    <string name="tyTheFavorPattern">人情往来</string>
+
+    <string name="tyIncomeSalary">薪资</string>
+    <string name="tyIncomeReward">奖金</string>
+    <string name="tyIncomeLend">借入</string>
+    <string name="tyIncomeDun">收债</string>
+    <string name="tyIncomeInterest">利息收入</string>
+    <string name="tyIncomeInvestRecovery">投资回收</string>
+    <string name="tyIncomeInvestProfit">投资收益</string>
+    <string name="tyIncomeUnexpected">意外所得</string>
+
+    <string name="cancel">取消</string>
+    <string name="confirm">确定</string>
+
+    <string name="num_0">0</string>
+    <string name="num_1">1</string>
+    <string name="num_2">2</string>
+    <string name="num_3">3</string>
+    <string name="num_4">4</string>
+    <string name="num_5">5</string>
+    <string name="num_6">6</string>
+    <string name="num_7">7</string>
+    <string name="num_8">8</string>
+    <string name="num_9">9</string>
+    <string name="num_clean_to_0">清零</string>
+    <string name="symbol_dot">.</string>
+    <string name="ok">确定</string>
+
+    <string name="permission_req_title_format">%s需要以下权限才能正常使用</string>
+    <string name="permission_req_go_open">去开启</string>
+    <string name="permission_req_open">开启</string>
+
+    <string name="permission_storage">存储权限</string>
+    <string name="permission_storage_desc">导出数据到磁盘或从磁盘中导入数据</string>
+    <string name="permission_phone">手机/电话权限</string>
+    <string name="permission_phone_desc">统计应用崩溃信息</string>
+
+</resources>

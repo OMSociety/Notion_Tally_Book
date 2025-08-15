@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout>
+
+    <data class=".tally.module.home.TodayExpenseItemBinding">
+
+        <import type="com.coderpage.mine.app.tally.common.utils.TallyUtils" />
+
+        <import type="com.coderpage.mine.common.Font" />
+
+        <variable
+            name="activity"
+            type="android.app.Activity" />
+
+        <variable
+            name="vm"
+            type="com.coderpage.mine.app.tally.module.home.HomeViewModel" />
+
+        <variable
+            name="data"
+            type="com.coderpage.mine.app.tally.module.home.model.HomeTodayDayRecordsModel" />
+
+    </data>
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/recycler_item_divider">
+
+        <TextView
+            textTypeFace="@{Font.QUICKSAND_BOLD}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_normal"
+            android:gravity="start|center"
+            android:paddingTop="@dimen/padding_normal"
+            android:paddingBottom="@dimen/padding_micro"
+            android:text="@{@string/tally_module_home_recent3day_tip(data.displayExpenseAmount, data.displayIncomeAmount)}"
+            android:textColor="@color/appTextColorPrimary"
+            android:textSize="@dimen/app_text_size_medium"
+            tools:text="@string/tally_module_home_recent3day_tip" />
+
+    </FrameLayout>
+</layout>
