@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.android.arouter.BuildConfig;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.coderpage.lib.update.ApkModel;
 import com.coderpage.lib.update.Updater;
@@ -18,6 +17,7 @@ import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.router.TallyRouter;
 import com.coderpage.mine.app.tally.update.UpdateUtils;
 import com.coderpage.mine.ui.BaseActivity;
+import com.coderpage.mine.BuildConfig;
 
 import java.util.Locale;
 
