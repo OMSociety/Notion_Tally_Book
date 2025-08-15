@@ -169,18 +169,20 @@
     <string name="tally_about_check_new_version">检查更新</string>
     <string name="tally_about_find_new_version" formatted="false">新版本 %s(%d)</string>
     <string name="tally_about_title_about_app">关于应用</string>
-    <string name="tally_about_about_app_content">这个版本是开源的项目Mine0.6.2版本修改而来，由于是web程序员非安卓开发者，水平有限只能这样了。由于每次使用的时候都要输入太多东西，所以我增加了ai相关的能力，只需要截图分享到这个记事本就可以自动帮你记录。</string>
+    <string name="tally_about_about_app_content">一个记账本应用, 简单干净.</string>
     <string name="tally_about_title_developer_info">开发者</string>
     <string name="tally_about_title_about_me">关于我</string>
     <string name="tally_about_about_me_content">web 程序员</string>
     <string name="tally_about_title_send_email">发送邮件</string>
-    <string name="tally_about_send_email_content">原作者个人邮箱 codenobug@163.com。</string>
+    <string name="tally_about_send_email_content">个人邮箱 154929237@qq.com</string>
     <string name="tally_about_title_wechat">微信公众号</string>
-    <string name="tally_about_wechat_content">微信公众号：MINE应用；可以通过公众号反馈意见或者BUG</string>
+    <string name="tally_about_wechat_content">微信公众号：没有! 没有你写它干嘛呢?</string>
     <string name="tally_about_wechat_copied">微信公众号已复制</string>
     <string name="tally_about_title_source_code">源代码</string>
-    <string name="tally_about_source_code_content">原作者代码已托管在 GitHub(https://github.com/coderpage/Mine)。我的代码在Gitee(https://gitee.com/rocks-by-the-lake/mine)</string>
-
+    <string name="tally_about_source_code_content">
+        原作者代码已托管在 GitHub(https://github.com/coderpage/Mine)
+        我的代码在 Gitee(https://gitee.com/rocks-by-the-lake/mine)
+    </string>
     <string name="tyOther">其他</string>
     <string name="tyFoodAndBeverage">餐饮</string>
     <string name="tyTraffic">交通</string>
