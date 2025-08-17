@@ -17,7 +17,7 @@ import java.util.List;
 
 class RecordCategoryPageAdapter extends PagerAdapter {
 
-    private final int PAGE_ITEM_COUNT = 10;
+    private final int PAGE_ITEM_COUNT = 35;
 
     private List<Category> mCategoryList = new ArrayList<>();
     private List<RecordCategoryPage> mPageList = new ArrayList<>();
