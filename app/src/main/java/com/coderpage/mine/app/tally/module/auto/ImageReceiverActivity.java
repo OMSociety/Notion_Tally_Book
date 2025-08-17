@@ -2,11 +2,16 @@ package com.coderpage.mine.app.tally.module.auto;
 
 import static java.lang.Math.abs;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
@@ -19,11 +24,13 @@ import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationR
 import com.alibaba.dashscope.common.MultiModalMessage;
 import com.alibaba.dashscope.common.Role;
 import com.alibaba.fastjson.JSONObject;
+import com.coderpage.base.utils.UIUtils;
 import com.coderpage.mine.MineApp;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.RecordType;
 import com.coderpage.mine.app.tally.eventbus.EventRecordAdd;
 import com.coderpage.mine.app.tally.module.edit.record.RecordRepository;
+import com.coderpage.mine.app.tally.module.home.HomeActivity;
 import com.coderpage.mine.app.tally.module.setting.SettingWorkerConst;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
 import com.coderpage.mine.app.tally.persistence.model.Record;
@@ -75,6 +82,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
 
 
     private void processAndPrintImage(Uri imageUri) throws Exception {
+        Context context = MineApp.getAppContext();
         // 在这里实现您的"打印"逻辑
         // 可能是保存到记事本、显示在应用中等操作
         String base64Image = uriToBase64(imageUri);
@@ -129,11 +137,9 @@ public class ImageReceiverActivity extends AppCompatActivity {
 
             } catch (Exception e) {
                 Log.e(TAG, "ai请求失败", e);
-                runOnUiThread(() -> {
-                    // 显示错误提示
-                    android.widget.Toast.makeText(this, "ai请求失败: " + e.getMessage(),
-                            android.widget.Toast.LENGTH_LONG).show();
-                });
+                String title = "AI自动记账失败";
+                String content = "错误" + e.getMessage();
+                sendNotification(context, title, content);
             } finally {
                 runOnUiThread(() -> finish());
             }
@@ -294,10 +300,65 @@ public class ImageReceiverActivity extends AppCompatActivity {
                 record.setId(result.data());
                 EventBus.getDefault().post(new EventRecordAdd(record));
                 Log.d(TAG, "记录保存成功: " + record.getId());
+
+                runOnUiThread(() -> {
+                    // 提示
+                    android.widget.Toast.makeText(this, "AI自动记账成功: " + Math.abs(amount.getMoney()) + "元",
+                            android.widget.Toast.LENGTH_LONG).show();
+                });
+
+//                String title = "AI自动记账成功";
+//                String content = (type == RecordType.EXPENSE ? "支出" : "收入") +
+//                        Math.abs(amount.getMoney()) + "元";
+//                sendNotification(context, title, content);
             } else {
                 Log.e(TAG, "记录保存失败: " + result.error());
             }
         });
+    }
+
+    /**
+     * 发送通知到通知中心
+     *
+     * @param context 上下文
+     * @param title 标题
+     * @param content 内容
+     */
+    private void sendNotification(Context context,String title,String content) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // 创建通知渠道 (Android 8.0+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "ai_record_channel",
+                    "AI记账通知",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setDescription("AI自动记账通知");
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // 创建点击通知后打开的意图
+        Intent intent = new Intent(context, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        // 构建通知
+        Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder = new Notification.Builder(context, "ai_record_channel");
+        } else {
+            builder = new Notification.Builder(context);
+        }
+
+        builder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
+        // 发送通知
+        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
     }
 
     /**

@@ -3,18 +3,25 @@ package com.coderpage.mine.app.tally.module.auto;
 
 import static java.lang.Math.abs;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import com.coderpage.base.utils.UIUtils;
 import com.coderpage.mine.MineApp;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.RecordType;
 import com.coderpage.mine.app.tally.eventbus.EventRecordAdd;
 import com.coderpage.mine.app.tally.module.edit.record.RecordRepository;
+import com.coderpage.mine.app.tally.module.home.HomeActivity;
 import com.coderpage.mine.app.tally.module.setting.SettingWorkerConst;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
 import com.coderpage.mine.app.tally.persistence.model.Record;
@@ -276,9 +283,65 @@ public class SmsReceiver extends BroadcastReceiver {
                 record.setId(result.data());
                 EventBus.getDefault().post(new EventRecordAdd(record));
                 Log.d(TAG, "记录保存成功: " + record.getId());
+                // 添加成功提示
+                UIUtils.showToastShort(context, "短信记账成功: " +
+                        (type == RecordType.EXPENSE ? "支出" : "收入") +
+                        Math.abs(amount.getMoney()) + "元");
+
+                // 发送通知到通知中心
+                sendNotification(context, type, amount);
             } else {
                 Log.e(TAG, "记录保存失败: " + result.error());
             }
         });
+    }
+
+    /**
+     * 发送通知到通知中心
+     *
+     * @param context 上下文
+     * @param type 记录类型
+     * @param amount 金额信息
+     */
+    private void sendNotification(Context context, RecordType type, AiIdentifyAmount amount) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // 创建通知渠道 (Android 8.0+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "sms_record_channel",
+                    "短信记账通知",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setDescription("短信自动记账通知");
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // 构建通知内容
+        String title = "短信自动记账成功";
+        String content = (type == RecordType.EXPENSE ? "支出" : "收入") +
+                Math.abs(amount.getMoney()) + "元";
+
+        // 创建点击通知后打开的意图
+        Intent intent = new Intent(context, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        // 构建通知
+        Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder = new Notification.Builder(context, "sms_record_channel");
+        } else {
+            builder = new Notification.Builder(context);
+        }
+
+        builder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
+        // 发送通知
+        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
     }
 }
