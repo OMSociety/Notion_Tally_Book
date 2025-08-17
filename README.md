@@ -2,7 +2,6 @@
 - 自己写的一个记账本应用, 简单干净.
 - 应用中使用的图标来自 [iconfont](http://iconfont.cn/) 和 [material-design-icons](https://github.com/google/material-design-icons)
 - 原作者微信公众号 搜索:MINE应用
-- 项目演示: https://yangxu-blog.oss-cn-hangzhou.aliyuncs.com/test/video_aiamount_of_money.mp4
 
 ## 碎碎念
 - 我其实非常喜欢这个项目,用了大概有2年时间. 期间没有遇到问题, 但是觉得打开输入金额, 标签, 真的太麻烦了. 我想要让他简单记录,
@@ -22,7 +21,7 @@
  增加清空全部记录
  增加自动备份功能
 
-## 链接
+## 链接, 项目演示
 - 我的博客简单介绍了项目  [阿旭的时光瓶](http://xtimebottle.top/)
 - 原作者代码已托管在 GitHub(https://github.com/coderpage/Mine)
 - 我的代码在Gitee(https://gitee.com/rocks-by-the-lake/mine)
