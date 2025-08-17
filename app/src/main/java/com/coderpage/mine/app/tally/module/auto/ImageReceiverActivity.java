@@ -4,6 +4,8 @@ import static java.lang.Math.abs;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -82,8 +84,15 @@ public class ImageReceiverActivity extends AppCompatActivity {
         MultiModalMessage userMessage = MultiModalMessage.builder().role(Role.USER.getValue())
                 .content(Arrays.asList(
                         Collections.singletonMap("image", imageData),
-                        Collections.singletonMap("text", "快速识别图片中的账单信息，不要深度分析。回答三个问题: 1.是否涉及支付或收入? 2.是支出还是收入? 3.金额是多少?"),
-                        Collections.singletonMap("text", "严格按照json格式输出,不需要额外表述: bill[true,false], expenseOrIncome[expense,income,other], money[数值]")
+//                        Collections.singletonMap("text", "快速识别图片中的账单信息，不要深度分析。回答三个问题: 1.是否涉及支付或收入? 2.是支出还是收入? 3.金额是多少?"),
+//                        Collections.singletonMap("text", "回答示例: {\"bill\":true,\"expenseOrIncome\":\"expense\",\"money\":23}"),
+//                        Collections.singletonMap("text", "严格按照json格式输出,不需要额外表述: bill[true,false], expenseOrIncome[expense,income,other], money[数值]")
+                        Collections.singletonMap("text", "回答三个问题: 1.是否涉及支付或收入? 2.是支出还是收入? 3.金额是多少?"),
+                        Collections.singletonMap("text", "严格按照以下JSON格式输出，不要包含任何额外文字:\n" +
+                                "{\"bill\":true/false,\"expenseOrIncome\":\"expense/income/other\",\"money\":数值}\n" +
+                                "示例: {\"bill\":true,\"expenseOrIncome\":\"expense\",\"money\":23.5}"),
+                        Collections.singletonMap("text", "重要: 只返回JSON，不要添加任何解释或额外文本")
+
                 )).build();
 
         // 从设置中获取 API Key 和模型名称
@@ -135,9 +144,30 @@ public class ImageReceiverActivity extends AppCompatActivity {
     private String uriToBase64(Uri uri) {
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
-            byte[] bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
+
+            // 首先解码图片尺寸，不加载到内存中
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(inputStream, null, options);
+
+            // 重置输入流
             inputStream.close();
+            inputStream = getContentResolver().openInputStream(uri);
+
+            // 设置缩放比例为2（缩小一半）
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = 2;
+
+            // 解码图片并缩放
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+            inputStream.close();
+
+            // 将Bitmap转换为Base64
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            byte[] bytes = baos.toByteArray();
+            bitmap.recycle();
+
             return Base64.encodeToString(bytes, Base64.NO_WRAP);
         } catch (Exception e) {
             Log.e(TAG, "图片转换Base64失败", e);
@@ -174,9 +204,9 @@ public class ImageReceiverActivity extends AppCompatActivity {
             Matcher matcher1 = pattern1.matcher(DataString);
             if (matcher1.find()) {
                 Boolean booleanValue = Boolean.valueOf(matcher.group());
-                if (booleanValue == false){
+                if (booleanValue == false) {
                     return getZeroAmount();
-                }else {
+                } else {
                     aiIdentifyAmount.setBill(true);
                 }
             }
@@ -184,9 +214,9 @@ public class ImageReceiverActivity extends AppCompatActivity {
             Matcher matcher2 = pattern2.matcher(DataString);
             if (matcher2.find()) {
                 String expenseOrIncome = matcher.group();
-                if (expenseOrIncome.equals("other")){
+                if (expenseOrIncome.equals("other")) {
                     return getZeroAmount();
-                }else {
+                } else {
                     aiIdentifyAmount.setExpenseOrIncome(expenseOrIncome);
                 }
             }
@@ -215,11 +245,11 @@ public class ImageReceiverActivity extends AppCompatActivity {
     private void saveRecordDirectly(AiIdentifyAmount amount) {
         Context context = MineApp.getAppContext();
         //如果不是账单，则返回
-        if (amount.getBill() == false)return;
+        if (amount.getBill() == false) return;
 
         //如果识别不出来是支出或者是收入, 不记录
         String expenseOrIncome = amount.getExpenseOrIncome();
-        if (expenseOrIncome.equals("other"))return;
+        if (expenseOrIncome.equals("other")) return;
 
         //确定分类
         RecordType type = "expense".equals(expenseOrIncome) ? RecordType.EXPENSE : RecordType.INCOME;
@@ -231,7 +261,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
                     defaultCategory = categoryModel;
                 }
             }
-        }else if (type == RecordType.INCOME) {
+        } else if (type == RecordType.INCOME) {
             List<CategoryModel> categoryList = mDataBase.categoryDao().allIncomeCategory();
             for (CategoryModel categoryModel : categoryList) {
                 if (categoryModel.getName().equals(context.getString(R.string.tyOther))) {
@@ -272,6 +302,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
 
     /**
      * 从数据库获取 API Key
+     *
      * @return API Key 字符串
      */
     private String getApiKeyFromSettings() {
@@ -293,6 +324,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
 
     /**
      * 从数据库获取 AI 模型名称
+     *
      * @return 模型名称字符串
      */
     private String getAiModelFromSettings() {
