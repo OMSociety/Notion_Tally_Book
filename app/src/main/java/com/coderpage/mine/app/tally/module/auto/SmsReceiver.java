@@ -131,11 +131,11 @@ public class SmsReceiver extends BroadcastReceiver {
      */
     private AiIdentifyAmount extractAmount(String messageBody) {
         //删除关键词
-        List<String> delKeywords = Arrays.asList("支付机构");
+        List<String> delKeywords = Arrays.asList("支付机构","快捷支付协议","支付协议");
         //收入类
         List<String> incomeKeywords = Arrays.asList("工资", "奖金", "薪资", "汇入", "转入", "到账", "收入", "进账", "收益", "利息", "返现", "退款", "补贴", "存入", "收款", "余额增加");
         //支出类
-        List<String> expenseKeywords = Arrays.asList("消费", "支出", "支付", "付款", "扣款", "刷卡消费", "取现", "转账", "转出", "汇出", "提现", "手续费", "年费", "管理费", "利息支出", "扣账", "余额减少", "支出");
+        List<String> expenseKeywords = Arrays.asList("消费", "支出", "支付", "付款", "扣款", "刷卡消费", "取现", "转账", "转出", "汇出", "提现", "手续费", "年费", "管理费", "利息支出", "扣账", "余额减少", "支出", "还款");
 
         //创建返回值
         AiIdentifyAmount amount = new AiIdentifyAmount(false, "other", 0);
