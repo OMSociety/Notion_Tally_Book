@@ -301,15 +301,15 @@ public class ImageReceiverActivity extends AppCompatActivity {
                 EventBus.getDefault().post(new EventRecordAdd(record));
                 Log.d(TAG, "记录保存成功: " + record.getId());
 
+                String title = "AI自动记账成功:";
+                String content = (type == RecordType.EXPENSE ? "支出" : "收入") +
+                        Math.abs(amount.getMoney()) + "元";
                 runOnUiThread(() -> {
                     // 提示
-                    android.widget.Toast.makeText(this, "AI自动记账成功: " + Math.abs(amount.getMoney()) + "元",
+                    android.widget.Toast.makeText(this, title + content,
                             android.widget.Toast.LENGTH_LONG).show();
                 });
 
-//                String title = "AI自动记账成功";
-//                String content = (type == RecordType.EXPENSE ? "支出" : "收入") +
-//                        Math.abs(amount.getMoney()) + "元";
 //                sendNotification(context, title, content);
             } else {
                 Log.e(TAG, "记录保存失败: " + result.error());

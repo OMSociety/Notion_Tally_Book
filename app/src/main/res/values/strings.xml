@@ -169,14 +169,14 @@
     <string name="tally_about_check_new_version">检查更新</string>
     <string name="tally_about_find_new_version" formatted="false">新版本 %s(%d)</string>
     <string name="tally_about_title_about_app">关于应用</string>
-    <string name="tally_about_about_app_content">一个记账本应用, 简单干净.</string>
+    <string name="tally_about_about_app_content">一个记账本应用, 简单干净. 用开源软件接着开发的, 增加了一些我想要的功能.</string>
     <string name="tally_about_title_developer_info">开发者</string>
     <string name="tally_about_title_about_me">关于我</string>
-    <string name="tally_about_about_me_content">web 程序员</string>
+    <string name="tally_about_about_me_content">web程序员</string>
     <string name="tally_about_title_send_email">发送邮件</string>
     <string name="tally_about_send_email_content">个人邮箱 154929237@qq.com</string>
     <string name="tally_about_title_wechat">微信公众号</string>
-    <string name="tally_about_wechat_content">微信公众号：没有! 没有你写它干嘛呢?</string>
+    <string name="tally_about_wechat_content">微信公众号：没有! 没有你写它干嘛呢? (´・ω・`)</string>
     <string name="tally_about_wechat_copied">微信公众号已复制</string>
     <string name="tally_about_title_source_code">源代码</string>
     <string name="tally_about_source_code_content">
