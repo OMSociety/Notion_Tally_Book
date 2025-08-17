@@ -156,7 +156,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
 
             // 设置缩放比例为2（缩小一半）
             options.inJustDecodeBounds = false;
-            options.inSampleSize = 2;
+            options.inSampleSize = 3;
 
             // 解码图片并缩放
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
