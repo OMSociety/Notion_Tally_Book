@@ -113,11 +113,22 @@ public class RecordsViewModel extends BaseViewModel implements LifecycleObserver
         return mRecordList;
     }
 
+    public RecordQuery getCurrentQuery() {
+        return mQuery;
+    }
+
     /** 设置查询条件，并重新加载数据 */
     void setQuery(RecordQuery query) {
         if (query == null) {
             return;
         }
+        // 在应用新查询条件前，清空当前显示的数据列表
+        // 这样可以确保旧数据不会继续显示在页面上
+        if (mRecordList.getValue() != null) {
+            mRecordList.getValue().clear();
+            mRecordList.postValue(mRecordList.getValue());
+        }
+
         mQuery = query;
         boolean refreshUseLoadMode = mRecordList.getValue() == null || mRecordList.getValue().isEmpty();
         if (refreshUseLoadMode) {
