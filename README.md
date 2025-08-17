@@ -24,7 +24,7 @@
 - - 增加自动备份功能
 
 ## 链接, 项目演示
-- 我的博客简单介绍了项目  [阿旭的时光瓶](http://xtimebottle.top/)
+- 我的博客简单介绍了项目  [阿旭的时光瓶](http://myblog.love/articles/101)
 - 原作者代码已托管在 GitHub(https://github.com/coderpage/Mine)
 - 我的代码在Gitee(https://gitee.com/rocks-by-the-lake/mine)
 
