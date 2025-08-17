@@ -1,36 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data class=".module.records.RecordsActivityBinding" />
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background"
-        android:fitsSystemWindows="true"
-        android:orientation="vertical">
+        android:fitsSystemWindows="true">
 
-        <include layout="@layout/toolbar" />
-
-        <com.coderpage.base.widget.LoadingLayout
-            android:id="@+id/loadingLayout"
+        <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/background"
+            android:orientation="vertical">
 
-            <com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
-                android:id="@+id/refreshLayout"
+            <include layout="@layout/toolbar" />
+
+            <com.coderpage.base.widget.LoadingLayout
+                android:id="@+id/loadingLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerView"
+                <com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
+                    android:id="@+id/refreshLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>
+                    android:layout_height="match_parent">
 
-        </com.coderpage.base.widget.LoadingLayout>
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>
 
+            </com.coderpage.base.widget.LoadingLayout>
 
-    </LinearLayout>
+        </LinearLayout>
+
+        <!-- 清除日期按钮 -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabClearDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="86dp"
+            android:src="@drawable/ic_trash_white"
+            app:fabSize="normal"
+            android:visibility="gone" />
+        <!-- 日期选择按钮 -->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabCalendar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_date_range_white"
+            app:fabSize="normal" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </layout>
