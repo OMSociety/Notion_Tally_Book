@@ -6,6 +6,7 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.work.ExistingPeriodicWorkPolicy;
@@ -24,14 +26,19 @@ import com.coderpage.base.common.IError;
 import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.utils.FileUtils;
 import com.coderpage.base.utils.ResUtils;
+import com.coderpage.concurrency.AsyncTaskExecutor;
 import com.coderpage.framework.BaseViewModel;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.permission.PermissionReqHandler;
+import com.coderpage.mine.app.tally.utils.DatePickUtils;
 import com.tendcloud.tenddata.TCAgent;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -402,6 +409,140 @@ public class BackupFileViewModel extends BaseViewModel {
             }
         });
     }
+
+    //导出文件
+    /** 导出为CSV或Excel点击 */
+    public void onExportToCsvOrExcelClick(Activity activity) {
+        showExportDataDialog(activity);
+    }
+
+    /**
+     * 显示导出数据对话框
+     * @param activity Activity上下文
+     */
+    private void showExportDataDialog(Activity activity) {
+        // 加载自定义布局
+        View view = activity.getLayoutInflater().inflate(R.layout.dialog_tally_export_data, null);
+
+        TextView tvStartDate = view.findViewById(R.id.tvStartDate);
+        TextView tvEndDate = view.findViewById(R.id.tvEndDate);
+        RadioGroup rgFormat = view.findViewById(R.id.rgFormat);
+
+        // 设置默认日期（最近30天）
+        Calendar calendar = Calendar.getInstance();
+        long endDate = calendar.getTimeInMillis();
+        calendar.add(Calendar.MONTH, -1);
+        long startDate = calendar.getTimeInMillis();
+
+        // 格式化日期
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        tvStartDate.setText(sdf.format(new Date(startDate)));
+        tvEndDate.setText(sdf.format(new Date(endDate)));
+        tvStartDate.setTag(startDate);
+        tvEndDate.setTag(endDate);
+
+        // 设置日期选择监听器
+        tvStartDate.setOnClickListener(v -> {
+            DatePickUtils.showDatePickDialog(activity, (Long) v.getTag(), new DatePickUtils.OnDatePickListener() {
+                @Override
+                public void onDatePick(DialogInterface dialog, int year, int month, int dayOfMonth) {
+                    Calendar selectedDate = Calendar.getInstance();
+                    selectedDate.set(year, month, dayOfMonth);
+                    tvStartDate.setTag(selectedDate.getTimeInMillis());
+                    tvStartDate.setText(sdf.format(selectedDate.getTime()));
+                }
+            });
+        });
+
+        tvEndDate.setOnClickListener(v -> {
+            DatePickUtils.showDatePickDialog(activity, (Long) v.getTag(), new DatePickUtils.OnDatePickListener() {
+                @Override
+                public void onDatePick(DialogInterface dialog, int year, int month, int dayOfMonth) {
+                    Calendar selectedDate = Calendar.getInstance();
+                    selectedDate.set(year, month, dayOfMonth);
+                    tvEndDate.setTag(selectedDate.getTimeInMillis());
+                    tvEndDate.setText(sdf.format(selectedDate.getTime()));
+                }
+            });
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("导出数据")
+                .setView(view)
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                    // 获取用户选择的参数
+                    long selectedStartDate = (Long) tvStartDate.getTag();
+                    long selectedEndDate = (Long) tvEndDate.getTag();
+                    int selectedFormat = rgFormat.getCheckedRadioButtonId();
+
+                    // 执行导出操作
+                    exportData(activity, selectedStartDate, selectedEndDate, selectedFormat);
+                    dialog.dismiss();
+                });
+        builder.create().show();
+    }
+
+    /**
+     * 导出数据
+     * @param activity Activity上下文
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @param formatId 格式ID（CSV或Excel）
+     */
+    private void exportData(Activity activity, long startDate, long endDate, int formatId) {
+        // 检查存储权限
+        String[] permissionArray = new String[]{
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+        if (mPermissionReqHandler == null) {
+            mPermissionReqHandler = new PermissionReqHandler(activity);
+        }
+        mPermissionReqHandler.requestPermission(false, permissionArray, new PermissionReqHandler.Listener() {
+            @Override
+            public void onGranted(boolean grantedAll, String[] permissionArray) {
+                // 执行实际的导出操作
+                performExport(startDate, endDate, formatId);
+            }
+
+            @Override
+            public void onDenied(String[] permissionArray) {
+                showToastShort(R.string.permission_request_failed_write_external_storage);
+            }
+        });
+    }
+
+    /**
+     * 执行实际的数据导出操作
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @param formatId 格式ID
+     */
+    private void performExport(long startDate, long endDate, int formatId) {
+        // 这里是实际的导出逻辑
+        // 目前只是显示一个提示信息
+        mProcessMessage.postValue("正在导出数据...");
+
+        // 模拟导出过程
+        AsyncTaskExecutor.execute(() -> {
+            // 模拟耗时操作
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // 完成后更新UI
+            runOnUiThread(() -> {
+                mProcessMessage.postValue(null);
+                String format = formatId == R.id.rbCsv ? "CSV" : "Excel";
+                showToastShort("数据已导出为" + format + "格式");
+            });
+        });
+    }
+
+
 
     ///////////////////////////////////////////////////////////////////////////
     // 生命周期
