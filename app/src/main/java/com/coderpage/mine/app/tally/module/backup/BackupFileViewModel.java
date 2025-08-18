@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.coderpage.base.common.IError;
@@ -31,6 +32,7 @@ import com.tendcloud.tenddata.TCAgent;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -73,9 +75,27 @@ public class BackupFileViewModel extends BaseViewModel {
     private void initAutoBackupStatus() {
         SharedPreferences prefs = getApplication().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         boolean enabled = prefs.getBoolean(KEY_AUTO_BACKUP_ENABLED, false); // 默认关闭
+
+        // 检查是否真正存在任务
+        if (enabled) {
+            try {
+                List<WorkInfo> workInfos = WorkManager.getInstance()
+                        .getWorkInfosByTag(WorkerConst.UNIQUE_NAME_AUTO_BACKUP_WORKER)
+                        .get();
+                // 如果没有找到任务，则更新状态为关闭
+                if (workInfos.isEmpty()) {
+                    enabled = false;
+                    // 同时更新 SharedPreferences 中的状态
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean(KEY_AUTO_BACKUP_ENABLED, false);
+                    editor.apply();
+                }
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         mAutoBackupEnabled.setValue(enabled);
-
-
     }
     /**
      * 切换自动备份状态
