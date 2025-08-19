@@ -2,10 +2,14 @@ package com.coderpage.mine.app.tally.module.backup;
 
 import static com.coderpage.base.utils.LogUtils.LOGE;
 import static com.coderpage.base.utils.LogUtils.makeLogTag;
+import static com.coderpage.base.utils.UIUtils.showToastShort;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.coderpage.base.common.Callback;
@@ -16,6 +20,7 @@ import com.coderpage.base.utils.CommonUtils;
 import com.coderpage.base.utils.LogUtils;
 import com.coderpage.concurrency.AsyncTaskExecutor;
 import com.coderpage.mine.BuildConfig;
+import com.coderpage.mine.MineApp;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.error.ErrorCode;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
@@ -448,6 +453,14 @@ public class Backup {
     public void performExport(Long startDate, Long endDate, String folder, int formatId) {
         TallyDatabase database = TallyDatabase.getInstance();
         AsyncTaskExecutor.execute(() -> {
+
+            //查询数据
+            List<Record> records = database.recordDao().queryAllBetweenTimeTimeDesc(startDate, endDate);
+            if (records == null || records.size() == 0) {
+                exportTips(MineApp.getAppContext(), "导出失败: 没有查询到账单记录");
+                return;
+            }
+
             //创建文件
             String dateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                     .format(Calendar.getInstance().getTime());
@@ -464,15 +477,13 @@ public class Backup {
                 return;
             }
 
-            //查询数据
-            List<Record> records = database.recordDao().queryAllBetweenTimeTimeDesc(startDate, endDate);
-
             //写出数据
             if (formatId == R.id.rbCsv) {
                 writeCsvFile(file, records);
             } else {
                 writeExcelFile(file, records);
             }
+            exportTips(MineApp.getAppContext(), "导出成功");
         });
     }
 
@@ -583,4 +594,10 @@ public class Backup {
             }
         }
     }
+    private void exportTips(Context context, String msg){
+        new Handler(Looper.getMainLooper()).post(() -> {
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        });
+    }
+
 }

@@ -443,8 +443,16 @@ public class BackupFileViewModel extends BaseViewModel {
 
         // 设置默认日期（最近30天）
         Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
         long endDate = calendar.getTimeInMillis();
         calendar.add(Calendar.MONTH, -1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         long startDate = calendar.getTimeInMillis();
 
         // 格式化日期
@@ -482,6 +490,10 @@ public class BackupFileViewModel extends BaseViewModel {
                         // 用户选择日期后的回调处理
                         Calendar selectedDate = Calendar.getInstance();
                         selectedDate.set(selectedYear, selectedMonth, selectedDay);
+                        selectedDate.set(Calendar.HOUR_OF_DAY, 0);
+                        selectedDate.set(Calendar.MINUTE, 0);
+                        selectedDate.set(Calendar.SECOND, 0);
+                        selectedDate.set(Calendar.MILLISECOND, 0);
                         long timeInMillis = selectedDate.getTimeInMillis();
                         tvStartDate.setTag(timeInMillis);
                         tvStartDate.setText(sdf.format(selectedDate.getTime()));
@@ -510,6 +522,10 @@ public class BackupFileViewModel extends BaseViewModel {
                         // 用户选择日期后的回调处理
                         Calendar selectedDate = Calendar.getInstance();
                         selectedDate.set(selectedYear, selectedMonth, selectedDay);
+                        selectedDate.set(Calendar.HOUR_OF_DAY, 23);
+                        selectedDate.set(Calendar.MINUTE, 59);
+                        selectedDate.set(Calendar.SECOND, 59);
+                        selectedDate.set(Calendar.MILLISECOND, 999);
                         long timeInMillis = selectedDate.getTimeInMillis();
                         tvEndDate.setTag(timeInMillis);
                         tvEndDate.setText(sdf.format(selectedDate.getTime()));
@@ -622,8 +638,6 @@ public class BackupFileViewModel extends BaseViewModel {
                 // 导出完成后提示用户
                 runOnUiThread(() -> {
                     mProcessMessage.postValue(null);
-                    String format = formatId == R.id.rbCsv ? "CSV" : "Excel";
-                    showToastShort("数据已导出为" + format + "格式到 " + folder);
                 });
             }
 
