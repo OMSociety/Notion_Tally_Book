@@ -454,6 +454,11 @@ public class BackupFileViewModel extends BaseViewModel {
         tvStartDate.setTag(startDate);
         tvEndDate.setTag(endDate);
 
+        //设置一个默认导出的文件夹
+        String defaultExportFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        tvFolder.setText(defaultExportFolder);
+        tvFolder.setTag(defaultExportFolder);
+
         // 更新清除按钮的可见性
         updateClearButtonVisibility(tvStartDate, ivClearStartDate, startDate);
         updateClearButtonVisibility(tvEndDate, ivClearEndDate, endDate);
@@ -633,10 +638,11 @@ public class BackupFileViewModel extends BaseViewModel {
         // 模拟导出过程
         AsyncTaskExecutor.execute(() -> {
             try {
-                File testFile = new File(folder, "test.txt");
-                if (!testFile.exists()) {
-                    testFile.createNewFile();
-                }
+                //获取导出数据
+
+                //创建文件
+
+                //写出数据
 
                 // 完成后更新UI
                 runOnUiThread(() -> {
@@ -648,7 +654,7 @@ public class BackupFileViewModel extends BaseViewModel {
                 // 完成后更新UI
                 runOnUiThread(() -> {
                     mProcessMessage.postValue(null);
-                    showToastShort("数据失败");
+                    showToastShort("数据已导失败");
                 });
             }
         });
