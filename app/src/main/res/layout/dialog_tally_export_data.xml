@@ -80,6 +80,34 @@
             android:visibility="gone" />
     </RelativeLayout>
 
+    <!-- 添加的文件夹选择器 -->
+    <TextView
+        android:id="@+id/tvFolderLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_normal"
+        android:text="导出到文件夹"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="@dimen/app_text_size_normal" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_micro">
+
+        <TextView
+            android:id="@+id/tvFolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_touchable_white"
+            android:gravity="center_vertical"
+            android:hint="请选择导出文件夹"
+            android:padding="@dimen/padding_normal"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="@dimen/app_text_size_normal" />
+    </RelativeLayout>
+    <!-- 文件夹选择器结束 -->
+
     <TextView
         android:id="@+id/tvFormatLabel"
         android:layout_width="wrap_content"

@@ -11,13 +11,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
+import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
@@ -56,6 +62,8 @@ public class BackupFileViewModel extends BaseViewModel {
     private MutableLiveData<String> mProcessMessage = new MutableLiveData<>();
 
     private PermissionReqHandler mPermissionReqHandler;
+
+    private TextView mCurrentFolderTextView;
 
     // 自动备份状态
     private MutableLiveData<Boolean> mAutoBackupEnabled = new MutableLiveData<>();
@@ -428,6 +436,7 @@ public class BackupFileViewModel extends BaseViewModel {
 
         TextView tvStartDate = view.findViewById(R.id.tvStartDate);
         TextView tvEndDate = view.findViewById(R.id.tvEndDate);
+        TextView tvFolder = view.findViewById(R.id.tvFolder);
         RadioGroup rgFormat = view.findViewById(R.id.rgFormat);
         ImageView ivClearStartDate = view.findViewById(R.id.ivClearStartDate);
         ImageView ivClearEndDate = view.findViewById(R.id.ivClearEndDate);
@@ -506,6 +515,13 @@ public class BackupFileViewModel extends BaseViewModel {
             datePickerDialog.show();
         });
 
+        // 设置文件夹选择监听器
+        tvFolder.setOnClickListener(v -> {
+            // 这里应该打开文件夹选择器
+            // 目前我们显示一个简单的输入对话框作为示例
+            showFolderSelectionDialog(activity, tvFolder);
+        });
+
         // 设置清除按钮监听器
         ivClearStartDate.setOnClickListener(v -> {
             // 清除开始日期
@@ -529,13 +545,30 @@ public class BackupFileViewModel extends BaseViewModel {
                     // 获取用户选择的参数
                     Long selectedStartDate = (Long) tvStartDate.getTag();
                     Long selectedEndDate = (Long) tvEndDate.getTag();
+                    String selectedFolder = (String) tvFolder.getTag();
                     int selectedFormat = rgFormat.getCheckedRadioButtonId();
 
                     // 执行导出操作
-                    exportData(activity, selectedStartDate, selectedEndDate, selectedFormat);
+                    exportData(activity, selectedStartDate, selectedEndDate, selectedFolder, selectedFormat);
                     dialog.dismiss();
                 });
-        builder.create().show();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /**
+     * 显示文件夹选择对话框
+     *
+     * @param activity Activity上下文
+     * @param folderTextView 显示文件夹路径的TextView
+     */
+    private void showFolderSelectionDialog(Activity activity, TextView folderTextView) {
+        // 保存当前对话框中的tvFolder引用
+        mCurrentFolderTextView = folderTextView;
+        // 使用系统文件管理器选择文件夹
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        activity.startActivityForResult(intent, 2);
     }
     /**
      * 更新清除按钮的可见性
@@ -559,9 +592,10 @@ public class BackupFileViewModel extends BaseViewModel {
      * @param activity Activity上下文
      * @param startDate 开始日期
      * @param endDate 结束日期
+     * @param folder 导出文件夹路径
      * @param formatId 格式ID（CSV或Excel）
      */
-    private void exportData(Activity activity, Long startDate, Long endDate, int formatId) {
+    private void exportData(Activity activity, Long startDate, Long endDate, String folder, int formatId) {
         // 检查存储权限
         String[] permissionArray = new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -574,7 +608,7 @@ public class BackupFileViewModel extends BaseViewModel {
             @Override
             public void onGranted(boolean grantedAll, String[] permissionArray) {
                 // 执行实际的导出操作
-                performExport(startDate, endDate, formatId);
+                performExport(startDate, endDate, folder, formatId);
             }
 
             @Override
@@ -588,42 +622,136 @@ public class BackupFileViewModel extends BaseViewModel {
      * 执行实际的数据导出操作
      * @param startDate 开始日期
      * @param endDate 结束日期
+     * @param folder 导出文件夹路径
      * @param formatId 格式ID
      */
-    private void performExport(Long startDate, Long endDate, int formatId) {
+    private void performExport(Long startDate, Long endDate, String folder, int formatId) {
         // 这里是实际的导出逻辑
         // 目前只是显示一个提示信息
-        mProcessMessage.postValue("正在导出数据...");
+        mProcessMessage.postValue("正在导出数据到 " + folder + "...");
 
         // 模拟导出过程
         AsyncTaskExecutor.execute(() -> {
-            // 模拟耗时操作
             try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                File testFile = new File(folder, "test.txt");
+                if (!testFile.exists()) {
+                    testFile.createNewFile();
+                }
 
-            // 完成后更新UI
-            runOnUiThread(() -> {
-                mProcessMessage.postValue(null);
-                String format = formatId == R.id.rbCsv ? "CSV" : "Excel";
-                showToastShort("数据已导出为" + format + "格式");
-            });
+                // 完成后更新UI
+                runOnUiThread(() -> {
+                    mProcessMessage.postValue(null);
+                    String format = formatId == R.id.rbCsv ? "CSV" : "Excel";
+                    showToastShort("数据已导出为" + format + "格式到 " + folder);
+                });
+            } catch (Exception e) {
+                // 完成后更新UI
+                runOnUiThread(() -> {
+                    mProcessMessage.postValue(null);
+                    showToastShort("数据失败");
+                });
+            }
         });
     }
+
+    /**
+     * 从URI获取文件夹路径
+     *
+     * @param context 上下文
+     * @param uri 文件夹URI
+     * @return 文件夹路径
+     */
+    private String getFolderPathFromUri(Context context, Uri uri) {
+        // 使用DocumentFile处理目录URI
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            DocumentFile documentFile = DocumentFile.fromTreeUri(context, uri);
+            if (documentFile != null && documentFile.exists()) {
+                // 对于外部存储文档
+                if (FileUtils.isExternalStorageDocument(uri)) {
+                    final String docId = DocumentsContract.getTreeDocumentId(uri);
+                    final String[] split = docId.split(":");
+                    if (split.length == 2) {
+                        if ("primary".equalsIgnoreCase(split[0])) {
+                            return Environment.getExternalStorageDirectory() + "/" + split[1];
+                        }
+                    }
+                    // 如果无法解析，至少返回一个合理的默认值
+                    return Environment.getExternalStorageDirectory().toString();
+                }
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (DocumentsContract.isDocumentUri(context, uri)) {
+                // 外部存储文档
+                if (FileUtils.isExternalStorageDocument(uri)) {
+                    final String docId = DocumentsContract.getDocumentId(uri);
+                    final String[] split = docId.split(":");
+                    if (split.length == 2) {
+                        if ("primary".equalsIgnoreCase(split[0])) {
+                            return Environment.getExternalStorageDirectory() + "/" + split[1];
+                        }
+                    }
+                    return Environment.getExternalStorageDirectory().toString();
+                }
+                // 下载文档
+                else if (FileUtils.isDownloadsDocument(uri)) {
+                    // 对于下载目录，我们返回下载目录路径
+                    return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+                }
+                // 其他文档类型
+                else {
+                    // 尝试使用FileUtils.getPath获取路径
+                    String path = FileUtils.getPath(context, uri);
+                    if (!TextUtils.isEmpty(path)) {
+                        return path;
+                    }
+                }
+            }
+        }
+
+        // 对于非Document URI，尝试直接获取路径
+        if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        // 尝试使用FileUtils.getPath获取路径
+        String path = FileUtils.getPath(context, uri);
+        if (!TextUtils.isEmpty(path)) {
+            return path;
+        }
+
+        // 如果无法解析路径，则使用默认下载目录
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+    }
+
 
 
     ///////////////////////////////////////////////////////////////////////////
     // 生命周期
     ///////////////////////////////////////////////////////////////////////////
-
     protected void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            // Get the Uri of the selected file
-            Uri uri = data.getData();
-            String path = FileUtils.getPath(activity, uri);
-            onBackupFileSelectedFromFileSystem(activity, path);
+            if (requestCode == 1) {
+                // Get the Uri of the selected file
+                Uri uri = data.getData();
+                String path = FileUtils.getPath(activity, uri);
+                onBackupFileSelectedFromFileSystem(activity, path);
+            } else if (requestCode == 2) {
+                // 处理文件夹选择结果
+                Uri uri = data.getData();
+                if (uri != null) {
+                    // 使用DocumentFile处理文件夹URI
+                    String path = getFolderPathFromUri(activity, uri);
+                    if (path != null) {
+                        // 更新UI
+                        if (mCurrentFolderTextView != null) {
+                            mCurrentFolderTextView.setText(path);
+                            mCurrentFolderTextView.setTag(path);
+                        }
+                    }
+                }
+            }
         }
     }
 
