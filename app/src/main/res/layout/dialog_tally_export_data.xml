@@ -17,18 +17,32 @@
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/app_text_size_normal" />
 
-    <TextView
-        android:id="@+id/tvStartDate"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_micro"
-        android:background="@drawable/bg_touchable_white"
-        android:drawableEnd="@drawable/ic_date_range"
-        android:gravity="center_vertical"
-        android:hint="请选择开始日期"
-        android:padding="@dimen/padding_normal"
-        android:textColor="?android:attr/textColorSecondary"
-        android:textSize="@dimen/app_text_size_normal" />
+        android:layout_marginTop="@dimen/spacing_micro">
+
+        <TextView
+            android:id="@+id/tvStartDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_touchable_white"
+            android:gravity="center_vertical"
+            android:hint="请选择开始日期"
+            android:padding="@dimen/padding_normal"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="@dimen/app_text_size_normal" />
+
+        <ImageView
+            android:id="@+id/ivClearStartDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/tvStartDate"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/padding_normal"
+            android:src="@drawable/abc_ic_clear_material"
+            android:visibility="gone" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tvEndDateLabel"
@@ -39,18 +53,32 @@
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/app_text_size_normal" />
 
-    <TextView
-        android:id="@+id/tvEndDate"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_micro"
-        android:background="@drawable/bg_touchable_white"
-        android:drawableEnd="@drawable/ic_date_range"
-        android:gravity="center_vertical"
-        android:hint="请选择结束日期"
-        android:padding="@dimen/padding_normal"
-        android:textColor="?android:attr/textColorSecondary"
-        android:textSize="@dimen/app_text_size_normal" />
+        android:layout_marginTop="@dimen/spacing_micro">
+
+        <TextView
+            android:id="@+id/tvEndDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_touchable_white"
+            android:gravity="center_vertical"
+            android:hint="请选择结束日期"
+            android:padding="@dimen/padding_normal"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="@dimen/app_text_size_normal" />
+
+        <ImageView
+            android:id="@+id/ivClearEndDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/tvEndDate"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/padding_normal"
+            android:src="@drawable/abc_ic_clear_material"
+            android:visibility="gone" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tvFormatLabel"

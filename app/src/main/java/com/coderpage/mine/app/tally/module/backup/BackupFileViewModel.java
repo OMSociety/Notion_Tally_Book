@@ -3,6 +3,7 @@ package com.coderpage.mine.app.tally.module.backup;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
+import android.app.DatePickerDialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
@@ -14,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -427,6 +429,8 @@ public class BackupFileViewModel extends BaseViewModel {
         TextView tvStartDate = view.findViewById(R.id.tvStartDate);
         TextView tvEndDate = view.findViewById(R.id.tvEndDate);
         RadioGroup rgFormat = view.findViewById(R.id.rgFormat);
+        ImageView ivClearStartDate = view.findViewById(R.id.ivClearStartDate);
+        ImageView ivClearEndDate = view.findViewById(R.id.ivClearEndDate);
 
         // 设置默认日期（最近30天）
         Calendar calendar = Calendar.getInstance();
@@ -441,39 +445,90 @@ public class BackupFileViewModel extends BaseViewModel {
         tvStartDate.setTag(startDate);
         tvEndDate.setTag(endDate);
 
+        // 更新清除按钮的可见性
+        updateClearButtonVisibility(tvStartDate, ivClearStartDate, startDate);
+        updateClearButtonVisibility(tvEndDate, ivClearEndDate, endDate);
+
         // 设置日期选择监听器
         tvStartDate.setOnClickListener(v -> {
-            DatePickUtils.showDatePickDialog(activity, (Long) v.getTag(), new DatePickUtils.OnDatePickListener() {
-                @Override
-                public void onDatePick(DialogInterface dialog, int year, int month, int dayOfMonth) {
-                    Calendar selectedDate = Calendar.getInstance();
-                    selectedDate.set(year, month, dayOfMonth);
-                    tvStartDate.setTag(selectedDate.getTimeInMillis());
-                    tvStartDate.setText(sdf.format(selectedDate.getTime()));
-                }
-            });
+            // 获取当前选择的日期作为默认值
+            Calendar c = Calendar.getInstance();
+            Long currentDate = (Long) v.getTag();
+            if (currentDate != null) {
+                c.setTimeInMillis(currentDate);
+            }
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // 创建并显示 DatePickerDialog
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    activity,
+                    (view1, selectedYear, selectedMonth, selectedDay) -> {
+                        // 用户选择日期后的回调处理
+                        Calendar selectedDate = Calendar.getInstance();
+                        selectedDate.set(selectedYear, selectedMonth, selectedDay);
+                        long timeInMillis = selectedDate.getTimeInMillis();
+                        tvStartDate.setTag(timeInMillis);
+                        tvStartDate.setText(sdf.format(selectedDate.getTime()));
+                        updateClearButtonVisibility(tvStartDate, ivClearStartDate, timeInMillis);
+                    },
+                    year, month, day
+            );
+            datePickerDialog.show();
         });
 
         tvEndDate.setOnClickListener(v -> {
-            DatePickUtils.showDatePickDialog(activity, (Long) v.getTag(), new DatePickUtils.OnDatePickListener() {
-                @Override
-                public void onDatePick(DialogInterface dialog, int year, int month, int dayOfMonth) {
-                    Calendar selectedDate = Calendar.getInstance();
-                    selectedDate.set(year, month, dayOfMonth);
-                    tvEndDate.setTag(selectedDate.getTimeInMillis());
-                    tvEndDate.setText(sdf.format(selectedDate.getTime()));
-                }
-            });
+            // 获取当前选择的日期作为默认值
+            Calendar c = Calendar.getInstance();
+            Long currentDate = (Long) v.getTag();
+            if (currentDate != null) {
+                c.setTimeInMillis(currentDate);
+            }
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // 创建并显示 DatePickerDialog
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    activity,
+                    (view1, selectedYear, selectedMonth, selectedDay) -> {
+                        // 用户选择日期后的回调处理
+                        Calendar selectedDate = Calendar.getInstance();
+                        selectedDate.set(selectedYear, selectedMonth, selectedDay);
+                        long timeInMillis = selectedDate.getTimeInMillis();
+                        tvEndDate.setTag(timeInMillis);
+                        tvEndDate.setText(sdf.format(selectedDate.getTime()));
+                        updateClearButtonVisibility(tvEndDate, ivClearEndDate, timeInMillis);
+                    },
+                    year, month, day
+            );
+            datePickerDialog.show();
+        });
+
+        // 设置清除按钮监听器
+        ivClearStartDate.setOnClickListener(v -> {
+            // 清除开始日期
+            tvStartDate.setTag(null);
+            tvStartDate.setText("");
+            updateClearButtonVisibility(tvStartDate, ivClearStartDate, 0);
+        });
+
+        ivClearEndDate.setOnClickListener(v -> {
+            // 清除结束日期
+            tvEndDate.setTag(null);
+            tvEndDate.setText("");
+            updateClearButtonVisibility(tvEndDate, ivClearEndDate, 0);
         });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("导出数据")
+        builder.setTitle(" ")
                 .setView(view)
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
                     // 获取用户选择的参数
-                    long selectedStartDate = (Long) tvStartDate.getTag();
-                    long selectedEndDate = (Long) tvEndDate.getTag();
+                    Long selectedStartDate = (Long) tvStartDate.getTag();
+                    Long selectedEndDate = (Long) tvEndDate.getTag();
                     int selectedFormat = rgFormat.getCheckedRadioButtonId();
 
                     // 执行导出操作
@@ -481,6 +536,22 @@ public class BackupFileViewModel extends BaseViewModel {
                     dialog.dismiss();
                 });
         builder.create().show();
+    }
+    /**
+     * 更新清除按钮的可见性
+     *
+     * @param textView TextView
+     * @param clearButton 清除按钮
+     * @param date 日期时间戳
+     */
+    private void updateClearButtonVisibility(TextView textView, ImageView clearButton, long date) {
+        // 如果有日期，则显示清除图标（X图标）
+        if (date != 0 && !textView.getText().toString().isEmpty()) {
+            clearButton.setImageResource(R.drawable.abc_ic_clear_material);
+            clearButton.setVisibility(View.VISIBLE);
+        } else {
+            clearButton.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -490,7 +561,7 @@ public class BackupFileViewModel extends BaseViewModel {
      * @param endDate 结束日期
      * @param formatId 格式ID（CSV或Excel）
      */
-    private void exportData(Activity activity, long startDate, long endDate, int formatId) {
+    private void exportData(Activity activity, Long startDate, Long endDate, int formatId) {
         // 检查存储权限
         String[] permissionArray = new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -519,7 +590,7 @@ public class BackupFileViewModel extends BaseViewModel {
      * @param endDate 结束日期
      * @param formatId 格式ID
      */
-    private void performExport(long startDate, long endDate, int formatId) {
+    private void performExport(Long startDate, Long endDate, int formatId) {
         // 这里是实际的导出逻辑
         // 目前只是显示一个提示信息
         mProcessMessage.postValue("正在导出数据...");
@@ -541,7 +612,6 @@ public class BackupFileViewModel extends BaseViewModel {
             });
         });
     }
-
 
 
     ///////////////////////////////////////////////////////////////////////////
