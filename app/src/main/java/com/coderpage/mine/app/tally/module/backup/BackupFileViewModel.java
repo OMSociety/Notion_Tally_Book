@@ -162,7 +162,7 @@ public class BackupFileViewModel extends BaseViewModel {
         BackupFileManagerActivity.open(activity);
     }
 
-    /** 导出数据点击 */
+    /** 备份数据点击 */
     public void onExportDataClick(Activity activity) {
         String[] permissionArray = new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
