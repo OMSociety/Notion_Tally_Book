@@ -139,6 +139,8 @@ dependencies {
     api rootProject.dashscopeSdk
     api rootProject.multidex
     api rootProject.archWork
+    api rootProject.excelPoi
+
     compileOnly rootProject.lombok
     annotationProcessor rootProject.lombok
 

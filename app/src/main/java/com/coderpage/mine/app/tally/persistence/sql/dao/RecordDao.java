@@ -300,4 +300,20 @@ public interface RecordDao {
             "left outer join category on record.record_category_unique_name=category.category_unique_name")
     List<Record> queryAll();
 
+    /***
+     * 查询指定时间区间内的所有记录（收入和支出），按日期降序排序
+     *
+     * @param start 开始时间
+     * @param end 结束时间
+     *
+     * @return 查询到的所有记录
+     */
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
+    @Query("select * " +
+            "from record " +
+            "left outer join category on record.record_category_unique_name=category.category_unique_name " +
+            "where (:start is null or record_time >= :start) and (:end is null or record_time<= :end) " +
+            "order by record_time DESC")
+    List<Record> queryAllBetweenTimeTimeDesc(Long start, Long end);
+
 }

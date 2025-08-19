@@ -612,8 +612,19 @@ public class BackupFileViewModel extends BaseViewModel {
         mPermissionReqHandler.requestPermission(false, permissionArray, new PermissionReqHandler.Listener() {
             @Override
             public void onGranted(boolean grantedAll, String[] permissionArray) {
+                // 显示导出进度
+                mProcessMessage.postValue("正在导出数据...");
+
                 // 执行实际的导出操作
-                performExport(startDate, endDate, folder, formatId);
+                Backup backup = new Backup();
+                backup.performExport(startDate, endDate, folder, formatId);
+
+                // 导出完成后提示用户
+                runOnUiThread(() -> {
+                    mProcessMessage.postValue(null);
+                    String format = formatId == R.id.rbCsv ? "CSV" : "Excel";
+                    showToastShort("数据已导出为" + format + "格式到 " + folder);
+                });
             }
 
             @Override
@@ -623,42 +634,6 @@ public class BackupFileViewModel extends BaseViewModel {
         });
     }
 
-    /**
-     * 执行实际的数据导出操作
-     * @param startDate 开始日期
-     * @param endDate 结束日期
-     * @param folder 导出文件夹路径
-     * @param formatId 格式ID
-     */
-    private void performExport(Long startDate, Long endDate, String folder, int formatId) {
-        // 这里是实际的导出逻辑
-        // 目前只是显示一个提示信息
-        mProcessMessage.postValue("正在导出数据到 " + folder + "...");
-
-        // 模拟导出过程
-        AsyncTaskExecutor.execute(() -> {
-            try {
-                //获取导出数据
-
-                //创建文件
-
-                //写出数据
-
-                // 完成后更新UI
-                runOnUiThread(() -> {
-                    mProcessMessage.postValue(null);
-                    String format = formatId == R.id.rbCsv ? "CSV" : "Excel";
-                    showToastShort("数据已导出为" + format + "格式到 " + folder);
-                });
-            } catch (Exception e) {
-                // 完成后更新UI
-                runOnUiThread(() -> {
-                    mProcessMessage.postValue(null);
-                    showToastShort("数据已导失败");
-                });
-            }
-        });
-    }
 
     /**
      * 从URI获取文件夹路径

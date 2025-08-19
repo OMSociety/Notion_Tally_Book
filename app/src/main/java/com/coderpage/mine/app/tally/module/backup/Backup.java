@@ -16,6 +16,7 @@ import com.coderpage.base.utils.CommonUtils;
 import com.coderpage.base.utils.LogUtils;
 import com.coderpage.concurrency.AsyncTaskExecutor;
 import com.coderpage.mine.BuildConfig;
+import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.error.ErrorCode;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
 import com.coderpage.mine.app.tally.persistence.model.Record;
@@ -24,15 +25,29 @@ import com.coderpage.mine.app.tally.persistence.sql.dao.CategoryDao;
 import com.coderpage.mine.app.tally.persistence.sql.entity.CategoryEntity;
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author abner-l. 2017-06-01
@@ -423,5 +438,149 @@ public class Backup {
         return backupModel;
     }
 
+    /**
+     * 执行实际的数据导出操作
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @param folder 导出文件夹路径
+     * @param formatId 格式ID
+     */
+    public void performExport(Long startDate, Long endDate, String folder, int formatId) {
+        TallyDatabase database = TallyDatabase.getInstance();
+        AsyncTaskExecutor.execute(() -> {
+            //创建文件
+            String dateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    .format(Calendar.getInstance().getTime());
+            String format = formatId == R.id.rbCsv ? ".csv" : ".xls";
+            String fileName = "bill_export"+ "_" + dateFormatted + format;
+            File file = new File(folder, fileName);
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+            } catch (IOException e) {
+                //提示用户创建文件报错
+                e.printStackTrace();
+                return;
+            }
 
+            //查询数据
+            List<Record> records = database.recordDao().queryAllBetweenTimeTimeDesc(startDate, endDate);
+
+            //写出数据
+            if (formatId == R.id.rbCsv) {
+                writeCsvFile(file, records);
+            } else {
+                writeExcelFile(file, records);
+            }
+        });
+    }
+
+    /**
+     * 将记录写入CSV文件
+     * @param file 目标文件
+     * @param records 记录列表
+     */
+    private void writeCsvFile(File file, List<Record> records) {
+        try {
+            java.io.FileWriter fileWriter = new java.io.FileWriter(file);
+            // 写入CSV头部
+            fileWriter.append("时间,分类,金额,类型,备注\n");
+
+            // 写入数据行
+            for (Record record : records) {
+                // 格式化时间
+                String time = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                        .format(new java.util.Date(record.getTime()));
+
+                // 获取类型文本
+                String type = record.getType() == Record.TYPE_EXPENSE ? "支出" : "收入";
+
+                // 写入一行数据
+                fileWriter.append("\"")
+                        .append(time)
+                        .append("\"")
+                        .append(",")
+                        .append("\"")
+                        .append(record.getCategoryName() != null ? record.getCategoryName() : "")
+                        .append("\"")
+                        .append(",")
+                        .append("\"")
+                        .append(String.valueOf(record.getAmount()))
+                        .append("\"")
+                        .append(",")
+                        .append("\"")
+                        .append(type)
+                        .append("\"")
+                        .append(",")
+                        .append("\"")
+                        .append(record.getDesc() != null ? record.getDesc() : "")
+                        .append("\"")
+                        .append("\n");
+            }
+
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+    }
+
+    private void writeExcelFile(File file, List<Record> records) {
+        try {
+            // 创建工作簿
+            Workbook workbook = new HSSFWorkbook();
+            Sheet sheet = workbook.createSheet("账单明细");
+
+            // 创建标题行（不使用CellStyle避免AWT依赖）
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"时间", "分类", "金额", "类型", "备注"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                // 不设置CellStyle以避免AWT依赖
+            }
+
+            // 填充数据
+            for (int i = 0; i < records.size(); i++) {
+                Record record = records.get(i);
+                Row row = sheet.createRow(i + 1);
+
+                // 时间
+                String time = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                        .format(new java.util.Date(record.getTime()));
+                row.createCell(0).setCellValue(time);
+
+                // 分类
+                row.createCell(1).setCellValue(record.getCategoryName() != null ? record.getCategoryName() : "");
+
+                // 金额
+                row.createCell(2).setCellValue(record.getAmount());
+
+                // 类型
+                String type = record.getType() == Record.TYPE_EXPENSE ? "支出" : "收入";
+                row.createCell(3).setCellValue(type);
+
+                // 备注
+                row.createCell(4).setCellValue(record.getDesc() != null ? record.getDesc() : "");
+            }
+
+            // 设置默认列宽，避免使用autoSizeColumn触发AWT依赖
+            for (int i = 0; i < headers.length; i++) {
+                sheet.setColumnWidth(i, 20 * 256); // 设置列宽为20个字符宽度
+            }
+
+            // 写入文件
+            java.io.FileOutputStream fileOut = new java.io.FileOutputStream(file);
+            workbook.write(fileOut);
+            fileOut.close();
+            workbook.close();
+        } catch (Exception e) {
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+    }
 }

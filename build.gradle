@@ -76,6 +76,9 @@ ext {
     multidex = 'androidx.multidex:multidex:2.0.1'
     lombok = 'org.projectlombok:lombok:1.18.26'
     archWork ="android.arch.work:work-runtime:1.0.1"
+
+    excelPoi ='com.github.SUPERCILEX.poi-android:poi:3.17'
+
 }
 
 allprojects {
