@@ -91,7 +91,7 @@
     <string name="backup_version">备份版本</string>
     <string name="backup_file_size">文件大小</string>
 
-    <string name="tally_setting_btn_data_export">导出数据</string>
+    <string name="tally_setting_btn_data_export">备份数据</string>
     <string name="tally_setting_btn_data_export_tip">将账单数据备份到手机SD卡中，用于数据迁移</string>
     <string name="tally_setting_btn_data_import">导入数据</string>
     <string name="tally_setting_btn_data_import_tip">从手机SD卡中读取备份的账单数据</string>
