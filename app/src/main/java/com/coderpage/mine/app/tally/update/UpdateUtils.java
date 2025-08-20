@@ -24,8 +24,30 @@ public class UpdateUtils {
                 .checkNewVersion(context, checkCallBack);
     }
 
+    // 添加Gitee更新检查方法
+    public static void startNewClientVersionCheckFromGitee(Context context,
+                                                           Updater.NewVersionCheckCallBack checkCallBack) {
+        new Updater.Builder(context, new GiteeSourceFetcher())
+                .setExecutor(AsyncTaskExecutor.executor())
+                .setNotifyIcon(R.mipmap.ic_launcher)
+                .create()
+                .checkNewVersion(context, checkCallBack);
+    }
+
     public static void startNewClientVersionCheckBackground(Context context) {
         new Updater.Builder(context, new LatestVersionFetcher())
+                .setExecutor(AsyncTaskExecutor.executor())
+                .showCheckProgressDialog(false)
+                .showCheckResultToast(false)
+                .showApkDownloadConfirmDialog(false)
+                .setNotifyIcon(R.mipmap.ic_launcher)
+                .create()
+                .checkNewVersion(context);
+    }
+
+    // 添加后台Gitee更新检查方法
+    public static void startNewClientVersionCheckBackgroundFromGitee(Context context) {
+        new Updater.Builder(context, new GiteeSourceFetcher())
                 .setExecutor(AsyncTaskExecutor.executor())
                 .showCheckProgressDialog(false)
                 .showCheckResultToast(false)
@@ -41,6 +63,19 @@ public class UpdateUtils {
                 .compare(context, newVersionApkModelPersisted);
         if (hasNewVersion) {
             new Updater.Builder(context, new LatestVersionFetcher())
+                    .setNotifyIcon(R.mipmap.ic_launcher)
+                    .create()
+                    .showApkDownloadConfirmDialog(context, newVersionApkModelPersisted);
+        }
+    }
+
+    // 添加Gitee版本检查确认对话框方法
+    public static void checkPersistedNewVersionAndShowUpdateConfirmDialogFromGitee(Context context) {
+        ApkModel newVersionApkModelPersisted = Updater.getNewVersionApkModelPersisted(context);
+        boolean hasNewVersion = new DefaultVersionComparator()
+                .compare(context, newVersionApkModelPersisted);
+        if (hasNewVersion) {
+            new Updater.Builder(context, new GiteeSourceFetcher())
                     .setNotifyIcon(R.mipmap.ic_launcher)
                     .create()
                     .showApkDownloadConfirmDialog(context, newVersionApkModelPersisted);

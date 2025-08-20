@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.coderpage.lib.update.ApkModel;
+import com.coderpage.lib.update.Error;
 import com.coderpage.lib.update.Updater;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.router.TallyRouter;
@@ -29,6 +30,8 @@ import java.util.Locale;
 @Route(path = TallyRouter.ABOUT)
 public class AboutActivity extends BaseActivity {
     private TextView mNewVersionTv;
+    // 添加一个变量来跟踪当前使用的更新源
+    private int mCurrentUpdateSource = 1; // 0 = 默认服务器, 1 = Gitee
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,20 +69,81 @@ public class AboutActivity extends BaseActivity {
         super.onPostCreate(savedInstanceState);
         setToolbarAsBack((View v) -> finish());
     }
-
     private View.OnClickListener mOnClickListener = (v) -> {
         int id = v.getId();
         switch (id) {
             // 检查更新
             case R.id.lyAppInfo:
-                UpdateUtils.startNewClientVersionCheck(AboutActivity.this, new Updater.NewVersionCheckCallBack() {
-                    @Override
-                    public void onFindNewVersion(ApkModel apkModel) {
-                        mNewVersionTv.setText(getString(R.string.tally_about_find_new_version,
-                                apkModel.getVersion(), apkModel.getBuildCode()));
-                        mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
-                    }
-                });
+                // 切换更新源
+                if (mCurrentUpdateSource == 0) {
+                    // 使用默认服务器更新
+                    UpdateUtils.startNewClientVersionCheck(AboutActivity.this, new Updater.NewVersionCheckCallBack() {
+                        @Override
+                        public void onFindNewVersion(ApkModel apkModel) {
+                            mNewVersionTv.setText(getString(R.string.tally_about_find_new_version,
+                                    apkModel.getVersion(), apkModel.getBuildCode()));
+                            mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
+                        }
+
+                        @Override
+                        public void onCheckStart() {
+                            mNewVersionTv.setText("正在检查默认服务器更新...");
+                            mNewVersionTv.setTextColor(getResources().getColor(R.color.appTextColorPrimary));
+                        }
+
+                        @Override
+                        public void onAlreadyNewestVersion(ApkModel apkModel) {
+                            mNewVersionTv.setText("已是最新版");
+                            mNewVersionTv.setTextColor(getResources().getColor(R.color.appTextColorPrimary));
+                        }
+
+                        @Override
+                        public void onCheckFail(Error error) {
+                            // 根据错误类型显示不同的提示信息
+                            String errorMsg = error.message();
+                            if (errorMsg != null && (errorMsg.contains("Failed to connect") || errorMsg.contains("failed to connect") || errorMsg.contains("UnknownHostException"))) {
+                                mNewVersionTv.setText("网络出差了");
+                            } else {
+                                mNewVersionTv.setText("更新遇到些问题");
+                            }
+                            mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
+                        }
+                    });
+                } else if (mCurrentUpdateSource == 1){
+                    // 使用Gitee更新
+                    UpdateUtils.startNewClientVersionCheckFromGitee(AboutActivity.this, new Updater.NewVersionCheckCallBack() {
+                        @Override
+                        public void onFindNewVersion(ApkModel apkModel) {
+                            mNewVersionTv.setText(getString(R.string.tally_about_find_new_version,
+                                    apkModel.getVersion(), apkModel.getBuildCode()));
+                            mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
+                        }
+
+                        @Override
+                        public void onCheckStart() {
+                            mNewVersionTv.setText("正在检查Gitee更新...");
+                            mNewVersionTv.setTextColor(getResources().getColor(R.color.appTextColorPrimary));
+                        }
+
+                        @Override
+                        public void onAlreadyNewestVersion(ApkModel apkModel) {
+                            mNewVersionTv.setText("已是最新版");
+                            mNewVersionTv.setTextColor(getResources().getColor(R.color.appTextColorPrimary));
+                        }
+
+                        @Override
+                        public void onCheckFail(Error error) {
+                            // 根据错误类型显示不同的提示信息
+                            String errorMsg = error.message();
+                            if (errorMsg != null && (errorMsg.contains("Failed to connect") || errorMsg.contains("failed to connect") || errorMsg.contains("UnknownHostException"))) {
+                                mNewVersionTv.setText("网络出差了");
+                            } else {
+                                mNewVersionTv.setText("更新遇到些问题");
+                            }
+                            mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
+                        }
+                    });
+                }
                 break;
 
             // 微信公众号点击
@@ -103,6 +167,7 @@ public class AboutActivity extends BaseActivity {
                 break;
         }
     };
+
 
     /** 复制微信公众号 */
     public void copyWeChatNumber() {
