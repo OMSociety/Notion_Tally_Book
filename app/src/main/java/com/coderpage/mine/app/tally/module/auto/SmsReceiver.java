@@ -44,14 +44,16 @@ public class SmsReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         mDataBase = TallyDatabase.getInstance();
-        // 提示正在处理
-        UIUtils.showToastShort(context, "短信记账处理中...");
 
         // 检查是否启用了短信识别功能
         if (!isSmsRecognitionEnabled(context)) {
             Log.d(TAG, "短信识别功能未开启");
             return;
         }
+
+        // 提示正在处理
+        UIUtils.showToastShort(context, "短信记账处理中...");
+
 
         // 获取短信内容
         Bundle bundle = intent.getExtras();
