@@ -242,6 +242,7 @@
     <string name="agree">同意</string>
     <string name="disagree">不同意</string>
     <string name="exit_app">退出应用</string>
+    <string name="tally_about_title_legal">法律声明</string>
     <string name="user_agreement">用户协议</string>
     <string name="privacy_policy">隐私政策</string>
 

@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.coderpage.lib.update.ApkModel;
 import com.coderpage.lib.update.Updater;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.router.TallyRouter;
+import com.coderpage.mine.app.tally.module.home.DocumentActivity;
 import com.coderpage.mine.app.tally.update.UpdateUtils;
 import com.coderpage.mine.ui.BaseActivity;
 import com.coderpage.mine.BuildConfig;
@@ -26,7 +28,6 @@ import java.util.Locale;
  */
 @Route(path = TallyRouter.ABOUT)
 public class AboutActivity extends BaseActivity {
-
     private TextView mNewVersionTv;
 
     @Override
@@ -55,6 +56,9 @@ public class AboutActivity extends BaseActivity {
             return true;
         });
         findViewById(R.id.lyWeChatInfo).setOnClickListener(mOnClickListener);
+        // 添加用户协议和隐私政策点击事件
+        findViewById(R.id.lyUserAgreement).setOnClickListener(mOnClickListener);
+        findViewById(R.id.lyPrivacyPolicy).setOnClickListener(mOnClickListener);
     }
 
     @Override
@@ -82,6 +86,20 @@ public class AboutActivity extends BaseActivity {
             case R.id.lyWeChatInfo:
                 copyWeChatNumber();
                 Toast.makeText(this, R.string.tally_about_wechat_copied, Toast.LENGTH_SHORT).show();
+                break;
+
+            // 用户协议点击
+            case R.id.lyUserAgreement:
+                Intent userAgreementIntent = new Intent(this, DocumentActivity.class);
+                userAgreementIntent.putExtra(DocumentActivity.EXTRA_DOCUMENT_TYPE, DocumentActivity.TYPE_USER_AGREEMENT);
+                startActivity(userAgreementIntent);
+                break;
+
+            // 隐私政策点击
+            case R.id.lyPrivacyPolicy:
+                Intent privacyPolicyIntent = new Intent(this, DocumentActivity.class);
+                privacyPolicyIntent.putExtra(DocumentActivity.EXTRA_DOCUMENT_TYPE, DocumentActivity.TYPE_PRIVACY_POLICY);
+                startActivity(privacyPolicyIntent);
                 break;
         }
     };

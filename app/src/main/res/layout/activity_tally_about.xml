@@ -232,6 +232,59 @@
                     android:textSize="@dimen/app_text_size_medium"/>
 
             </LinearLayout>
+            <!-- 添加用户协议和隐私政策条目 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_normal"
+                android:text="@string/tally_about_title_legal"
+                android:textColor="@color/appTextColorLabel"
+                android:textSize="@dimen/app_text_size_medium"/>
+
+            <LinearLayout
+                android:id="@+id/lyUserAgreement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_micro">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/user_agreement"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="@dimen/app_text_size_normal"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyPrivacyPolicy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/padding_micro"
+                android:paddingLeft="@dimen/padding_normal"
+                android:paddingRight="@dimen/padding_normal"
+                android:paddingTop="@dimen/padding_micro">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/privacy_policy"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="@dimen/app_text_size_normal"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
