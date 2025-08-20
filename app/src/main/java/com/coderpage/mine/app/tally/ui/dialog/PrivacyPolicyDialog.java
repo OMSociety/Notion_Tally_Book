@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.coderpage.mine.R;
-import com.coderpage.mine.app.tally.module.home.DocumentActivity;
 
 /**
  * 隐私政策和开发者公示对话框
@@ -110,6 +109,10 @@ public class PrivacyPolicyDialog {
         // 总是显示"不同意"按钮，让用户可以选择拒绝
         builder.setNegativeButton(R.string.disagree, mNegativeListener);
 
-        return builder.create();
+        AlertDialog dialog = builder.create();
+        // 设置对话框不可通过点击外部区域取消，确保用户必须做出选择
+        dialog.setCanceledOnTouchOutside(false);
+
+        return dialog;
     }
 }

@@ -1,4 +1,4 @@
-package com.coderpage.mine.app.tally.module.home;
+package com.coderpage.mine.app.tally.ui.dialog;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

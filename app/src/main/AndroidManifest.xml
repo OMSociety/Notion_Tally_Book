@@ -63,7 +63,7 @@
             </intent-filter>
         </receiver>
         <activity
-            android:name=".app.tally.module.home.DocumentActivity"
+            android:name=".app.tally.ui.dialog.DocumentActivity"
             android:label="@string/user_agreement"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />

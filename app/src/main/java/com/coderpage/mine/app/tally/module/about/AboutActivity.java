@@ -17,7 +17,7 @@ import com.coderpage.lib.update.Error;
 import com.coderpage.lib.update.Updater;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.router.TallyRouter;
-import com.coderpage.mine.app.tally.module.home.DocumentActivity;
+import com.coderpage.mine.app.tally.ui.dialog.DocumentActivity;
 import com.coderpage.mine.app.tally.update.UpdateUtils;
 import com.coderpage.mine.ui.BaseActivity;
 import com.coderpage.mine.BuildConfig;
