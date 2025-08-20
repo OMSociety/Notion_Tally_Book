@@ -175,7 +175,7 @@ public class AboutActivity extends BaseActivity {
         if (clipboardManager == null) {
             return;
         }
-        ClipData.Item clipItem = new ClipData.Item("MINE应用");
+        ClipData.Item clipItem = new ClipData.Item("没有你也点(≧∀≦)ゞ开心!");
         ClipData clipData = new ClipData("微信公众号", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, clipItem);
         clipboardManager.setPrimaryClip(clipData);
     }
