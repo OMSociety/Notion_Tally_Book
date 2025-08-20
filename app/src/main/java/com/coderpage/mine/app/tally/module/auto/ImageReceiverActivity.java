@@ -108,12 +108,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
         String model = getAiModelFromSettings();
 
         if (apiKey ==  null){
-            runOnUiThread(() -> {
-                // 显示错误提示
-                android.widget.Toast.makeText(this, "请先在设置中配置 AI API Key",
-                        android.widget.Toast.LENGTH_LONG).show();
-            });
-            finish();
+            UIUtils.showToastShort(context, "请先在设置中配置 AI API Key");
             return;
         }
 
