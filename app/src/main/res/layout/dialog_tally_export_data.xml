@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="开始日期"
-        android:textColor="@color/appTextColorPrimary"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/app_text_size_normal" />
 
     <RelativeLayout
@@ -30,10 +30,8 @@
             android:gravity="center_vertical"
             android:hint="请选择开始日期"
             android:padding="@dimen/padding_normal"
-            android:textColor="@color/appTextColorSecondary"
-            android:textSize="@dimen/app_text_size_normal"
-            android:drawableEnd="@drawable/abc_ic_clear_material"
-            android:drawablePadding="@dimen/padding_normal"/>
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="@dimen/app_text_size_normal" />
 
         <ImageView
             android:id="@+id/ivClearStartDate"
@@ -46,18 +44,13 @@
             android:visibility="gone" />
     </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider"/>
-
     <TextView
         android:id="@+id/tvEndDateLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_normal"
         android:text="结束日期"
-        android:textColor="@color/appTextColorPrimary"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/app_text_size_normal" />
 
     <RelativeLayout
@@ -73,10 +66,8 @@
             android:gravity="center_vertical"
             android:hint="请选择结束日期"
             android:padding="@dimen/padding_normal"
-            android:textColor="@color/appTextColorSecondary"
-            android:textSize="@dimen/app_text_size_normal"
-            android:drawableEnd="@drawable/abc_ic_clear_material"
-            android:drawablePadding="@dimen/padding_normal"/>
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="@dimen/app_text_size_normal" />
 
         <ImageView
             android:id="@+id/ivClearEndDate"
@@ -89,11 +80,6 @@
             android:visibility="gone" />
     </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider"/>
-
     <!-- 添加的文件夹选择器 -->
     <TextView
         android:id="@+id/tvFolderLabel"
@@ -101,7 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_normal"
         android:text="导出到文件夹"
-        android:textColor="@color/appTextColorPrimary"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/app_text_size_normal" />
 
     <RelativeLayout
@@ -117,16 +103,9 @@
             android:gravity="center_vertical"
             android:hint="请选择导出文件夹"
             android:padding="@dimen/padding_normal"
-            android:textColor="@color/appTextColorSecondary"
-            android:textSize="@dimen/app_text_size_normal"
-            android:drawableEnd="@drawable/abc_ic_go_search_api_material"
-            android:drawablePadding="@dimen/padding_normal"/>
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="@dimen/app_text_size_normal" />
     </RelativeLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider"/>
     <!-- 文件夹选择器结束 -->
 
     <TextView
@@ -135,7 +114,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_normal"
         android:text="导出格式"
-        android:textColor="@color/appTextColorPrimary"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/app_text_size_normal" />
 
     <RadioGroup
@@ -152,7 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="CSV"
-            android:textColor="@color/appTextColorSecondary"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="@dimen/app_text_size_normal" />
 
         <RadioButton
@@ -161,7 +140,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding_normal"
             android:text="Excel"
-            android:textColor="@color/appTextColorSecondary"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="@dimen/app_text_size_normal" />
     </RadioGroup>
 
