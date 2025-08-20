@@ -4,10 +4,12 @@ import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -22,6 +24,7 @@ import com.coderpage.mine.app.tally.module.debug.DebugActivity;
 import com.coderpage.mine.app.tally.module.records.RecordItemViewModel;
 import com.coderpage.mine.app.tally.module.search.SearchActivity;
 import com.coderpage.mine.app.tally.ui.dialog.PermissionReqDialog;
+import com.coderpage.mine.app.tally.ui.dialog.PrivacyPolicyDialog;
 import com.coderpage.mine.app.tally.ui.refresh.RefreshHeadView;
 import com.coderpage.mine.app.tally.update.UpdateUtils;
 import com.coderpage.mine.ui.BaseActivity;
@@ -43,6 +46,9 @@ import java.util.List;
 
 public class HomeActivity extends BaseActivity {
 
+    private static final String PREF_NAME = "app_policy";
+    private static final String KEY_PRIVACY_ACCEPTED = "privacy_accepted";
+
     private PermissionReqHandler mPermissionReqHandler;
     private String[] mNeedPermissionArray = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -62,10 +68,73 @@ public class HomeActivity extends BaseActivity {
         mViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         getLifecycle().addObserver(mViewModel);
 
+        // 检查是否已同意隐私政策
+        checkPrivacyPolicy();
+
         initView();
         subscribeUi();
 
         mPermissionReqHandler = new PermissionReqHandler(self());
+    }
+
+    /**
+     * 检查隐私政策是否已同意
+     */
+    private void checkPrivacyPolicy() {
+        SharedPreferences sp = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        boolean privacyAccepted = sp.getBoolean(KEY_PRIVACY_ACCEPTED, false);
+
+        if (!privacyAccepted) {
+            showPrivacyPolicyDialog(true);
+        }
+    }
+
+    /**
+     * 显示隐私政策对话框
+     * @param isFirstTime 是否首次显示
+     */
+    private void showPrivacyPolicyDialog(boolean isFirstTime) {
+        new PrivacyPolicyDialog(this)
+                .setFirstTime(isFirstTime)
+                .setOnPositiveClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 用户同意隐私政策
+                        SharedPreferences sp = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+                        sp.edit().putBoolean(KEY_PRIVACY_ACCEPTED, true).apply();
+                        dialog.dismiss();
+
+                        // 继续处理权限请求
+                        handlePermission();
+                    }
+                })
+                .setOnNegativeClickListener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 用户拒绝隐私政策，退出应用
+                        dialog.dismiss();
+                        showExitDialog();
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    /**
+     * 显示退出应用对话框
+     */
+    private void showExitDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("您需要同意隐私政策才能使用本应用")
+                .setPositiveButton(R.string.exit_app, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setCancelable(false)
+                .show();
     }
 
     @Override

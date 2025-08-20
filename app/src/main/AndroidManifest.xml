@@ -62,7 +62,11 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
-
+        <activity
+            android:name=".app.tally.module.home.DocumentActivity"
+            android:label="@string/user_agreement"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.edit.RecordEditActivity"
             android:screenOrientation="portrait"
