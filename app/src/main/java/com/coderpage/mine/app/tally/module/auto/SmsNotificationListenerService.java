@@ -1,18 +1,12 @@
-// 文件路径: app/src/main/java/com/coderpage/mine/app/tally/module/auto/SmsReceiver.java
 package com.coderpage.mine.app.tally.module.auto;
 
-import static java.lang.Math.abs;
-
+import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.telephony.SmsMessage;
+import android.service.notification.NotificationListenerService;
+import android.service.notification.StatusBarNotification;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.coderpage.base.utils.UIUtils;
@@ -21,7 +15,6 @@ import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.RecordType;
 import com.coderpage.mine.app.tally.eventbus.EventRecordAdd;
 import com.coderpage.mine.app.tally.module.edit.record.RecordRepository;
-import com.coderpage.mine.app.tally.module.home.HomeActivity;
 import com.coderpage.mine.app.tally.module.setting.SettingWorkerConst;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
 import com.coderpage.mine.app.tally.persistence.model.Record;
@@ -31,59 +24,65 @@ import com.coderpage.mine.utils.AndroidUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SmsReceiver extends BroadcastReceiver {
-    private static final String TAG = "SmsReceiver";
+
+@SuppressLint("OverrideAbstract")
+public class SmsNotificationListenerService extends NotificationListenerService {
+    private static final String TAG = "SmsNotificationListener";
     private TallyDatabase mDataBase;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onListenerConnected() {
+        super.onListenerConnected();
+        Log.d(TAG, "Notification listener connected");
         mDataBase = TallyDatabase.getInstance();
-        Log.d(TAG, "收到短信广播");
+    }
 
-        if (true){
-            //拒绝使用短信识别功能,改用监听短信通知
-            return;
-        }
+    @Override
+    @SuppressLint("NewApi")
+    public void onNotificationPosted(StatusBarNotification sbn) {
+        super.onNotificationPosted(sbn);
 
         // 检查是否启用了短信识别功能
-        if (!isSmsRecognitionEnabled(context)) {
+        if (!isSmsRecognitionEnabled()) {
             Log.d(TAG, "短信识别功能未开启");
             return;
         }
 
-        // 获取短信内容
-        Bundle bundle = intent.getExtras();
-        if (bundle == null) {
-            return;
-        }
+        // 只处理短信应用的通知
+        String pkg = sbn.getPackageName();
+        if (isSmsPackage(pkg)) {
+            Log.d(TAG, "收到短信通知，包名: " + pkg);
 
-        Object[] pdus = (Object[]) bundle.get("pdus");
-        if (pdus == null || pdus.length == 0) {
-            return;
-        }
+            // 提取短信内容
+            String sender = null;
+            String messageBody = null;
 
-        // 解析短信
-        for (Object pdu : pdus) {
-            SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) pdu);
-            if (smsMessage != null) {
-                String sender = smsMessage.getDisplayOriginatingAddress();
-                String messageBody = smsMessage.getMessageBody();
+            // 获取通知对象
+            Notification notification = sbn.getNotification();
+            if (notification != null) {
+                Bundle extras = notification.extras;
+                if (extras != null) {
+                    // 获取发送者和消息内容
+                    sender = extras.getString(Notification.EXTRA_TITLE);
+                    messageBody = extras.getString(Notification.EXTRA_TEXT);
+                }
+            }
 
+            // 检查必要信息是否存在
+            if (!TextUtils.isEmpty(sender) && !TextUtils.isEmpty(messageBody)) {
                 Log.d(TAG, "发件人: " + sender + ", 内容: " + messageBody);
 
                 // 检查是否在检测名单中
-                if (isInDetectionList(context, sender)) {
+                if (isInDetectionList(sender)) {
                     // 解析金额
                     AiIdentifyAmount amount = extractAmount(messageBody);
-                    if (amount != null) {
+                    if (amount != null && amount.getBill() && !"other".equals(amount.getExpenseOrIncome()) && amount.getMoney() > 0) {
                         // 保存记录
-                        saveRecordDirectly(amount);
+                        saveRecordDirectly(amount, sender);
                     }
                 }
             }
@@ -91,9 +90,25 @@ public class SmsReceiver extends BroadcastReceiver {
     }
 
     /**
+     * 判断是否为短信应用包名
+     */
+    private boolean isSmsPackage(String pkg) {
+        return "com.android.mms".equals(pkg) ||
+                "com.android.messaging".equals(pkg) ||
+                "com.google.android.apps.messaging".equals(pkg) ||
+                "com.samsung.android.messaging".equals(pkg) ||
+                "com.huawei.message".equals(pkg) ||
+                "com.miui.message".equals(pkg) ||
+                "com.oppo.message".equals(pkg) ||
+                "com.vivo.messaging".equals(pkg) ||
+                pkg.contains("sms") ||
+                pkg.contains("mms");
+    }
+
+    /**
      * 检查是否启用了短信识别功能
      */
-    private boolean isSmsRecognitionEnabled(Context context) {
+    private boolean isSmsRecognitionEnabled() {
         try {
             com.coderpage.mine.persistence.entity.KeyValue keyValue =
                     MineDatabase.getInstance().keyValueDao()
@@ -111,7 +126,7 @@ public class SmsReceiver extends BroadcastReceiver {
     /**
      * 检查发送方是否在检测名单中
      */
-    private boolean isInDetectionList(Context context, String sender) {
+    private boolean isInDetectionList(String sender) {
         try {
             com.coderpage.mine.persistence.entity.KeyValue keyValue =
                     MineDatabase.getInstance().keyValueDao()
@@ -136,11 +151,11 @@ public class SmsReceiver extends BroadcastReceiver {
      */
     private AiIdentifyAmount extractAmount(String messageBody) {
         //删除关键词
-        List<String> delKeywords = Arrays.asList("支付机构","快捷支付协议","支付协议","代付协议","支付宝");
+        String[] delKeywords = {"支付机构","快捷支付协议","支付协议","代付协议","支付宝"};
         //收入类
-        List<String> incomeKeywords = Arrays.asList("工资", "奖金", "薪资", "汇入", "转入", "到账", "收入", "进账", "收益", "利息", "返现", "退款", "补贴", "存入", "收款", "余额增加");
+        String[] incomeKeywords = {"工资", "奖金", "薪资", "汇入", "转入", "到账", "收入", "进账", "收益", "利息", "返现", "退款", "补贴", "存入", "收款", "余额增加"};
         //支出类
-        List<String> expenseKeywords = Arrays.asList("消费", "支出", "支付", "付款", "扣款", "刷卡消费", "取现", "转账", "转出", "汇出", "提现", "手续费", "年费", "管理费", "利息支出", "扣账", "余额减少", "还款");
+        String[] expenseKeywords = {"消费", "支出", "支付", "付款", "扣款", "刷卡消费", "取现", "转账", "转出", "汇出", "提现", "手续费", "年费", "管理费", "利息支出", "扣账", "余额减少", "还款"};
 
         //创建返回值
         AiIdentifyAmount amount = new AiIdentifyAmount(false, "other", 0);
@@ -149,6 +164,7 @@ public class SmsReceiver extends BroadcastReceiver {
         for (String delKeyword : delKeywords) {
             messageBody = messageBody.replace(delKeyword, "");
         }
+
         // 判断是否为收入
         boolean isIncome = false;
         for (String keyword : incomeKeywords) {
@@ -175,7 +191,7 @@ public class SmsReceiver extends BroadcastReceiver {
         }
 
         // 设置收支类型
-        List<String> keywords = null;
+        String[] keywords = null;
         if (isIncome) {
             amount.setExpenseOrIncome("income");
             amount.setBill(true);
@@ -186,7 +202,6 @@ public class SmsReceiver extends BroadcastReceiver {
             keywords = expenseKeywords;
         }
 
-        // 提取金额（使用正则表达式匹配金额）
         // 提取金额（使用正则表达式匹配金额）
         // 1. 截取关键字后面的所有短信内容
         String contentAfterKeyword = messageBody;
@@ -202,15 +217,9 @@ public class SmsReceiver extends BroadcastReceiver {
         Pattern pattern = Pattern.compile("[+-]?[0-9][0-9,.]*\\.?[0-9]*");
         Matcher matcher = pattern.matcher(contentAfterKeyword);
 
-        // 查找所有匹配项
-        List<String> matchedAmounts = new ArrayList<>();
-        while (matcher.find()) {
-            matchedAmounts.add(matcher.group());
-        }
-
-        // 如果有匹配项，选择第一个
-        if (!matchedAmounts.isEmpty()) {
-            String matchedAmount = matchedAmounts.get(0);
+        // 查找第一个匹配项
+        if (matcher.find()) {
+            String matchedAmount = matcher.group();
 
             // 3. 处理金额数值，删除逗号
             String processedAmount = matchedAmount.replace(",", "");
@@ -238,15 +247,16 @@ public class SmsReceiver extends BroadcastReceiver {
      * 直接保存记录数据，不依赖界面状态
      *
      * @param amount 识别出的金额信息
+     * @param sender 发送方
      */
-    private void saveRecordDirectly(AiIdentifyAmount amount) {
+    private void saveRecordDirectly(AiIdentifyAmount amount, String sender) {
         Context context = MineApp.getAppContext();
         //如果不是账单，则返回
-        if (amount.getBill() == false) return;
+        if (!amount.getBill()) return;
 
         //如果识别不出来是支出或者是收入, 不记录
         String expenseOrIncome = amount.getExpenseOrIncome();
-        if (amount.getExpenseOrIncome().equals("other")) return;
+        if ("other".equals(expenseOrIncome)) return;
 
         //如果是0元也不记录
         if (amount.getMoney() == 0) return;
@@ -271,16 +281,15 @@ public class SmsReceiver extends BroadcastReceiver {
         }
         if (defaultCategory == null) return;
 
-
         //创建记录
         Record record = new Record();
         record.setType(type == RecordType.EXPENSE ? Record.TYPE_EXPENSE : Record.TYPE_INCOME);
 
         // 创建新的记录
         record.setSyncId(AndroidUtils.generateUUID());
-        record.setAmount(abs(amount.getMoney()));
+        record.setAmount(Math.abs(amount.getMoney()));
         record.setTime(System.currentTimeMillis());
-        record.setDesc("短信识别记录");
+        record.setDesc("短信识别记录 [" + sender + "]");
 
         // 设置默认分类
         record.setCategoryIcon(defaultCategory.getIcon());
@@ -298,61 +307,9 @@ public class SmsReceiver extends BroadcastReceiver {
                 UIUtils.showToastShort(context, "短信记账成功: " +
                         (type == RecordType.EXPENSE ? "支出" : "收入") +
                         Math.abs(amount.getMoney()) + "元");
-
-                // 发送通知到通知中心
-                sendNotification(context, type, amount);
             } else {
                 Log.e(TAG, "记录保存失败: " + result.error());
             }
         });
-    }
-
-    /**
-     * 发送通知到通知中心
-     *
-     * @param context 上下文
-     * @param type 记录类型
-     * @param amount 金额信息
-     */
-    private void sendNotification(Context context, RecordType type, AiIdentifyAmount amount) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // 创建通知渠道 (Android 8.0+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    "sms_record_channel",
-                    "短信记账通知",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            channel.setDescription("短信自动记账通知");
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        // 构建通知内容
-        String title = "短信自动记账成功";
-        String content = (type == RecordType.EXPENSE ? "支出" : "收入") +
-                Math.abs(amount.getMoney()) + "元";
-
-        // 创建点击通知后打开的意图
-        Intent intent = new Intent(context, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
-        // 构建通知
-        Notification.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder = new Notification.Builder(context, "sms_record_channel");
-        } else {
-            builder = new Notification.Builder(context);
-        }
-
-        builder.setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
-
-        // 发送通知
-        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
     }
 }
