@@ -46,11 +46,6 @@ public class SmsReceiver extends BroadcastReceiver {
         mDataBase = TallyDatabase.getInstance();
         Log.d(TAG, "收到短信广播");
 
-        if (true){
-            //拒绝使用短信识别功能,改用监听短信通知
-            return;
-        }
-
         // 检查是否启用了短信识别功能
         if (!isSmsRecognitionEnabled(context)) {
             Log.d(TAG, "短信识别功能未开启");

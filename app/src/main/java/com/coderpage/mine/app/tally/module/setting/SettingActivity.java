@@ -5,12 +5,9 @@ import static com.coderpage.base.utils.LogUtils.makeLogTag;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -64,6 +61,17 @@ public class SettingActivity extends BaseActivity {
             }
         });
 
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
+//                != PackageManager.PERMISSION_GRANTED ||
+//                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
+//                        != PackageManager.PERMISSION_GRANTED) {
+//
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{
+//                            Manifest.permission.RECEIVE_SMS,
+//                            Manifest.permission.READ_SMS
+//                    }, 1001);
+//        }
 
         // 初始化短信识别开关按钮
         Button btnRecognitionSwitch = findViewById(R.id.btnRecognitionSwitch);
@@ -73,15 +81,18 @@ public class SettingActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 // 在点击时检查权限
-                if (!isNotificationServiceEnabled()) {
-                    // 如果没有权限，引导用户开启通知监听权限
-                    Intent intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-                    }
-                    startActivity(intent);
-                    Toast.makeText(SettingActivity.this, "请在设置中开启通知监听权限", Toast.LENGTH_LONG).show();
-                }else {
+                if (ContextCompat.checkSelfPermission(SettingActivity.this, Manifest.permission.RECEIVE_SMS)
+                        != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(SettingActivity.this, Manifest.permission.READ_SMS)
+                                != PackageManager.PERMISSION_GRANTED) {
+
+                    // 如果没有权限，先请求权限
+                    ActivityCompat.requestPermissions(SettingActivity.this,
+                            new String[]{
+                                    Manifest.permission.RECEIVE_SMS,
+                                    Manifest.permission.READ_SMS
+                            }, 1001);
+                } else {
                     // 如果已有权限，执行开关逻辑
                     SettingViewModel viewModel = mBinding.getVm();
                     boolean currentStatus = viewModel.smsRecognitionEnabled.get();
@@ -105,24 +116,6 @@ public class SettingActivity extends BaseActivity {
                 btnRecognitionSwitch.setText(enabled ? "已开启" : "已关闭");
             }
         });
-    }
-
-    /**
-     * 检查通知监听服务是否已启用
-     */
-    private boolean isNotificationServiceEnabled() {
-        String pkgName = getPackageName();
-        final String flat = Settings.Secure.getString(getContentResolver(),
-                "enabled_notification_listeners");
-        if (flat != null && !flat.isEmpty()) {
-            String[] names = flat.split(":");
-            for (String name : names) {
-                if (name.contains(pkgName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     @Override
