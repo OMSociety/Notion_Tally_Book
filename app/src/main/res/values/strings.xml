@@ -237,7 +237,7 @@
 
     <!-- 隐私政策和开发者公示 -->
     <string name="privacy_policy_title">用户协议和隐私政策</string>
-    <string name="privacy_policy_content">请您务必审慎阅读、充分理解"用户协议"和"隐私政策"各条款，包括但不限于：为了更好的向您提供服务，我们需要收集您的设备信息、操作日志等信息用于分析、优化产品体验。\n\n我们承诺不会将您的个人数据泄露给第三方，仅会在必要范围内使用阿里云AI服务处理您的记账数据以提供智能分类功能。\n\n您可阅读《用户协议》和《隐私政策》了解详细信息。如果您同意，请点击下方按钮开始接受我们的服务。</string>
+    <string name="privacy_policy_content">请您应当审慎阅读、充分理解《用户协议》和《隐私政策》的各项条款，特别是关于个人信息处理的约定。\n\n为优化产品功能、提升服务体验，我们可能需要收集并使用您的设备信息、操作日志等必要信息（具体详见上述协议文本）。\n\n若您点击“同意”或“接受”按钮，即表示您已阅读并明确同意接受全部条款的约束。</string>
     <string name="developer_info_content">开发者名称：stone\n开发者邮箱：154929237@qq.com\n开发者网站：https://gitee.com/rocks-by-the-lake/mine</string>
     <string name="agree">同意</string>
     <string name="disagree">不同意</string>
