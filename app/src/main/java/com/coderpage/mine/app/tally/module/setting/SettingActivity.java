@@ -61,18 +61,6 @@ public class SettingActivity extends BaseActivity {
             }
         });
 
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
-//                != PackageManager.PERMISSION_GRANTED ||
-//                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
-//                        != PackageManager.PERMISSION_GRANTED) {
-//
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{
-//                            Manifest.permission.RECEIVE_SMS,
-//                            Manifest.permission.READ_SMS
-//                    }, 1001);
-//        }
-
         // 初始化短信识别开关按钮
         Button btnRecognitionSwitch = findViewById(R.id.btnRecognitionSwitch);
         // 设置初始状态

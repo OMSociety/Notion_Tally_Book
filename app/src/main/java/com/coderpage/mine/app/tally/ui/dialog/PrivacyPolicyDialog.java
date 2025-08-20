@@ -51,7 +51,6 @@ public class PrivacyPolicyDialog {
 
         // 构建包含可点击链接的内容
         String contentText = mContext.getString(R.string.privacy_policy_content);
-        String developerInfo = mContext.getString(R.string.developer_info_content);
 
         SpannableString spannableContent = new SpannableString(contentText);
 
@@ -86,7 +85,7 @@ public class PrivacyPolicyDialog {
             spannableContent.setSpan(privacyPolicySpan, privacyPolicyStart, privacyPolicyStart + 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
 
-        SpannableString fullContent = new SpannableString(spannableContent.toString() + "\n\n" + developerInfo);
+        SpannableString fullContent = new SpannableString(spannableContent.toString());
         // 复制原来的span
         for (Object span : spannableContent.getSpans(0, spannableContent.length(), Object.class)) {
             fullContent.setSpan(span, spannableContent.getSpanStart(span), spannableContent.getSpanEnd(span), spannableContent.getSpanFlags(span));
