@@ -32,6 +32,7 @@
 - - 增加账单记录筛选功能
 
 ## 链接, 项目演示
+- 项目展示: [bilibili-我的记账本](hhttps://www.bilibili.com/video/BV1S7vAzcEtr/?vd_source=532d0b4dfeb22a8060ec4e9ed2f0b4bf)
 - 我的博客简单介绍了项目  [阿旭的时光瓶](http://myblog.love/articles/101)
 - 原作者代码已托管在 GitHub(https://github.com/coderpage/Mine)
 - 我的代码在Gitee(https://gitee.com/rocks-by-the-lake/mine)
