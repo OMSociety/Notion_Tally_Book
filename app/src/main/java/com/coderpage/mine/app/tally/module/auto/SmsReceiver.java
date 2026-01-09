@@ -51,10 +51,6 @@ public class SmsReceiver extends BroadcastReceiver {
             return;
         }
 
-        // 提示正在处理
-        UIUtils.showToastShort(context, "短信记账处理中...");
-
-
         // 获取短信内容
         Bundle bundle = intent.getExtras();
         if (bundle == null) {
@@ -65,6 +61,7 @@ public class SmsReceiver extends BroadcastReceiver {
         if (pdus == null || pdus.length == 0) {
             return;
         }
+
 
         // 解析短信
         for (Object pdu : pdus) {
@@ -77,6 +74,8 @@ public class SmsReceiver extends BroadcastReceiver {
 
                 // 检查是否在检测名单中
                 if (isInDetectionList(context, sender)) {
+                    // 提示正在处理
+                    UIUtils.showToastShort(context, "短信记账处理中...");
                     // 解析金额
                     AiIdentifyAmount amount = extractAmount(messageBody);
                     if (amount != null) {
@@ -134,11 +133,11 @@ public class SmsReceiver extends BroadcastReceiver {
      */
     private AiIdentifyAmount extractAmount(String messageBody) {
         //删除关键词
-        List<String> delKeywords = Arrays.asList("支付机构","快捷支付协议","支付协议","代付协议","支付宝");
+        List<String> delKeywords = Arrays.asList("支付机构","快捷支付协议","支付协议","代付协议","支付宝","代发工资客户","活动补贴","活动返现");
         //收入类
-        List<String> incomeKeywords = Arrays.asList("工资", "奖金", "薪资", "汇入", "转入", "到账", "收入", "进账", "收益", "利息", "返现", "退款", "补贴", "存入", "收款", "余额增加");
+        List<String> incomeKeywords = Arrays.asList("工资", "奖金", "薪资", "汇入", "转入", "到账", "收入", "进账", "退款", "存入", "收款", "余额增加");
         //支出类
-        List<String> expenseKeywords = Arrays.asList("消费", "支出", "支付", "付款", "扣款", "刷卡消费", "取现", "转账", "转出", "汇出", "提现", "手续费", "年费", "管理费", "利息支出", "扣账", "余额减少", "还款");
+        List<String> expenseKeywords = Arrays.asList("消费", "支出", "支付", "付款", "扣款", "扣收", "刷卡消费", "取现", "转账", "转出", "汇出", "提现", "手续费", "年费", "管理费", "利息支出", "扣账", "余额减少", "还款");
 
         //创建返回值
         AiIdentifyAmount amount = new AiIdentifyAmount(false, "other", 0);
