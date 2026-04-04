@@ -126,6 +126,7 @@ dependencies {
     api rootProject.retrofit
     api rootProject.retrofitConverterFastjson
     api rootProject.okhttp3InterceptorLogging
+    api 'com.squareup.okhttp3:okhttp:3.15'
     api rootProject.eventBus
     api rootProject.archRoomRuntime
     api rootProject.archLifecycleExtension
