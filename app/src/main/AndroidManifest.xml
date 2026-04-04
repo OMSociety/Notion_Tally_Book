@@ -136,6 +136,13 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+        <!-- Notion 同步设置页面 -->
+        <activity
+            android:name=".app.tally.module.setting.NotionSyncSettingActivity"
+            android:exported="false"
+            android:label="Notion 同步设置"
+            android:parentActivityName=".app.tally.module.setting.SettingActivity" />
+
 
         <service
             android:name="com.coderpage.lib.update.DownloadService"
