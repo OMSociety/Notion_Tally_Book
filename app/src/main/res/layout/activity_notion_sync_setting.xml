@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Notion 同步设置" android:textSize="24sp" android:textStyle="bold"
+            android:textColor="@color/text_primary" android:layout_marginBottom="24dp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Notion Integration Token" android:textColor="@color/text_secondary"/>
+        <EditText android:id="@+id/et_notion_token" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="secret_xxx..." android:inputType="textPassword"
+            android:layout_marginTop="8dp" android:layout_marginBottom="16dp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Notion Database ID" android:textColor="@color/text_secondary"/>
+        <EditText android:id="@+id/et_database_id" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="32位字母数字组合"
+            android:layout_marginTop="8dp" android:layout_marginBottom="16dp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="同步方向" android:textColor="@color/text_secondary" android:layout_marginTop="8dp"/>
+        <RadioGroup android:id="@+id/rg_sync_direction" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="8dp">
+            <RadioButton android:id="@+id/rb_to_notion" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="本地 → Notion"/>
+            <RadioButton android:id="@+id/rb_from_notion" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="Notion → 本地"/>
+            <RadioButton android:id="@+id/rb_bidirectional" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="双向同步" android:checked="true"/>
+        </RadioGroup>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="16dp" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="自动同步" android:textColor="@color/text_primary"/>
+            <Switch android:id="@+id/switch_auto_sync" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <Button android:id="@+id/btn_save" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="保存配置" android:layout_marginTop="24dp" android:backgroundTint="@color/accent"/>
+        <Button android:id="@+id/btn_test" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="测试连接" android:layout_marginTop="8dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+        <Button android:id="@+id/btn_sync_now" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="立即同步" android:layout_marginTop="8dp"
+            style="@style/Widget.MaterialComponents.Button.TextButton"/>
+        <TextView android:id="@+id/tv_status" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_marginTop="16dp" android:textColor="@color/text_secondary"/>
+    </LinearLayout>
+</ScrollView>
