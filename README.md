@@ -1,37 +1,181 @@
-# Mine
-- 自己写的一个记账本应用, 简单干净.
-- 应用中使用的图标来自 [iconfont](http://iconfont.cn/) 和 [material-design-icons](https://github.com/google/material-design-icons)
-- 原作者微信公众号 搜索:MINE应用
+# Notion Tally Book
 
-## 碎碎念
-- 我其实非常喜欢这个项目,用了大概有2年时间. 期间没有遇到问题, 但是觉得打开输入金额, 标签, 真的太麻烦了. 我想要让他简单记录,
-自动记录. 是的现在你可以使用分享功能到记账本, 这样你就可以记录了. 非常的方便, 无论是截图分享, 还是相册分享都可以哦. 另外还实
-现了短信自动记录, 这是我梦寐以求的功能. 如果你担心隐私问题可以选择不使用短信功能.
-- 不是专业的安卓开发者, 代码已经尽可能优化了. 
-- 原作者新版的v0.8.0很漂亮的, 可惜没有开源, 也没有我想要的功能. 叹! 我下载一个放发行版里面了, 需要的自己拿.
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Android-green?style=flat-square" alt="Platform">
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/AI%20Generated-LLM-brightgreen?style=flat-square" alt="AI">
+</p>
 
-## 新功能
-- ai能力来源于阿里云, 需要申请阿里百炼的账户: [阿里百炼控制台](https://bailian.console.aliyun.com/?tab=globalset#/efm/api_key)
-- ai调用的key是必填的, 否则无法使用. 模型名称可以不填, 我默认给了一个(qwen2.5-vl-32b-instruct), 0.7.3(正式版)费用的话嗯,,,,,目
-前输入价格：8元/百万tokens 输出价格：24元/百万tokens, 1080x2400的图片加上提示词加上输出大概是3分/次. 0.7.4版本
-中我增加了图片压缩, (qwen2.5-vl-32b-instruct)大概0.5分/每次
-- 短信能力基于安卓, 但是需要一些敏感权限, 短信识别是依靠关键词, 如果短信中同时存在支付类和收入类关键词, 那么就不会记录.
-例如: 支付宝收款: 20元. 存在支付和收款关键词, 那么就会忽略. 当然"支付宝"这种关键字做了处理, 识别的了.
-- 在原版的0.6.2版本的基础上增加了些新功能:
+> ⚠️ **AI Generated** — 本项目文档由 AI 辅助生成
 
-- - 增加ai调用识别能力
-- - 增加了短信自动识别能力 
-- - 增加清空全部记录
-- - 增加自动备份功能
-- - 增加文件导出功能
-- - 增加账单记录筛选功能
+---
 
-## 链接, 项目演示
-- 我的博客简单介绍了项目  [阿旭的时光瓶](http://myblog.love/articles/101)
-- 原作者代码已托管在 GitHub(https://github.com/coderpage/Mine)
-- 我的代码在Gitee(https://gitee.com/rocks-by-the-lake/mine)
+## 📱 项目简介
 
-## 下载
-- 也可以直接点击下载链接
-- 我的版本: https://pan.baidu.com/s/1CG6P8w69ynVRWIhjZAsxYw?pwd=wqbh 提取码: wqbh
-- 作者原版：https://mp.weixin.qq.com/s?__biz=MzIzNTgwNzk1Nw==&mid=2247483666&idx=1&sn=a13dfe72241b69240bc7b502f7233457&chksm=e8e034a8df97bdbe5d270e8e7001f2a5bd1ddcbb14c75544024c8ce72ad8cd3cc82a997df7df&xtrack=1&scene=0&subscene=274&sessionid=1755250754&clicktime=1755258252&enterid=1755258252&ascene=7&fasttmpl_type=0&fasttmpl_fullversion=7865762-zh_CN-zip&fasttmpl_flag=0&realreporttime=1755258252347&devicetype=android-35&version=28003d5a&nettype=WIFI&abtest_cookie=AAACAA%3D%3D&lang=zh_CN&session_us=gh_a027cefd7741&countrycode=CN&exportkey=n_ChQIAhIQcC6QJ0pprWWOmdJ9mpMrExLxAQIE97dBBAEAAAAAAJVGMIRnCOsAAAAOpnltbLcz9gKNyK89dVj0EnjhlsLKEWNLpAn8jl5jjyQfrlHkFV0%2FVJDOY3LoHKknxq56x3W68Gd9mfnwPxFeMS1ZoJVZQNcwxzQRl1vEg9vsQbB8BM3UQAADeR9aR8P0T6OS928T5tZ%2BHkFC86medGh%2By07zMk8GY6itRmAXXBJUioezrmoG4wDKaJ9hCe7itmB8FSH%2BnosSrkWdaZnfyKl0vd2CWHzR%2Bvcw4Wj1LyrCpv%2B5waTHiR%2FkDH%2BxOAszcc1jfSscC%2BoO9X3TwJ9l1eGswbel5FFafeo%3D&pass_ticket=W5oyb1AOUMIGxEXhZFQASaP0KvV2k2TjDSWDiamG6cY%2FNf%2FIOrEdyi4EnceMVpQp&wx_header=3
+**Notion Tally Book** 是一款基于 [Mine](https://github.com/coderpage/Mine) fork 的 Android 记账应用，在原版基础上扩展了 **Notion 云同步** 功能。
+
+### 核心能力
+
+| 功能 | 说明 |
+|------|------|
+| 本地记账 | 快速记录收支，支持分类、备注、时间 |
+| AI 智能识别 | 截图/短信自动解析金额和分类 |
+| Notion 同步 | 本地数据实时双向同步至 Notion 云端 |
+| 冲突处理 | 智能合并/覆盖策略处理同步冲突 |
+| 数据备份 | 本地自动备份 + 文件导出 |
+
+---
+
+## 🏗️ 项目结构
+
+```
+Notion_Tally_Book/
+├── app/                          # 主应用模块
+│   └── src/main/java/com/coderpage/mine/
+│       ├── app/tally/
+│       │   ├── module/           # 功能模块
+│       │   │   ├── home/          # 首页
+│       │   │   ├── edit/          # 记账编辑
+│       │   │   ├── detail/        # 记录详情
+│       │   │   ├── records/       # 记录列表
+│       │   │   ├── chart/         # 统计图表
+│       │   │   ├── search/        # 搜索
+│       │   │   ├── setting/       # 设置（含 Notion 同步配置）
+│       │   │   ├── backup/        # 备份管理
+│       │   │   ├── auto/          # AI 自动识别
+│       │   │   ├── about/         # 关于
+│       │   │   └── debug/         # 调试
+│       │   ├── sync/              # Notion 同步核心
+│       │   │   ├── NotionSyncManager.java      # 同步管理器
+│       │   │   ├── NotionApiClient.java         # API 客户端
+│       │   │   ├── ConflictResolver.java        # 冲突处理器
+│       │   │   └── NotionDatabaseValidator.java # 数据库校验
+│       │   └── config/
+│       │       └── NotionConfig.java            # 同步配置
+│       └── framework/             # MVP 框架
+├── libbase/                       # 基础库
+└── libupdate/                     # 更新模块
+```
+
+---
+
+## 🔧 技术栈
+
+| 层级 | 技术 | 说明 |
+|------|------|------|
+| 平台 | Android | minSdk 21, targetSdk 34 |
+| 语言 | Java + Kotlin | 主体 Java，扩展 Kotlin |
+| 架构 | MVP | Model-View-Presenter |
+| 数据库 | Room | 本地 SQLite ORM |
+| 网络 | Retrofit + OkHttp | API 通信 |
+| 同步 | Notion API v1 | 云端数据同步 |
+| AI | 阿里云百炼 | Qwen2.5-VL-32B 视觉模型 |
+| UI | DataBinding + Material | 响应式 UI |
+
+---
+
+## ☁️ Notion 同步说明
+
+### 同步模式
+
+| 模式 | 说明 |
+|------|------|
+| 本地 → Notion | 仅上传本地记录到云端 |
+| Notion → 本地 | 仅从云端拉取到本地 |
+| 双向同步 | 双向增量同步，自动冲突处理 |
+
+### Notion 数据库模板
+
+需要创建包含以下属性的数据库：
+
+| 属性名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| 金额 | Number | ✅ | 记账金额 |
+| 类型 | Select | ✅ | 支出 / 收入 |
+| 分类 | Select | ✅ | 支出分类 |
+| 时间 | Date | ✅ | 记账日期 |
+| 备注 | Text | ❌ | 附加说明 |
+| 状态 | Select | ✅ | 活跃 / 已删除 |
+
+详细配置见 [NOTION_DATABASE_TEMPLATE.md](./docs/NOTION_DATABASE_TEMPLATE.md)
+
+---
+
+## 🚀 快速开始
+
+### 编译构建
+
+```bash
+# 克隆源码
+git clone https://github.com/OMSociety/Notion_Tally_Book.git
+cd Notion_Tally_Book
+
+# 构建 Debug APK
+./gradlew assembleDebug
+
+# 构建 Release APK（需配置签名）
+./gradlew assembleRelease
+```
+
+### 配置 Notion 同步
+
+1. 访问 [Notion Developers](https://www.notion.so/my-integrations) 创建 Integration，复制 Token
+2. 在 Notion 中创建数据库，按上述模板配置属性
+3. 将数据库分享给 Integration（`...` → `Add connections`）
+4. 从数据库 URL 提取 Database ID
+5. 在 App「设置」→「Notion 同步」中填入 Token 和 Database ID
+
+---
+
+## 📊 开发进度
+
+| 阶段 | 内容 | 状态 |
+|------|------|------|
+| P0 | 基础编译修复、缺失类补全、代码重构 | ✅ 完成 |
+| P1 | Notion 同步核心（API 客户端、双向同步、冲突处理、数据库校验） | ✅ 完成 |
+| P2 | Notion 同步设置 UI 集成 | ✅ 完成 |
+| P3 | 同步历史记录、错误重试机制 | 🚧 规划中 |
+
+---
+
+## 📄 许可证
+
+本项目基于 [Mine](https://github.com/coderpage/Mine) 修改，继承其 MIT 许可证。
+
+---
+
+## 🙏 致谢
+
+### 开源项目
+
+| 项目 | 地址 | 用途 |
+|------|------|------|
+| Mine | [GitHub](https://github.com/coderpage/Mine) | 本项目基础 |
+| Room | [Android Developers](https://developer.android.com/jetpack/androidx/releases/room) | 数据库 ORM |
+| Retrofit | [Square](https://square.github.io/retrofit/) | HTTP 客户端 |
+| Notion API | [Developers.notion.so](https://developers.notion.com/) | 云端同步 |
+
+### 资源
+
+| 资源 | 来源 |
+|------|------|
+| 应用图标 | [iconfont](http://iconfont.cn/) |
+| UI 图标 | [Material Design Icons](https://github.com/google/material-design-icons) |
+| AI 模型 | [阿里云百炼](https://bailian.console.aliyun.com/) (Qwen2.5-VL) |
+
+### 开发工具
+
+| 工具 | 用途 |
+|------|------|
+| [AstrBot](https://github.com/SynCLK/AstrBot) | AI 辅助开发（代码修复、文档生成） |
+
+---
+
+## 📬 联系
+
+- 原作者微信公众号：**搜索 MINE应用**
+- Issues：本仓库接受 Bug 报告和功能建议
+
+---
+
+*本项目仅供学习交流使用，如需商业使用请联系原项目作者。*
