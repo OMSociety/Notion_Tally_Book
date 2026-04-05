@@ -19,12 +19,23 @@ import com.coderpage.mine.app.tally.persistence.sql.entity.CategoryEntity;
 import java.util.List;
 
 /**
+ * 分类 Repository
+ * 
+ * 封装分类的 CRUD 操作，提供给 ViewModel 调用。
+ * 
  * @author lc. 2019-04-20 16:06
  * @since 0.6.0
  */
-
-
 class CategoryRepository {
+
+    private final TallyDatabase database;
+
+    /**
+     * 构造方法，每次从 DatabaseProvider 获取实例
+     */
+    CategoryRepository() {
+        this.database = TallyDatabase.getInstance();
+    }
 
     /**
      * 查询分类
@@ -34,7 +45,7 @@ class CategoryRepository {
      */
     void queryCategoryById(long categoryId, SimpleCallback<CategoryModel> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            CategoryModel categoryModel = TallyDatabase.getInstance().categoryDao().queryById(categoryId);
+            CategoryModel categoryModel = database.categoryDao().queryById(categoryId);
             callback.success(categoryModel);
         });
     }
@@ -46,19 +57,19 @@ class CategoryRepository {
      */
     void loadAllExpenseCategory(SimpleCallback<List<CategoryModel>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            List<CategoryModel> categoryList = TallyDatabase.getInstance().categoryDao().allExpenseCategory();
+            List<CategoryModel> categoryList = database.categoryDao().allExpenseCategory();
             callback.success(categoryList);
         });
     }
 
     /**
-     * 读取所有支出分类
+     * 读取所有收入分类
      *
      * @param callback 回调
      */
     void loadAllIncomeCategory(SimpleCallback<List<CategoryModel>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            List<CategoryModel> categoryList = TallyDatabase.getInstance().categoryDao().allIncomeCategory();
+            List<CategoryModel> categoryList = database.categoryDao().allIncomeCategory();
             callback.success(categoryList);
         });
     }
@@ -73,8 +84,8 @@ class CategoryRepository {
      */
     void updateCategory(long categoryId, String icon, String name, SimpleCallback<CategoryModel> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            TallyDatabase.getInstance().categoryDao().update(categoryId, icon, name);
-            CategoryModel categoryModel = TallyDatabase.getInstance().categoryDao().queryById(categoryId);
+            database.categoryDao().update(categoryId, icon, name);
+            CategoryModel categoryModel = database.categoryDao().queryById(categoryId);
             callback.success(categoryModel);
         });
     }
@@ -87,7 +98,7 @@ class CategoryRepository {
      */
     void updateCategoryOrder(List<CategoryModel> categoryList, SimpleCallback<Void> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            CategoryDao categoryDao = TallyDatabase.getInstance().categoryDao();
+            CategoryDao categoryDao = database.categoryDao();
             ArrayUtils.forEach(categoryList, (count, index, item) -> {
                 categoryDao.updateOrder(item.getId(), item.getOrder());
             });
@@ -110,7 +121,7 @@ class CategoryRepository {
                      String name,
                      SimpleCallback<Result<Void, IError>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            CategoryDao categoryDao = TallyDatabase.getInstance().categoryDao();
+            CategoryDao categoryDao = database.categoryDao();
 
             List<CategoryModel> categoryList = categoryDao.allCategory();
             boolean alreadyContains = ArrayUtils.contains(categoryList, item -> {
@@ -128,7 +139,7 @@ class CategoryRepository {
             entity.setUniqueName(uniqueName);
             entity.setIcon(iconName);
             entity.setName(name);
-            TallyDatabase.getInstance().categoryDao().insert(entity);
+            database.categoryDao().insert(entity);
 
             callback.success(new Result<>(null, null));
         });
