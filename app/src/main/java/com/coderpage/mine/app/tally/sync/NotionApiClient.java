@@ -75,9 +75,6 @@ public class NotionApiClient {
     static final String FIELD_TIME = "时间";
     /** 类型字段名（支出/收入） */
     static final String FIELD_TYPE = "类型";
-    /** 状态字段名（活跃/删除） */
-    static final String FIELD_STATUS = "状态";
-
     // ==================== 内部状态 ====================
     private String apiToken;
     private String databaseId;
@@ -346,10 +343,6 @@ public class NotionApiClient {
         String typeName = record.getType() == 0 ? "支出" : "收入";
         props.put(FIELD_TYPE, new JSONObject()
                 .put("select", new JSONObject().put("name", typeName)));
-        // 状态（固定"活跃"）
-        props.put(FIELD_STATUS, new JSONObject()
-                .put("select", new JSONObject().put("name", "活跃")));
-
         page.put("properties", props);
         return page;
     }
