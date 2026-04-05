@@ -5,9 +5,6 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.coderpage.mine.app.tally.config.NotionConfig;
-import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
-import com.coderpage.mine.app.tally.persistence.sql.dao.RecordDao;
-import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 import com.coderpage.mine.persistence.entity.TallyRecord;
 
 import java.util.ArrayList;
@@ -24,9 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 职责：
  * <ul>
  *   <li>管理同步方向（本地→Notion / Notion→本地 / 双向）</li>
- *   <li>将 RecordEntity 与 TallyRecord 互相转换（TallyRecord 继承自 RecordEntity）</li>
  *   <li>通过 NotionApiClient 与 Notion API 通信</li>
- *   <li>通过 RecordDao 操作本地 SQLite 数据库</li>
+ *   <li>通过 SyncRepository 操作本地数据库（遵循分层架构）</li>
  *   <li>通过 NotionDatabaseValidator 校验数据库模板</li>
  * </ul>
  *
@@ -58,7 +54,7 @@ public class NotionSyncManager {
     private final NotionConfig config;
     private final NotionApiClient apiClient;
     private final NotionDatabaseValidator validator;
-    private final RecordDao recordDao;
+    private final SyncRepository syncRepository;
     private final ExecutorService executor;
     private final Handler mainHandler;
 
@@ -70,33 +66,22 @@ public class NotionSyncManager {
     public interface SyncListener {
         /** 同步开始 */
         void onSyncStart();
-        /** 同步进度更新
-         * @param current 当前处理到第几条
-         * @param total   总共要处理多少条
-         * @param message 当前正在处理的内容描述
-         */
+        /** 同步进度更新 */
         void onSyncProgress(int current, int total, String message);
-        /** 同步完成
-         * @param synced  成功同步的记录数
-         * @param failed  失败的记录数
-         */
+        /** 同步完成 */
         void onSyncComplete(int synced, int failed);
-        /** 同步出错
-         * @param error 错误描述
-         */
+        /** 同步出错 */
         void onSyncError(String error);
     }
 
     /**
      * 构造同步管理器
-     *
-     * @param context Android Context
      */
     public NotionSyncManager(Context context) {
         this.config = new NotionConfig(context);
         this.apiClient = new NotionApiClient();
         this.validator = new NotionDatabaseValidator();
-        this.recordDao = TallyDatabase.getInstance().recordDao();
+        this.syncRepository = new SyncRepository();
         this.executor = Executors.newSingleThreadExecutor();
         this.mainHandler = new Handler(Looper.getMainLooper());
 
@@ -107,17 +92,13 @@ public class NotionSyncManager {
 
     /**
      * 设置同步进度监听器
-     *
-     * @param l 监听器实例，传入 null 可清除监听
      */
     public void setSyncListener(SyncListener l) {
         this.listener = l;
     }
 
     /**
-     * 检查 Notion 配置是否完整（Token 和 Database ID 均已配置）
-     *
-     * @return true 表示已配置，可发起同步
+     * 检查 Notion 配置是否完整
      */
     public boolean isConfigured() {
         return config.isConfigured();
@@ -125,8 +106,6 @@ public class NotionSyncManager {
 
     /**
      * 获取配置管理器引用
-     *
-     * @return NotionConfig 实例
      */
     public NotionConfig getConfig() {
         return config;
@@ -134,9 +113,6 @@ public class NotionSyncManager {
 
     /**
      * 更新 Notion 凭证
-     *
-     * @param token      Notion Integration Token
-     * @param databaseId Notion Database ID
      */
     public void updateCredentials(String token, String databaseId) {
         config.setNotionToken(token);
@@ -146,11 +122,6 @@ public class NotionSyncManager {
 
     /**
      * 测试 Notion 连接并校验数据库字段模板
-     *
-     * 与 {@link #sync()} 的区别在于只做连接验证，不执行实际同步。
-     * 推荐在用户点击「测试连接」按钮时调用。
-     *
-     * @param callback 回调，result 包含校验详情
      */
     public void testConnection(ConnectionTestCallback callback) {
         if (!config.isConfigured()) {
@@ -187,9 +158,6 @@ public class NotionSyncManager {
 
     /**
      * 发起同步，根据配置的同步方向分发到对应方法
-     *
-     * <b>完整同步流程：</b>
-     * 1. 检查配置完整性 → 2. 校验数据库字段模板 → 3. 执行同步 → 4. 回调结果
      */
     public void sync() {
         if (!config.isConfigured()) {
@@ -199,7 +167,6 @@ public class NotionSyncManager {
             return;
         }
 
-        // 第一步：同步前校验数据库模板
         if (listener != null) {
             mainHandler.post(() -> listener.onSyncStart());
             mainHandler.post(() -> listener.onSyncProgress(0, 1, "正在校验数据库模板..."));
@@ -213,7 +180,6 @@ public class NotionSyncManager {
                     mainHandler.post(() -> listener.onSyncError(result.summary));
                     return;
                 }
-                // 模板校验通过，执行同步
                 mainHandler.post(() -> listener.onSyncProgress(0, 1, "模板校验通过，开始同步..."));
                 doSync();
             }
@@ -225,9 +191,6 @@ public class NotionSyncManager {
         });
     }
 
-    /**
-     * 执行实际同步（模板校验通过后调用）
-     */
     private void doSync() {
         switch (config.getSyncDirection()) {
             case SYNC_TO_NOTION:
@@ -249,12 +212,9 @@ public class NotionSyncManager {
 
     // ==================== 同步方向实现 ====================
 
-    /**
-     * 同步方向：本地 → Notion
-     */
     private void syncToNotion() {
         executor.execute(() -> {
-            List<TallyRecord> localRecords = getLocalUnsyncedRecords();
+            List<TallyRecord> localRecords = syncRepository.queryUnsyncedRecords();
             if (localRecords.isEmpty()) {
                 config.setLastSyncTime(System.currentTimeMillis());
                 notifyComplete(0, 0);
@@ -284,15 +244,12 @@ public class NotionSyncManager {
         });
     }
 
-    /**
-     * 带重试的 Notion 上传
-     */
     private void uploadWithRetry(TallyRecord record, int retryCount,
                                  AtomicInteger synced, AtomicInteger failed, CountDownLatch latch) {
         apiClient.createRecord(record, new NotionApiClient.NotionCallback<String>() {
             @Override
             public void onSuccess(String notionId) {
-                updateLocalRecordSynced(record.getId(), notionId);
+                syncRepository.markAsSynced(record.getId(), notionId);
                 synced.incrementAndGet();
                 latch.countDown();
             }
@@ -309,9 +266,6 @@ public class NotionSyncManager {
         });
     }
 
-    /**
-     * 同步方向：Notion → 本地
-     */
     private void syncFromNotion() {
         apiClient.queryDatabase(new NotionApiClient.NotionCallback<List<TallyRecord>>() {
             @Override
@@ -325,12 +279,12 @@ public class NotionSyncManager {
                         TallyRecord nr = records.get(i);
                         notifyProgress(i + 1, total, "处理: " + nr.getRemark());
 
-                        TallyRecord local = findLocalByNotionId(nr.getNotionId());
+                        TallyRecord local = syncRepository.findByNotionId(nr.getNotionId());
                         if (local == null) {
-                            addLocalRecord(nr);
+                            syncRepository.insertFromNotion(nr);
                             added++;
                         } else if (nr.getLastModified() > local.getLastModified()) {
-                            updateLocalRecord(nr);
+                            syncRepository.updateFromNotion(nr);
                             updated++;
                         }
                     }
@@ -347,9 +301,6 @@ public class NotionSyncManager {
         });
     }
 
-    /**
-     * 同步方向：双向同步
-     */
     private void syncBidirectional() {
         apiClient.queryDatabase(new NotionApiClient.NotionCallback<List<TallyRecord>>() {
             @Override
@@ -364,11 +315,6 @@ public class NotionSyncManager {
         });
     }
 
-    /**
-     * 双向同步核心逻辑：合并本地与 Notion 记录
-     *
-     * <b>冲突策略</b>：以 lastModified 为准，保留较新的那条记录。
-     */
     private void mergeRecords(List<TallyRecord> notionRecords) {
         int localUpdated = 0;
         int notionUpdated = 0;
@@ -379,12 +325,12 @@ public class NotionSyncManager {
             TallyRecord nr = notionRecords.get(i);
             notifyProgress(i + 1, total, "合并: " + nr.getRemark());
 
-            TallyRecord local = findLocalByNotionId(nr.getNotionId());
+            TallyRecord local = syncRepository.findByNotionId(nr.getNotionId());
             if (local == null) {
-                addLocalRecord(nr);
+                syncRepository.insertFromNotion(nr);
                 localUpdated++;
             } else if (nr.getLastModified() > local.getLastModified()) {
-                updateLocalRecord(nr);
+                syncRepository.updateFromNotion(nr);
                 localUpdated++;
             } else if (local.getLastModified() > nr.getLastModified() && !local.isSynced()) {
                 toUpload.add(local);
@@ -400,7 +346,7 @@ public class NotionSyncManager {
                     @Override
                     public void onSuccess(Boolean result) {
                         if (result) {
-                            updateLocalRecordSynced(r.getId(), r.getNotionId());
+                            syncRepository.markAsSynced(r.getId(), r.getNotionId());
                             successCount.incrementAndGet();
                         }
                         latch.countDown();
@@ -423,90 +369,6 @@ public class NotionSyncManager {
 
         config.setLastSyncTime(System.currentTimeMillis());
         notifyComplete(localUpdated, notionUpdated);
-    }
-
-    // ==================== 本地数据库操作 ====================
-
-    /**
-     * 查询本地所有未同步到 Notion 的记录
-     *
-     * @return 未同步的记录列表（按时间升序）
-     */
-    private List<TallyRecord> getLocalUnsyncedRecords() {
-        List<RecordEntity> entities = recordDao.queryAll();
-        List<TallyRecord> result = new ArrayList<>();
-        if (entities == null) return result;
-
-        for (RecordEntity e : entities) {
-            // record_sync_status == 0 表示未同步
-            if (e.getSyncStatus() == 0) {
-                result.add(TallyRecord.fromEntity(e));
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 将已成功上传的本地记录标记为已同步
-     *
-     * @param localId  本地记录 ID
-     * @param notionId Notion Page ID
-     */
-    private void updateLocalRecordSynced(long localId, String notionId) {
-        RecordEntity entity = recordDao.queryById(localId);
-        if (entity == null) return;
-        entity.setSyncId(notionId);
-        entity.setSyncStatus(1);
-        recordDao.update(entity);
-    }
-
-    /**
-     * 根据 Notion Page ID 查询本地对应记录
-     *
-     * @param notionId Notion Page ID
-     * @return 对应本地记录，不存在则返回 null
-     */
-    private TallyRecord findLocalByNotionId(String notionId) {
-        if (notionId == null || notionId.isEmpty()) return null;
-        List<RecordEntity> all = recordDao.queryAll();
-        if (all == null) return null;
-        for (RecordEntity e : all) {
-            if (notionId.equals(e.getSyncId())) {
-                return TallyRecord.fromEntity(e);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 将 Notion 记录写入本地数据库
-     *
-     * @param record 从 Notion 解析出的记录
-     * @return 新增记录的本地 ID
-     */
-    private long addLocalRecord(TallyRecord record) {
-        RecordEntity entity = record.toEntity();
-        entity.setSyncStatus(1);
-        return recordDao.insert(entity);
-    }
-
-    /**
-     * 用 Notion 数据覆盖更新本地记录
-     */
-    private void updateLocalRecord(TallyRecord record) {
-        TallyRecord local = findLocalByNotionId(record.getNotionId());
-        if (local == null) return;
-
-        RecordEntity entity = recordDao.queryById(local.getId());
-        if (entity == null) return;
-
-        entity.setAmount(record.getAmount());
-        entity.setTime(record.getTime());
-        entity.setCategoryUniqueName(record.getCategory());
-        entity.setDesc(record.getRemark() != null ? record.getRemark() : "");
-        entity.setType(record.getType());
-        entity.setSyncStatus(1);
-        recordDao.update(entity);
     }
 
     // ==================== 回调辅助 ====================
@@ -538,7 +400,7 @@ public class NotionSyncManager {
     }
 
     /**
-     * 释放资源（Activity/Fragment 销毁时调用）
+     * 释放资源
      */
     public void release() {
         if (executor != null && !executor.isShutdown()) {
