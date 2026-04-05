@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 职责：
  * <ul>
  *   <li>管理同步方向（本地→Notion / Notion→本地 / 双向）</li>
- *   <li>将 TallyRecord 与本地 RecordEntity 互相转换</li>
+ *   <li>将 RecordEntity 与 TallyRecord 互相转换（TallyRecord 继承自 RecordEntity）</li>
  *   <li>通过 NotionApiClient 与 Notion API 通信</li>
  *   <li>通过 RecordDao 操作本地 SQLite 数据库</li>
  *   <li>通过 NotionDatabaseValidator 校验数据库模板</li>
@@ -440,7 +440,7 @@ public class NotionSyncManager {
         for (RecordEntity e : entities) {
             // record_sync_status == 0 表示未同步
             if (e.getSyncStatus() == 0) {
-                result.add(entityToTallyRecord(e));
+                result.add(TallyRecord.fromEntity(e));
             }
         }
         return result;
@@ -472,7 +472,7 @@ public class NotionSyncManager {
         if (all == null) return null;
         for (RecordEntity e : all) {
             if (notionId.equals(e.getSyncId())) {
-                return entityToTallyRecord(e);
+                return TallyRecord.fromEntity(e);
             }
         }
         return null;
@@ -485,7 +485,7 @@ public class NotionSyncManager {
      * @return 新增记录的本地 ID
      */
     private long addLocalRecord(TallyRecord record) {
-        RecordEntity entity = tallyRecordToEntity(record);
+        RecordEntity entity = record.toEntity();
         entity.setSyncStatus(1);
         return recordDao.insert(entity);
     }
@@ -507,41 +507,6 @@ public class NotionSyncManager {
         entity.setType(record.getType());
         entity.setSyncStatus(1);
         recordDao.update(entity);
-    }
-
-    // ==================== 实体转换工具 ====================
-
-    /**
-     * 将本地 RecordEntity 转换为 TallyRecord（用于 API 调用）
-     */
-    private TallyRecord entityToTallyRecord(RecordEntity entity) {
-        if (entity == null) return null;
-        TallyRecord record = new TallyRecord();
-        record.setId(entity.getId());
-        record.setNotionId(entity.getSyncId());
-        record.setTime(entity.getTime());
-        record.setAmount(entity.getAmount());
-        record.setCategory(entity.getCategoryUniqueName());
-        record.setRemark(entity.getDesc());
-        record.setType(entity.getType());
-        record.setSynced(entity.getSyncStatus() == 1);
-        record.setLastModified(entity.getTime());
-        return record;
-    }
-
-    /**
-     * 将 TallyRecord 转换为数据库 RecordEntity
-     */
-    private RecordEntity tallyRecordToEntity(TallyRecord record) {
-        RecordEntity entity = new RecordEntity();
-        entity.setSyncId(record.getNotionId() != null ? record.getNotionId() : "");
-        entity.setTime(record.getTime());
-        entity.setAmount(record.getAmount());
-        entity.setCategoryUniqueName(record.getCategory() != null ? record.getCategory() : "other");
-        entity.setDesc(record.getRemark() != null ? record.getRemark() : "");
-        entity.setType(record.getType());
-        entity.setSyncStatus(record.isSynced() ? 1 : 0);
-        return entity;
     }
 
     // ==================== 回调辅助 ====================
