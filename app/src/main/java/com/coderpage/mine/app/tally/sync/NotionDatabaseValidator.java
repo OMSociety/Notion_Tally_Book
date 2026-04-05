@@ -223,7 +223,7 @@ public class NotionDatabaseValidator {
         // fieldName, required, expectedNotionType
         String[][] expectedFields = {
                 {NotionApiClient.FIELD_AMOUNT,   "true",  "number"},
-                {NotionApiClient.FIELD_CATEGORY, "true",  "select"},
+                {NotionApiClient.FIELD_CATEGORY, "true",  "rich_text"},
                 {NotionApiClient.FIELD_REMARK,    "true",  "rich_text"},
                 {NotionApiClient.FIELD_TIME,      "true",  "date"},
                 {NotionApiClient.FIELD_TYPE,      "true",  "select"},
