@@ -96,10 +96,6 @@ Notion_Tally_Book/
 | 时间 | Date | ✅ | 记账日期 |
 | 备注 | Text | ❌ | 附加说明 |
 
-> 💡 **分类字段说明**：分类使用 **Text** 类型而非 Select，原因：
-> - 应用内可自由定义分类名称，无需在 Notion 侧维护选项列表
-> - 避免同步时分类名称不匹配导致的冲突
-> - 灵活适配不同用户的记账习惯
 
 详细配置见 [NOTION_DATABASE_TEMPLATE.md](./docs/NOTION_DATABASE_TEMPLATE.md)
 
