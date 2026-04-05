@@ -391,11 +391,17 @@ public class NotionApiClient {
                 r.setAmount(props.getJSONObject(FIELD_AMOUNT).optDouble("number", 0));
             }
 
-            // 分类（select）
+            // 分类（rich_text/text）
             if (props.has(FIELD_CATEGORY) && !props.isNull(FIELD_CATEGORY)) {
-                JSONObject select = props.getJSONObject(FIELD_CATEGORY).optJSONObject("select");
-                if (select != null) {
-                    r.setCategory(select.optString("name", ""));
+                JSONArray richText = props.getJSONObject(FIELD_CATEGORY).optJSONArray("rich_text");
+                if (richText != null && richText.length() > 0) {
+                    JSONObject textObj = richText.optJSONObject(0);
+                    if (textObj != null) {
+                        JSONObject text = textObj.optJSONObject("text");
+                        if (text != null) {
+                            r.setCategory(text.optString("content", ""));
+                        }
+                    }
                 }
             }
 
