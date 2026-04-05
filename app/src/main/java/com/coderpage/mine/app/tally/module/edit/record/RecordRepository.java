@@ -13,28 +13,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 记账记录 Repository
+ * 
+ * 封装记账记录和分类的 CRUD 操作，提供给 ViewModel 调用。
+ * 
  * @author lc. 2018-08-29 20:34
  * @since 0.6.0
  */
-
 public class RecordRepository {
 
-    private TallyDatabase mDataBase;
+    private final TallyDatabase database;
 
+    /**
+     * 构造方法，每次从 DatabaseProvider 获取实例
+     */
     public RecordRepository() {
-        mDataBase = TallyDatabase.getInstance();
+        this.database = TallyDatabase.getInstance();
     }
 
-    /** 查询所有支付分类 */
+    /**
+     * 查询所有分类
+     *
+     * @param type     分类类型（支出/收入）
+     * @param callback  回调
+     */
     public void queryAllCategory(RecordType type, SimpleCallback<List<CategoryModel>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
             if (type == RecordType.EXPENSE) {
-                List<CategoryModel> categoryList = mDataBase.categoryDao().allExpenseCategory();
+                List<CategoryModel> categoryList = database.categoryDao().allExpenseCategory();
                 MineExecutors.executeOnUiThread(() -> callback.success(categoryList));
                 return;
             }
             if (type == RecordType.INCOME) {
-                List<CategoryModel> categoryList = mDataBase.categoryDao().allIncomeCategory();
+                List<CategoryModel> categoryList = database.categoryDao().allIncomeCategory();
                 MineExecutors.executeOnUiThread(() -> callback.success(categoryList));
                 return;
             }
@@ -42,28 +53,43 @@ public class RecordRepository {
         });
     }
 
-    /** 通过 ID 查询记录 */
-    void queryRecordById(long recordId, SimpleCallback<Record> callback) {
+    /**
+     * 通过 ID 查询记录
+     *
+     * @param recordId 记录 ID
+     * @param callback 回调
+     */
+    public void queryRecordById(long recordId, SimpleCallback<Record> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            Record record = mDataBase.recordDao().queryById(recordId);
+            Record record = database.recordDao().queryById(recordId);
             MineExecutors.executeOnUiThread(() -> callback.success(record));
         });
     }
 
-    /** 保存记录 */
+    /**
+     * 保存新记录
+     *
+     * @param record   记录数据
+     * @param callback 回调
+     */
     public void saveRecord(Record record, SimpleCallback<Result<Long, IError>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            long id = mDataBase.recordDao().insert(record.createEntity());
+            long id = database.recordDao().insert(record.createEntity());
             MineExecutors.executeOnUiThread(() -> callback.success(new Result<>(id, null)));
         });
     }
 
-    /** 更新记录 */
-    void updateExpense(Record record, SimpleCallback<Result<Long, IError>> callback) {
+    /**
+     * 更新记录
+     *
+     * @param record   记录数据
+     * @param callback 回调
+     */
+    public void updateExpense(Record record, SimpleCallback<Result<Long, IError>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
             // 修改已同步记录时，重置同步状态，下次同步会上传变更
             record.setSyncStatus(0);
-            long id = mDataBase.recordDao().update(record.createEntity());
+            long id = database.recordDao().update(record.createEntity());
             MineExecutors.executeOnUiThread(() -> callback.success(new Result<>(id, null)));
         });
     }
