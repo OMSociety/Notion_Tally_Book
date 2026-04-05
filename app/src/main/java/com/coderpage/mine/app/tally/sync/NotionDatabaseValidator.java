@@ -33,7 +33,6 @@ import okhttp3.ResponseBody;
  *   <tr><td>备注</td><td>是</td><td>rich_text</td></tr>
  *   <tr><td>时间</td><td>是</td><td>date</td></tr>
  *   <tr><td>类型</td><td>是</td><td>select</td></tr>
- *   <tr><td>状态</td><td>否（推荐）</td><td>select</td></tr>
  * </table>
  *
  * @author abner-l
@@ -227,7 +226,7 @@ public class NotionDatabaseValidator {
                 {NotionApiClient.FIELD_REMARK,    "true",  "rich_text"},
                 {NotionApiClient.FIELD_TIME,      "true",  "date"},
                 {NotionApiClient.FIELD_TYPE,      "true",  "select"},
-                {NotionApiClient.FIELD_STATUS,    "false", "select"},
+
         };
 
         try {
