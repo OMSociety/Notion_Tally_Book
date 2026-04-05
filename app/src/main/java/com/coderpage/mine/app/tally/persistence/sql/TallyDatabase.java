@@ -17,6 +17,7 @@ import com.coderpage.mine.app.tally.data.CategoryContant;
 import com.coderpage.mine.app.tally.data.CategoryIconHelper;
 import com.coderpage.mine.app.tally.persistence.sql.dao.CategoryDao;
 import com.coderpage.mine.app.tally.persistence.sql.dao.RecordDao;
+import com.coderpage.mine.app.tally.persistence.sql.dao.SyncHistoryDao;
 import com.coderpage.mine.app.tally.persistence.sql.entity.CategoryEntity;
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 
@@ -28,7 +29,7 @@ import java.util.List;
  * @since 0.6.0
  */
 
-@Database(entities = {RecordEntity.class, CategoryEntity.class}, version = 60, exportSchema = false)
+@Database(entities = {RecordEntity.class, CategoryEntity.class, SyncHistoryEntity.class}, version = 60, exportSchema = false)
 public abstract class TallyDatabase extends RoomDatabase {
     /** sqlite db name */
     private static final String DATABASE_NAME = "sql_tally";
@@ -55,6 +56,13 @@ public abstract class TallyDatabase extends RoomDatabase {
      * @return 分类表操作
      */
     public abstract CategoryDao categoryDao();
+
+    /**
+     * 同步历史表
+     *
+     * @return 同步历史操作
+     */
+    public abstract SyncHistoryDao syncHistoryDao();
 
     public static TallyDatabase getInstance() {
         if (sInstance == null) {
