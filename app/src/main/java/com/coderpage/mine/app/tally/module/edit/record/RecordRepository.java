@@ -61,6 +61,8 @@ public class RecordRepository {
     /** 更新记录 */
     void updateExpense(Record record, SimpleCallback<Result<Long, IError>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
+            // 修改已同步记录时，重置同步状态，下次同步会上传变更
+            record.setSyncStatus(0);
             long id = mDataBase.recordDao().update(record.createEntity());
             MineExecutors.executeOnUiThread(() -> callback.success(new Result<>(id, null)));
         });
