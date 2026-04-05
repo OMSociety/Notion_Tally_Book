@@ -19,7 +19,7 @@
 | 功能 | 说明 |
 |------|------|
 | 本地记账 | 快速记录收支，支持分类、备注、时间 |
-| AI 智能识别 | 截图/短信自动解析金额和分类 |
+| AI 智能识别 | 图片识别 + 文本复制粘贴识别 |
 | Notion 同步 | 本地数据实时双向同步至 Notion 云端 |
 | 冲突处理 | 智能合并/覆盖策略处理同步冲突 |
 | 数据备份 | 本地自动备份 + 文件导出 |
@@ -71,7 +71,7 @@ Notion_Tally_Book/
 | 数据库 | Room | 本地 SQLite ORM |
 | 网络 | Retrofit + OkHttp | API 通信 |
 | 同步 | Notion API v1 | 云端数据同步 |
-| AI | 阿里云百炼 | Qwen2.5-VL-32B 视觉模型 |
+| AI | 自定义 API | 支持任意兼容 LLM API（图片+文本识别） |
 | UI | DataBinding + Material | 响应式 UI |
 
 ---
@@ -151,7 +151,7 @@ cd Notion_Tally_Book
 |------|------|
 | 应用图标 | [iconfont](http://iconfont.cn/) |
 | UI 图标 | [Material Design Icons](https://github.com/google/material-design-icons) |
-| AI 模型 | [阿里云百炼](https://bailian.console.aliyun.com/) (Qwen2.5-VL) |
+| AI 模型 | 支持接入任意 OpenAI 兼容 API |
 
 ### 开发工具
 
