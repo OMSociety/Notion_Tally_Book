@@ -2,6 +2,7 @@ package com.coderpage.mine.app.tally.persistence.sql.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import com.coderpage.mine.app.tally.persistence.sql.DatabaseConstants;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
@@ -11,7 +12,7 @@ import android.support.annotation.NonNull;
  * @since 0.6.0
  */
 
-@Entity(tableName = "category", indices = {@Index(value = {"category_unique_name"}, unique = true)})
+@Entity(tableName = DatabaseConstants.TABLE_CATEGORY, indices = {@Index(value = {DatabaseConstants.COLUMN_CATEGORY_UNIQUE_NAME}, unique = true)})
 public class CategoryEntity {
 
     public static final int TYPE_EXPENSE = 0;
