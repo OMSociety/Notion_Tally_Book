@@ -1,6 +1,7 @@
 package com.coderpage.mine.app.tally.persistence.sql.entity;
 
 import android.arch.persistence.room.Entity;
+import com.coderpage.mine.app.tally.persistence.sql.DatabaseConstants;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
@@ -8,7 +9,7 @@ import android.arch.persistence.room.PrimaryKey;
  *
  * 记录每次同步操作的详细信息
  */
-@Entity(tableName = "sync_history")
+@Entity(tableName = DatabaseConstants.TABLE_SYNC_HISTORY)
 public class SyncHistoryEntity {
 
     /** 同步历史ID */
