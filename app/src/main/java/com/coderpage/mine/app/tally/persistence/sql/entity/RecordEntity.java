@@ -2,6 +2,7 @@ package com.coderpage.mine.app.tally.persistence.sql.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import com.coderpage.mine.app.tally.persistence.sql.DatabaseConstants;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
@@ -10,7 +11,7 @@ import android.support.annotation.NonNull;
  * @author lc.
  * @since 0.6.0
  */
-@Entity(tableName = "record", indices = {@Index(value = {"record_sync_id"}, unique = true)})
+@Entity(tableName = DatabaseConstants.TABLE_RECORD, indices = {@Index(value = {DatabaseConstants.COLUMN_RECORD_SYNC_ID}, unique = true)})
 public class RecordEntity {
 
     /** 记录类型: 支出 */
