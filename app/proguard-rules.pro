@@ -111,3 +111,42 @@
 -keep class * implements com.alibaba.android.arouter.facade.template.ISyringe{*;}
 -keep interface * implements com.alibaba.android.arouter.facade.template.IProvider
 -keep class * implements com.alibaba.android.arouter.facade.template.IProvider
+
+## Notion SDK (OkHttp + Retrofit)
+# OkHttp
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-keep class okio.** { *; }
+-keep class okio.AsyncTimeout { *; }
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+
+# OkHttp Logging Interceptor
+-keep class okhttp3.logging.** { *; }
+-dontwarn okhttp3.logging.**
+
+# Retrofit
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
+
+# Gson
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn sun.misc.**
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Keep data classes
+-keep class com.coderpage.mine.persistence.entity.** { *; }
+-keep class com.coderpage.mine.app.tally.sync.** { *; }
