@@ -1,14 +1,20 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-kapt'
+}
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
+    namespace 'com.coderpage.mine'
+    compileSdk rootProject.compileSdkVersion
+    
     defaultConfig {
         applicationId rootProject.applicationId
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.appVersionCode
         versionName rootProject.appVersionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary true
         multiDexEnabled true
 
@@ -18,8 +24,12 @@ android {
             }
         }
     }
-    packagingOptions {
-        pickFirst 'META-INF/okio.kotlin_module'
+    
+    packaging {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += 'META-INF/okio.kotlin_module'
+        }
     }
 
     signingConfigs {
@@ -30,123 +40,123 @@ android {
             storePassword rootProject.storePassword
         }
     }
+    
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'TALKING_DATA_APP_ID', "\"$rootProject.talkingDataId\""
+            buildConfigField 'String', 'TALKING_DATA_APP_ID', ""$rootProject.talkingDataId""
         }
         debug {
             minifyEnabled false
             signingConfig signingConfigs.release
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'TALKING_DATA_APP_ID', "\"$rootProject.talkingDataId\""
+            buildConfigField 'String', 'TALKING_DATA_APP_ID', ""$rootProject.talkingDataId""
         }
     }
-    dataBinding {
-        enabled = true
+    
+    buildFeatures {
+        dataBinding true
+        viewBinding true
+        buildConfig true
     }
+    
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
-    lintOptions {
+    
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    
+    lint {
         checkReleaseBuilds true
         abortOnError false
     }
 
-    flavorDimensions 'channel'
+    flavorDimensions = ['channel']
 
     productFlavors {
-
         qh360 {
             dimension 'channel'
+            buildConfigField 'String', 'CHANNEL', '"qh360"'
         }
-        yingyongbao {
+        baidu {
             dimension 'channel'
+            buildConfigField 'String', 'CHANNEL', '"baidu"'
         }
-        xiaomi {
+        wandoujia {
             dimension 'channel'
+            buildConfigField 'String', 'CHANNEL', '"wandoujia"'
         }
-        huawei {
+        googleplay {
             dimension 'channel'
+            buildConfigField 'String', 'CHANNEL', '"googleplay"'
         }
         official {
             dimension 'channel'
+            buildConfigField 'String', 'CHANNEL', '"official"'
         }
     }
-
-    // APK 文件名称格式 mine-version-channel.apk
-    applicationVariants.all { variant ->
-
-        // 渠道名称
-        def productFlavorNames = variant.productFlavors.collect { it.name }
-        if (productFlavorNames.isEmpty()) {
-            productFlavorNames = [""]
-        }
-        def productFlavorName = productFlavorNames.join('')
-        // 版本号
-        def versionName = variant.mergedFlavor.versionName
-
-        def fileName
-        variant.outputs.all {
-            if (variant.buildType.name.equals('release')) {
-                fileName = "mine-${productFlavorName}-${versionName}.apk"
-            } else if (variant.buildType.name.equals('debug')) {
-                fileName = "mine-${productFlavorNames}-${versionName}-debug.apk"
-            }
-            outputFileName = fileName
-        }
-    }
-}
-
-apply plugin: 'com.coderpage.app'
-
-uploader {
-    apiServer = 'http://app.coderpage.com'
-    token = rootProject.releaseToken
-    appName = '我的记账本'
-    changeLog = file("${rootDir}/source/changelog/${rootProject.appVersionName}").text;
-    isRelease = true
 }
 
 dependencies {
-    api fileTree(include: ['*.jar'], dir: 'libs')
-    api project(':libbase')
-    api project(':libupdate')
-    api rootProject.appCompat
-    api rootProject.recyclerview
-    api rootProject.design
-    api rootProject.percentLayout
-    api rootProject.cardView
-    api rootProject.materialCalendarview
-    api rootProject.mpAndroidChart
-    api rootProject.fastjson
-    api rootProject.retrofit
-    api rootProject.retrofitConverterFastjson
-    api rootProject.okhttp3InterceptorLogging
-    api 'com.squareup.okhttp3:okhttp:3.15'
-    api rootProject.eventBus
-    api rootProject.archRoomRuntime
-    api rootProject.archLifecycleExtension
-    api rootProject.archViewmodel
-    api rootProject.archLiveData
-    api rootProject.archLifecycleRuntime
-    api rootProject.refreshLayout
-    api rootProject.constraintLayout
-    api rootProject.arounter
-
-    api rootProject.dashscopeSdk
-    api rootProject.multidex
-    api rootProject.archWork
-    api rootProject.excelPoi
-
-    compileOnly rootProject.lombok
+    // AndroidX Core
+    implementation "androidx.core:core:${rootProject.androidxCore}"
+    implementation "androidx.core:core-ktx:${rootProject.androidxCoreKtx}"
+    implementation "androidx.appcompat:appcompat:${rootProject.androidxAppCompat}"
+    implementation "androidx.constraintlayout:constraintlayout:${rootProject.androidxConstraintLayout}"
+    implementation "androidx.recyclerview:recyclerview:${rootProject.androidxRecyclerView}"
+    implementation "androidx.cardview:cardview:${rootProject.androidxCardView}"
+    implementation "androidx.percentlayout:percent:${rootProject.androidxPercentLayout}"
+    implementation "androidx.multidex:multidex:${rootProject.androidxMultidex}"
+    
+    // Material Design
+    implementation "com.google.android.material:material:${rootProject.materialDesign}"
+    
+    // Architecture Components
+    implementation "androidx.room:room-runtime:${rootProject.roomVersion}"
+    kapt "androidx.room:room-compiler:${rootProject.roomVersion}"
+    implementation "androidx.lifecycle:lifecycle-extensions:${rootProject.lifecycleVersion}"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${rootProject.lifecycleVersion}"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:${rootProject.lifecycleVersion}"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${rootProject.lifecycleVersion}"
+    
+    // Kotlin Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${rootProject.kotlinxCoroutines}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${rootProject.kotlinxCoroutines}"
+    
+    // WorkManager
+    implementation "androidx.work:work-runtime:${rootProject.workVersion}"
+    implementation "androidx.work:work-runtime-ktx:${rootProject.workVersion}"
+    
+    // 第三方库
+    implementation rootProject.eventBus
+    implementation rootProject.materialCalendarview
+    implementation rootProject.mpAndroidChart
+    implementation rootProject.fastjson
+    implementation rootProject.refreshLayout
+    implementation rootProject.dashscopeSdk
+    implementation rootProject.lombok
     annotationProcessor rootProject.lombok
-
-    annotationProcessor rootProject.archLifecycleCompiler
-    annotationProcessor rootProject.archRoomCompiler
+    
+    // ARouter
+    implementation rootProject.arounter
     annotationProcessor rootProject.arounterProcessor
+    
+    // 网络
+    implementation rootProject.retrofit
+    implementation rootProject.retrofitConverterGson
+    implementation rootProject.okhttp3
+    implementation rootProject.okhttp3Logging
+    
+    // 测试
     testImplementation rootProject.junit
+    androidTestImplementation rootProject.androidxTestRunner
+    androidTestImplementation rootProject.androidxTestRules
+    androidTestImplementation rootProject.androidxTestEspresso
+    testImplementation rootProject.robolectric
+    testImplementation rootProject.mockito
 }
