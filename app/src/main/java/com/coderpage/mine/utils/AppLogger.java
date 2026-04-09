@@ -2,29 +2,25 @@ package com.coderpage.mine.utils;
 
 import android.util.Log;
 
+import com.coderpage.mine.BuildConfig;
+
 /**
  * 应用日志工具类
  *
  * 封装 Android Log，提供统一的日志输出接口。
- * 支持日志级别过滤、Tag统一管理、可选的日志开关控制。
+ * 基于 BuildConfig.DEBUG 自动判断日志级别：
+ * <ul>
+ *   <li>DEBUG 构建：所有级别日志正常输出</li>
+ *   <li>RELEASE 构建：仅输出 w / i / e 级别，v / d 级别静默</li>
+ * </ul>
+ *
+ * 也可通过 {@link #setEnabled(boolean)} 手动覆盖。
  *
  * <b>使用示例：</b>
  * <pre>
- * // 基本用法（与 Android Log 用法一致）
- * AppLogger.d("Tag", "Debug message");
- * AppLogger.i("Tag", "Info message");
- * AppLogger.w("Tag", "Warning message");
- * AppLogger.e("Tag", "Error message");
- *
- * // 带异常信息的日志
- * try {
- *     // some code
- * } catch (Exception e) {
- *     AppLogger.e("Tag", "Error occurred", e);
- * }
- *
- * // 临时禁用日志（生产环境建议在 Application 中设置）
- * AppLogger.setEnabled(false);
+ * AppLogger.d("Tag", "Debug message");  // DEBUG 可见，RELEASE 静默
+ * AppLogger.e("Tag", "Error message");  // 始终可见
+ * AppLogger.setEnabled(false);          // 完全关闭日志
  * </pre>
  *
  * @author Flan
@@ -35,13 +31,13 @@ public class AppLogger {
     /** 默认 Tag */
     private static final String DEFAULT_TAG = "MineApp";
 
-    /** 是否启用日志输出（生产环境设为 false） */
-    private static boolean sEnabled = true;
+    /** 是否启用日志输出（默认跟随 BuildConfig.DEBUG） */
+    private static boolean sEnabled = BuildConfig.DEBUG;
 
     /**
      * 设置是否启用日志
      *
-     * @param enabled true 启用，false 禁用
+     * @param enabled true 启用，false 禁用所有日志
      */
     public static void setEnabled(boolean enabled) {
         sEnabled = enabled;
@@ -56,97 +52,77 @@ public class AppLogger {
         return sEnabled;
     }
 
-    /**
-     * Verbose 日志
-     */
+    // ==================== Verbose（仅 DEBUG 输出） ====================
+
     public static void v(String tag, String message) {
-        if (sEnabled) {
+        if (sEnabled && BuildConfig.DEBUG) {
             Log.v(tag, message);
         }
     }
 
-    /**
-     * Verbose 日志（带异常）
-     */
     public static void v(String tag, String message, Throwable t) {
-        if (sEnabled) {
+        if (sEnabled && BuildConfig.DEBUG) {
             Log.v(tag, message, t);
         }
     }
 
-    /**
-     * Debug 日志
-     */
+    // ==================== Debug（仅 DEBUG 输出） ====================
+
     public static void d(String tag, String message) {
-        if (sEnabled) {
+        if (sEnabled && BuildConfig.DEBUG) {
             Log.d(tag, message);
         }
     }
 
-    /**
-     * Debug 日志（带异常）
-     */
     public static void d(String tag, String message, Throwable t) {
-        if (sEnabled) {
+        if (sEnabled && BuildConfig.DEBUG) {
             Log.d(tag, message, t);
         }
     }
 
-    /**
-     * Info 日志
-     */
+    // ==================== Info（始终输出） ====================
+
     public static void i(String tag, String message) {
         if (sEnabled) {
             Log.i(tag, message);
         }
     }
 
-    /**
-     * Info 日志（带异常）
-     */
     public static void i(String tag, String message, Throwable t) {
         if (sEnabled) {
             Log.i(tag, message, t);
         }
     }
 
-    /**
-     * Warning 日志
-     */
+    // ==================== Warning（始终输出） ====================
+
     public static void w(String tag, String message) {
         if (sEnabled) {
             Log.w(tag, message);
         }
     }
 
-    /**
-     * Warning 日志（带异常）
-     */
     public static void w(String tag, String message, Throwable t) {
         if (sEnabled) {
             Log.w(tag, message, t);
         }
     }
 
-    /**
-     * Error 日志
-     */
+    // ==================== Error（始终输出） ====================
+
     public static void e(String tag, String message) {
         if (sEnabled) {
             Log.e(tag, message);
         }
     }
 
-    /**
-     * Error 日志（带异常）
-     */
     public static void e(String tag, String message, Throwable t) {
         if (sEnabled) {
             Log.e(tag, message, t);
         }
     }
 
-    // ==================== 使用默认 Tag 的便捷方法 ====================
+    // ==================== 默认 Tag 便捷方法 ====================
 
     public static void v(String message) {
         v(DEFAULT_TAG, message);
