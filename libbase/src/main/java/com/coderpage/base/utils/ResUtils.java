@@ -3,11 +3,11 @@ package com.coderpage.base.utils;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IntegerRes;
-import android.support.annotation.StringRes;
-import android.support.v7.content.res.AppCompatResources;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IntegerRes;
+import androidx.annotation.StringRes;
+import androidx.appcompat.content.res.AppCompatResources;
 
 /**
  * @author abner-l. 2017-05-11
