@@ -1,19 +1,34 @@
-package com.coderpage.mine.app.tally.module.backup;// AutoBackupWorker.java
+package com.coderpage.mine.app.tally.module.backup;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.coderpage.base.common.IError;
+import com.coderpage.mine.persistence.database.MineDatabase;
+import com.coderpage.mine.persistence.entity.KeyValue;
 
 import java.io.File;
 
+/**
+ * 自动备份 Worker
+ *
+ * 通过 WorkManager 在后台执行自动备份任务。
+ * 配置项从 MineDatabase (KeyValueDao) 读取，与 SettingViewModel 统一管理。
+ *
+ * @author abner-l
+ * @since 0.7.5
+ */
 public class AutoBackupWorker extends Worker {
-    
+
+    private static final String TAG = "AutoBackupWorker";
+
+    /** 自动备份开关 Key（与 SettingWorkerConst / SettingViewModel 对齐） */
+    private static final String KEY_AUTO_BACKUP_ENABLED = "auto_backup_enabled";
+
     public AutoBackupWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
@@ -21,46 +36,54 @@ public class AutoBackupWorker extends Worker {
     @Override
     public Result doWork() {
         if (!isAutoBackupEnabled()) {
+            Log.i(TAG, "Auto backup is disabled, skipping.");
             return Result.success();
         }
 
+        Log.i(TAG, "Starting auto backup...");
         try {
             File file = Backup.backupToJsonFileSync(getApplicationContext(),
                     new Backup.BackupProgressListener() {
                         @Override
                         public void onProgressUpdate(Backup.BackupProgress backupProgress) {
-                            // 可以添加日志记录
+                            Log.d(TAG, "Backup progress: " + backupProgress.name());
                         }
 
                         @Override
                         public void success(Void aVoid) {
-                            // 备份成功
-                            ((android.app.Activity) getApplicationContext()).runOnUiThread(() -> {
-                                Toast.makeText(getApplicationContext(), "备份成功", Toast.LENGTH_SHORT).show();
-                            });
+                            Log.i(TAG, "Auto backup completed successfully.");
                         }
 
                         @Override
                         public void failure(IError iError) {
-                            // 记录错误日志
-                            Log.e("AutoBackupWorker", "Backup failed: " + iError.msg());
-                            ((android.app.Activity) getApplicationContext()).runOnUiThread(() -> {
-                                Toast.makeText(getApplicationContext(), "备份失败: " + iError.msg(), Toast.LENGTH_SHORT).show();
-                            });
+                            Log.e(TAG, "Auto backup failed: " + iError.msg());
                         }
                     });
 
-            return file != null ? Result.success() : Result.failure();
+            if (file != null) {
+                Log.i(TAG, "Backup file saved: " + file.getAbsolutePath());
+                return Result.success();
+            } else {
+                Log.e(TAG, "Backup file is null, backup may have failed.");
+                return Result.failure();
+            }
         } catch (Exception e) {
-            Log.e("AutoBackupWorker", "Backup exception", e);
+            Log.e(TAG, "Backup exception", e);
             return Result.failure();
         }
     }
 
+    /**
+     * 从 MineDatabase (KeyValueDao) 读取自动备份开关状态
+     * 与 SettingViewModel 使用相同的配置源
+     */
     private boolean isAutoBackupEnabled() {
-        android.content.SharedPreferences prefs = getApplicationContext()
-                .getSharedPreferences("backup_settings", Context.MODE_PRIVATE);
-        return prefs.getBoolean("auto_backup_enabled", false);
+        try {
+            KeyValue setting = MineDatabase.getInstance().keyValueDao().query(KEY_AUTO_BACKUP_ENABLED);
+            return setting != null && "true".equalsIgnoreCase(setting.getValue());
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to read auto backup setting", e);
+            return false;
+        }
     }
-
 }
