@@ -46,11 +46,11 @@ public class HomeViewModel extends AndroidViewModel implements LifecycleObserver
     /** 首页数据列表 */
     private MutableLiveData<List<HomeDisplayData>> mDataList = new MutableLiveData<>();
 
-    private HomRepository mRepository;
+    private HomeRepository mRepository;
 
     public HomeViewModel(Application application) {
         super(application);
-        mRepository = new HomRepository();
+        mRepository = new HomeRepository();
         mHideMoney.set(SettingPreference.getHideMoney(application));
         refresh();
     }
