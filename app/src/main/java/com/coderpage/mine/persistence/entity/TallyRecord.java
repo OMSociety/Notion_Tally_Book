@@ -5,149 +5,235 @@ import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 /**
  * Notion 同步专用数据传输对象（DTO）
  * 
- * 继承自 RecordEntity，复用所有数据库字段。
- * 提供 Notion API 专用的别名方法，减少 entityToTallyRecord / tallyRecordToEntity 转换。
+ * 使用组合模式替代继承，消除数据冗余。
+ * 持有 RecordEntity 的引用，通过代理方法提供 Notion 友好的命名。
  * 
  * 字段映射关系：
- * - notionId     → syncId（Notion Page ID）
- * - category     → categoryUniqueName（分类唯一名称）
- * - remark       → desc（备注）
- * - synced       → syncStatus == 1
- * - lastModified → 由 Notion last_edited_time 设置
+ * - getNotionId()     → entity.getSyncId()（Notion Page ID）
+ * - getCategory()     → entity.getCategoryUniqueName()（分类唯一名称）
+ * - getRemark()       → entity.getDesc()（备注）
+ * - isSynced()        → entity.getSyncStatus() == 1
+ * - getLastModified() → Notion last_edited_time 或本地 time
  * 
  * @author abner-l
  * @since 0.7.5
  */
-public class TallyRecord extends RecordEntity {
+public class TallyRecord {
 
+    /** 持有数据库实体的引用（组合） */
+    private final RecordEntity entity;
+    
     /** Notion Page ID */
     private String notionId;
-
-    /** 分类名称（展示用，与 categoryUniqueName 配合） */
-    private String category;
-
-    /** 备注 */
-    private String remark;
-
-    /** 是否已同步到 Notion */
-    private boolean synced;
-
-    /** 最后修改时间（毫秒时间戳） */
+    
+    /** 最后修改时间（毫秒时间戳，来自 Notion 或本地） */
     private long lastModified;
 
     /**
-     * 默认构造器
+     * 默认构造器（用于反序列化场景）
      */
     public TallyRecord() {
-        super();
+        this.entity = new RecordEntity();
+        this.notionId = "";
+        this.lastModified = System.currentTimeMillis();
     }
 
     /**
-     * 从 RecordEntity 构造（用于 Notion→本地同步时转换）
+     * 从 RecordEntity 构造（用于本地→Notion 同步）
      * 
      * @param entity 数据库实体
      */
     public TallyRecord(RecordEntity entity) {
-        if (entity == null) return;
-        setId(entity.getId());
-        setAccountId(entity.getAccountId());
-        setTime(entity.getTime());
-        setAmount(entity.getAmount());
-        setCategoryUniqueName(entity.getCategoryUniqueName());
-        setDesc(entity.getDesc());
-        setSyncId(entity.getSyncId());
-        setSyncStatus(entity.getSyncStatus());
-        setDelete(entity.getDelete());
-        setType(entity.getType());
-        
-        // Notion 专用字段
+        if (entity == null) {
+            throw new IllegalArgumentException("entity cannot be null");
+        }
+        this.entity = entity;
         this.notionId = entity.getSyncId();
-        this.category = entity.getCategoryUniqueName();
-        this.remark = entity.getDesc();
-        this.synced = entity.getSyncStatus() == 1;
         this.lastModified = entity.getTime();
     }
 
-    // ==================== Notion 专用 getter/setter（别名方法） ====================
-
-    public String getNotionId() {
-        return notionId;
-    }
-
-    public void setNotionId(String notionId) {
-        this.notionId = notionId;
-        // 同时更新父类的 syncId
-        setSyncId(notionId != null ? notionId : "");
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-        // 同时更新父类的 categoryUniqueName
-        setCategoryUniqueName(category != null ? category : "other");
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-        // 同时更新父类的 desc
-        setDesc(remark != null ? remark : "");
-    }
-
-    public boolean isSynced() {
-        return synced;
-    }
-
-    public void setSynced(boolean synced) {
-        this.synced = synced;
-        // 同时更新父类的 syncStatus
-        setSyncStatus(synced ? 1 : 0);
-    }
-
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(long lastModified) {
-        this.lastModified = lastModified;
-    }
-
-    // ==================== 便捷转换方法 ====================
+    // ==================== 静态工厂方法 ====================
 
     /**
-     * 将当前对象转换为数据库实体
-     * 用于本地→Notion 同步时转换
-     * 
-     * @return RecordEntity 实例
-     */
-    public RecordEntity toEntity() {
-        RecordEntity entity = new RecordEntity();
-        entity.setId(getId());
-        entity.setAccountId(getAccountId());
-        entity.setTime(getTime());
-        entity.setAmount(getAmount());
-        entity.setCategoryUniqueName(getCategory() != null ? getCategory() : "other");
-        entity.setDesc(getRemark() != null ? getRemark() : "");
-        entity.setSyncId(getNotionId() != null ? getNotionId() : "");
-        entity.setSyncStatus(isSynced() ? 1 : 0);
-        entity.setDelete(0);
-        entity.setType(getType());
-        return entity;
-    }
-
-    /**
-     * 静态工厂方法：从 RecordEntity 创建 TallyRecord
+     * 从 RecordEntity 创建 TallyRecord
      * 
      * @param entity 数据库实体
      * @return TallyRecord 实例
      */
     public static TallyRecord fromEntity(RecordEntity entity) {
+        if (entity == null) return null;
         return new TallyRecord(entity);
+    }
+
+    /**
+     * 创建新的空记录
+     */
+    public static TallyRecord create() {
+        return new TallyRecord();
+    }
+
+    // ==================== 转换为数据库实体 ====================
+
+    /**
+     * 将当前对象转换为数据库实体
+     * 用于本地→Notion 同步时保存到本地数据库
+     * 
+     * @return RecordEntity 实例
+     */
+    public RecordEntity toEntity() {
+        entity.setSyncId(notionId != null ? notionId : "");
+        entity.setTime(lastModified);
+        return entity;
+    }
+
+    // ==================== Notion 专用 getter/setter ====================
+
+    /**
+     * 获取 Notion Page ID
+     */
+    public String getNotionId() {
+        return notionId;
+    }
+
+    /**
+     * 设置 Notion Page ID
+     */
+    public void setNotionId(String notionId) {
+        this.notionId = notionId;
+    }
+
+    /**
+     * 获取最后修改时间（毫秒时间戳）
+     */
+    public long getLastModified() {
+        return lastModified;
+    }
+
+    /**
+     * 设置最后修改时间
+     */
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    // ==================== 代理方法（Notion 友好命名）====================
+
+    /**
+     * 获取分类名称（代理 entity.getCategoryUniqueName）
+     */
+    public String getCategory() {
+        return entity.getCategoryUniqueName();
+    }
+
+    /**
+     * 设置分类名称
+     */
+    public void setCategory(String category) {
+        entity.setCategoryUniqueName(category != null ? category : "other");
+    }
+
+    /**
+     * 获取备注（代理 entity.getDesc）
+     */
+    public String getRemark() {
+        return entity.getDesc();
+    }
+
+    /**
+     * 设置备注
+     */
+    public void setRemark(String remark) {
+        entity.setDesc(remark != null ? remark : "");
+    }
+
+    /**
+     * 是否已同步到 Notion
+     */
+    public boolean isSynced() {
+        return entity.getSyncStatus() == 1;
+    }
+
+    /**
+     * 设置同步状态
+     */
+    public void setSynced(boolean synced) {
+        entity.setSyncStatus(synced ? 1 : 0);
+    }
+
+    // ==================== 直接访问底层实体（谨慎使用）====================
+
+    /**
+     * 获取底层的 RecordEntity
+     * 供内部组件使用，不建议外部代码直接调用
+     */
+    public RecordEntity getEntity() {
+        return entity;
+    }
+
+    // ==================== RecordEntity 字段的便捷访问方法 ====================
+
+    public long getId() {
+        return entity.getId();
+    }
+
+    public void setId(long id) {
+        entity.setId(id);
+    }
+
+    public long getAccountId() {
+        return entity.getAccountId();
+    }
+
+    public void setAccountId(long accountId) {
+        entity.setAccountId(accountId);
+    }
+
+    public long getTime() {
+        return entity.getTime();
+    }
+
+    public void setTime(long time) {
+        entity.setTime(time);
+    }
+
+    public double getAmount() {
+        return entity.getAmount();
+    }
+
+    public void setAmount(double amount) {
+        entity.setAmount(amount);
+    }
+
+    public String getCategoryUniqueName() {
+        return entity.getCategoryUniqueName();
+    }
+
+    public String getDesc() {
+        return entity.getDesc();
+    }
+
+    public String getSyncId() {
+        return notionId;
+    }
+
+    public int getSyncStatus() {
+        return entity.getSyncStatus();
+    }
+
+    public int getType() {
+        return entity.getType();
+    }
+
+    public void setType(int type) {
+        entity.setType(type);
+    }
+
+    /**
+     * 获取同步ID（兼容旧代码）
+     * @deprecated use {@link #getNotionId()} instead
+     */
+    @Deprecated
+    public String getSyncIdLegacy() {
+        return entity.getSyncId();
     }
 }
