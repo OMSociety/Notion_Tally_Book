@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.coderpage.mine.app.tally.sync.NotionApiClient;
+import com.coderpage.mine.app.tally.sync.NotionSyncManager;
 
 /**
  * Notion 同步配置管理
@@ -18,6 +19,7 @@ import com.coderpage.mine.app.tally.sync.NotionApiClient;
  *   <tr><td>同步开关</td><td>sync_enabled</td><td>false</td></tr>
  *   <tr><td>自动同步</td><td>auto_sync</td><td>false</td></tr>
  *   <tr><td>同步方向</td><td>sync_direction</td><td>双向(SYNC_BIDIRECTIONAL)</td></tr>
+ *   <tr><td>冲突解决策略</td><td>conflict_resolution</td><td>MERGE_FIELDS</td></tr>
  *   <tr><td>上次同步时间</td><td>last_sync_time</td><td>0</td></tr>
  * </table>
  *
@@ -35,6 +37,7 @@ public class NotionConfig {
     private static final String KEY_LAST_SYNC_TIME  = "last_sync_time";
     private static final String KEY_AUTO_SYNC       = "auto_sync";
     private static final String KEY_SYNC_DIRECTION  = "sync_direction";
+    private static final String KEY_CONFLICT_RESOLUTION = "conflict_resolution";
 
     /** 同步方向：本地 → Notion */
     public static final int SYNC_TO_NOTION       = 0;
@@ -167,6 +170,51 @@ public class NotionConfig {
         }
     }
 
+    // ==================== 冲突解决策略 ====================
+
+    /**
+     * 设置冲突解决策略
+     *
+     * @param resolution 冲突解决策略常量，取值：
+     *                  {@link NotionSyncManager.ConflictResolution#LOCAL_WINS}（本地优先）
+     *                  {@link NotionSyncManager.ConflictResolution#NOTION_WINS}（Notion优先）
+     *                  {@link NotionSyncManager.ConflictResolution#MERGE_FIELDS}（字段级合并，默认值）
+     *                  {@link NotionSyncManager.ConflictResolution#MANUAL}（手动解决）
+     */
+    public void setConflictResolution(NotionSyncManager.ConflictResolution resolution) {
+        prefs.edit().putString(KEY_CONFLICT_RESOLUTION, resolution.name()).apply();
+    }
+
+    /**
+     * 获取冲突解决策略
+     *
+     * @return 冲突解决策略，默认为 {@link NotionSyncManager.ConflictResolution#MERGE_FIELDS}
+     */
+    public NotionSyncManager.ConflictResolution getConflictResolution() {
+        String name = prefs.getString(KEY_CONFLICT_RESOLUTION, 
+                NotionSyncManager.ConflictResolution.MERGE_FIELDS.name());
+        try {
+            return NotionSyncManager.ConflictResolution.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return NotionSyncManager.ConflictResolution.MERGE_FIELDS;
+        }
+    }
+
+    /**
+     * 获取冲突解决策略的中文描述
+     *
+     * @return 策略描述字符串，用于 UI 显示
+     */
+    public String getConflictResolutionLabel() {
+        switch (getConflictResolution()) {
+            case LOCAL_WINS:    return "本地优先";
+            case NOTION_WINS:  return "Notion 优先";
+            case MERGE_FIELDS: return "字段级合并";
+            case MANUAL:       return "手动解决";
+            default:           return "未知策略";
+        }
+    }
+
     // ==================== 上次同步时间 ====================
 
     /**
@@ -228,6 +276,7 @@ public class NotionConfig {
                 .remove(KEY_SYNC_ENABLED)
                 .remove(KEY_AUTO_SYNC)
                 .remove(KEY_SYNC_DIRECTION)
+                .remove(KEY_CONFLICT_RESOLUTION)
                 .remove(KEY_LAST_SYNC_TIME)
                 .apply();
     }
