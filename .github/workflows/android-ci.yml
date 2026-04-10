@@ -26,6 +26,9 @@ jobs:
       - name: Create local.properties
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
+      - name: Set GRADLE_OPTS
+        run: echo "GRADLE_OPTS=-Xmx4g -Dorg.gradle.daemon=false" >> $GITHUB_ENV
+
       - name: Build debug APK (official flavor)
         run: |
           chmod +x gradlew
