@@ -89,28 +89,11 @@ android {
 }
 
 dependencies {
-    // 项目模块 (api 声明以传递依赖)
-    api project(':libbase')
+    // 项目模块
+    implementation project(':libbase')
     implementation project(':libupdate')
     // AndroidX Core
     implementation "androidx.core:core:${rootProject.androidxCore}"
-    implementation "androidx.annotation:annotation:${rootProject.androidxAnnotation}"
-    
-    
-    // AndroidX AppCompat (传递依赖)
-    implementation "androidx.appcompat:appcompat:${rootProject.androidxAppCompat}"
-    
-    
-    
-    // AndroidX RecyclerView
-    implementation "androidx.recyclerview:recyclerview:${rootProject.androidxRecyclerView}"
-    
-    // AndroidX ViewPager
-    
-    
-    // AndroidX Lifecycle
-    implementation "androidx.lifecycle:lifecycle-common:${rootProject.lifecycleVersion}"
-    implementation "androidx.databinding:databinding-runtime:${rootProject.databindingVersion}"
     implementation "androidx.core:core-ktx:${rootProject.androidxCoreKtx}"
     implementation "androidx.appcompat:appcompat:${rootProject.androidxAppCompat}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.androidxConstraintLayout}"
@@ -144,16 +127,9 @@ dependencies {
     implementation rootProject.mpAndroidChart
     implementation rootProject.timber
     
-    // TwinklingRefreshLayout (来自 JitPack)
-    implementation 'com.github.lcodecorex:TwinklingRefreshLayout:v1.03'
-
-    implementation rootProject.eventBus
-    implementation rootProject.mpAndroidChart
-    implementation rootProject.timber
-    
     // ARouter
     implementation rootProject.arounter
-    ksp rootProject.arounterProcessor
+    annotationProcessor rootProject.arounterProcessor
     
     // 网络
     implementation rootProject.okhttp3
@@ -166,6 +142,4 @@ dependencies {
     androidTestImplementation rootProject.androidxTestEspresso
     testImplementation rootProject.robolectric
     testImplementation rootProject.mockito
-}
-
 }
