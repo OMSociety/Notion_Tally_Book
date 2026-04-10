@@ -139,4 +139,7 @@
         <item name="android:background">@drawable/btn_bottom_borderless_withpadding</item>
     </style>
 
+
+    <!-- TabLayout style for compatibility -->
+    <style name="Widget.AppCompat.TabLayout" parent="Widget.MaterialComponents.TabLayout" />
 </resources>
