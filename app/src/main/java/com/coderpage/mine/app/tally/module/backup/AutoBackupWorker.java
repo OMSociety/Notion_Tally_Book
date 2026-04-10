@@ -2,7 +2,7 @@ package com.coderpage.mine.app.tally.module.backup;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
-import android.util.Log;
+import timber.log.Timber;
 
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -24,8 +24,6 @@ import java.io.File;
  */
 public class AutoBackupWorker extends Worker {
 
-    private static final String TAG = "AutoBackupWorker";
-
     /** 自动备份开关 Key（与 SettingWorkerConst / SettingViewModel 对齐） */
     private static final String KEY_AUTO_BACKUP_ENABLED = "auto_backup_enabled";
 
@@ -36,39 +34,39 @@ public class AutoBackupWorker extends Worker {
     @Override
     public Result doWork() {
         if (!isAutoBackupEnabled()) {
-            Log.i(TAG, "Auto backup is disabled, skipping.");
+            Timber.i("Auto backup is disabled, skipping.");
             return Result.success();
         }
 
-        Log.i(TAG, "Starting auto backup...");
+        Timber.i("Starting auto backup...");
         try {
             File file = Backup.backupToJsonFileSync(getApplicationContext(),
                     new Backup.BackupProgressListener() {
                         @Override
                         public void onProgressUpdate(Backup.BackupProgress backupProgress) {
-                            Log.d(TAG, "Backup progress: " + backupProgress.name());
+                            Timber.d("Backup progress: " + backupProgress.name());
                         }
 
                         @Override
                         public void success(Void aVoid) {
-                            Log.i(TAG, "Auto backup completed successfully.");
+                            Timber.i("Auto backup completed successfully.");
                         }
 
                         @Override
                         public void failure(IError iError) {
-                            Log.e(TAG, "Auto backup failed: " + iError.msg());
+                            Timber.e("Auto backup failed: " + iError.msg());
                         }
                     });
 
             if (file != null) {
-                Log.i(TAG, "Backup file saved: " + file.getAbsolutePath());
+                Timber.i("Backup file saved: " + file.getAbsolutePath());
                 return Result.success();
             } else {
-                Log.e(TAG, "Backup file is null, backup may have failed.");
+                Timber.e("Backup file is null, backup may have failed.");
                 return Result.failure();
             }
         } catch (Exception e) {
-            Log.e(TAG, "Backup exception", e);
+            Timber.e(e, "Backup exception");
             return Result.failure();
         }
     }
@@ -82,7 +80,7 @@ public class AutoBackupWorker extends Worker {
             KeyValue setting = MineDatabase.getInstance().keyValueDao().query(KEY_AUTO_BACKUP_ENABLED);
             return setting != null && "true".equalsIgnoreCase(setting.getValue());
         } catch (Exception e) {
-            Log.e(TAG, "Failed to read auto backup setting", e);
+            Timber.e(e, "Failed to read auto backup setting");
             return false;
         }
     }
