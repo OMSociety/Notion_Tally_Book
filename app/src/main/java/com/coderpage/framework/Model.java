@@ -1,7 +1,7 @@
 package com.coderpage.framework;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * @author abner-l. 2017-04-09
