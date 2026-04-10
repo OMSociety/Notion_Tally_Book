@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import com.coderpage.mine.MineApp;
 import com.coderpage.mine.R;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.tally.module.records.RecordDateTitleItemBinding;
 import com.coderpage.mine.tally.module.records.RecordItemBinding;
 
@@ -54,7 +53,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemViewType(int position) {
         Object item = mDataList.get(position);
-        return item instanceof Record ? ITEM_TYPE_RECORD : ITEM_TYPE_DATE_TITLE;
+        return item instanceof RecordEntity ? ITEM_TYPE_RECORD : ITEM_TYPE_DATE_TITLE;
     }
 
     @Override
@@ -71,8 +70,8 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         Object item = mDataList.get(position);
-        if (holder instanceof RecordsViewHolder && item instanceof Record) {
-            ((RecordsViewHolder) holder).bind((Record) item);
+        if (holder instanceof RecordsViewHolder && item instanceof RecordEntity) {
+            ((RecordsViewHolder) holder).bind((RecordEntity) item);
         }
         if (holder instanceof DateTitleViewHolder && item instanceof RecordsDateTitle) {
             ((DateTitleViewHolder) holder).bind((RecordsDateTitle) item);
@@ -89,7 +88,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             mBinding = binding;
         }
 
-        void bind(Record record) {
+        void bind(RecordEntity record) {
             mBinding.setActivity(mActivity);
             mBinding.setData(record);
             mBinding.setVm(mViewModel);
