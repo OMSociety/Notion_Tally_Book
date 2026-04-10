@@ -1,8 +1,8 @@
 package com.coderpage.mine.app.tally.ui.dialog;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.support.v4.app.DialogFragment;
 
 import com.alibaba.android.arouter.launcher.ARouter;
