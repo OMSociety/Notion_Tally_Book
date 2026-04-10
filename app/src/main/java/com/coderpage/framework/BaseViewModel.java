@@ -1,7 +1,7 @@
 package com.coderpage.framework;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
+import androidx.lifecycle.AndroidViewModel;
 import android.os.Looper;
 import android.support.annotation.StringRes;
 import android.widget.Toast;
