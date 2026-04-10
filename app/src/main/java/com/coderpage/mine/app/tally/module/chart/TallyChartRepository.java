@@ -7,8 +7,8 @@ import com.coderpage.mine.app.tally.module.chart.data.CategoryData;
 import com.coderpage.mine.app.tally.module.chart.data.DailyData;
 import com.coderpage.mine.app.tally.module.chart.data.Month;
 import com.coderpage.mine.app.tally.module.chart.data.MonthlyData;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.model.RecordCategoryGroup;
+import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 import com.coderpage.mine.app.tally.persistence.model.RecordGroup;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 
@@ -32,7 +32,7 @@ class TallyChartRepository {
     void queryFirstRecordTime(Callback<Long, IError> callback) {
         MineExecutors.ioExecutor().execute(() -> {
             long firstTime = System.currentTimeMillis();
-            Record recordFirst = TallyDatabase.getInstance().recordDao().queryFirst();
+            RecordEntity recordFirst = TallyDatabase.getInstance().recordDao().queryFirst();
             if (recordFirst != null) {
                 firstTime = recordFirst.getTime();
             }
