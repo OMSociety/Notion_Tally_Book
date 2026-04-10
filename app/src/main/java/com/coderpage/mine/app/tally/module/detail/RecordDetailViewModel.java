@@ -19,7 +19,6 @@ import com.coderpage.mine.app.tally.common.utils.TallyUtils;
 import com.coderpage.mine.app.tally.eventbus.EventRecordDelete;
 import com.coderpage.mine.app.tally.eventbus.EventRecordUpdate;
 import com.coderpage.mine.app.tally.module.edit.RecordEditActivity;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -73,12 +72,12 @@ public class RecordDetailViewModel extends BaseViewModel implements LifecycleObs
                     if (mType == TYPE_EXPENSE) {
                         mRepository.deleteExpense(mRecordId, result -> {
                             activity.finish();
-                            EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                            EventBus.getDefault().post(new EventRecordDelete((RecordEntity) mRecord));
                         });
                     } else {
                         mRepository.deleteIncome(mRecordId, result -> {
                             activity.finish();
-                            EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                            EventBus.getDefault().post(new EventRecordDelete((RecordEntity) mRecord));
                         });
                     }
                 }).show();
@@ -94,9 +93,9 @@ public class RecordDetailViewModel extends BaseViewModel implements LifecycleObs
 
     private void refreshData() {
         if (mType == TYPE_EXPENSE) {
-            mRepository.queryExpense(mRecordId, new Callback<Record, IError>() {
+            mRepository.queryExpense(mRecordId, new Callback<RecordEntity, IError>() {
                 @Override
-                public void success(Record expense) {
+                public void success(RecordEntity expense) {
                     mRecord = expense;
                     RecordData recordData = new RecordData();
                     recordData.setType(TYPE_EXPENSE);
@@ -115,9 +114,9 @@ public class RecordDetailViewModel extends BaseViewModel implements LifecycleObs
                 }
             });
         } else {
-            mRepository.queryIncome(mRecordId, new Callback<Record, IError>() {
+            mRepository.queryIncome(mRecordId, new Callback<RecordEntity, IError>() {
                 @Override
-                public void success(Record income) {
+                public void success(RecordEntity income) {
                     mRecord = income;
                     RecordData recordData = new RecordData();
                     recordData.setType(TYPE_INCOME);
