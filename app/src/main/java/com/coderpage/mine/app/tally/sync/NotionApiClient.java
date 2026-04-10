@@ -75,9 +75,6 @@ public class NotionApiClient {
     static final String FIELD_TIME = "时间";
     /** 类型字段名（支出/收入） */
     static final String FIELD_TYPE = "类型";
-
-    /** 状态字段名（活跃/已删除，用于软删除同步） */
-    static final String FIELD_STATUS = "状态";
     // ==================== 内部状态 ====================
     private String apiToken;
     private String databaseId;
@@ -346,10 +343,6 @@ public class NotionApiClient {
         String typeName = record.getType() == 0 ? "支出" : "收入";
         props.put(FIELD_TYPE, new JSONObject()
                 .put("select", new JSONObject().put("name", typeName)));
-        // 状态（活跃=未删除，已删除=软删除）
-        String statusName = (record.getDeleteStatus() == 1) ? "已删除" : "活跃";
-        props.put(FIELD_STATUS, new JSONObject()
-                .put("select", new JSONObject().put("name", statusName)));
         page.put("properties", props);
         return page;
     }
@@ -435,13 +428,6 @@ public class NotionApiClient {
                 JSONObject select = props.getJSONObject(FIELD_TYPE).optJSONObject("select");
                 String typeName = select != null ? select.optString("name", "支出") : "支出";
                 r.setType(typeName.equals("收入") ? 1 : 0);
-            }
-
-            // 状态（活跃/已删除）
-            if (props.has(FIELD_STATUS) && !props.isNull(FIELD_STATUS)) {
-                JSONObject select = props.getJSONObject(FIELD_STATUS).optJSONObject("select");
-                String statusName = select != null ? select.optString("name", "活跃") : "活跃";
-                r.setDeleteStatus(statusName.equals("已删除") ? 1 : 0);
             }
 
             // lastModified：使用 Notion 的 last_edited_time
