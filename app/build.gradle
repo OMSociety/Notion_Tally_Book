@@ -1,7 +1,9 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-kapt'
 }
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     namespace 'com.coderpage.mine'
@@ -39,6 +41,12 @@ android {
             storeFile file(rootProject.keyStore)
             storePassword rootProject.storePassword
         }
+        debug {
+            keyAlias rootProject.keyAlias
+            keyPassword rootProject.keyPassword
+            storeFile file(rootProject.keyStore)
+            storePassword rootProject.storePassword
+        }
     }
     
     buildTypes {
@@ -51,7 +59,7 @@ android {
         }
         debug {
             minifyEnabled false
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             buildConfigField 'String', 'TALKING_DATA_APP_ID', ""$rootProject.talkingDataId""
         }
     }
@@ -142,7 +150,6 @@ dependencies {
     annotationProcessor rootProject.arounterProcessor
     
     // 网络
-ConverterGson
     implementation rootProject.okhttp3
     implementation rootProject.okhttp3Logging
     
