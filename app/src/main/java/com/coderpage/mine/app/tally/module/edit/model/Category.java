@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.edit.model;
 
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
+import androidx.databinding.BaseObservable;
+import androidx.databinding.BindingAdapter;
 
 import com.coderpage.mine.BR;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
