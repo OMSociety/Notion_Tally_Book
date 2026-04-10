@@ -91,6 +91,12 @@ public class RecordEntity {
     @ColumnInfo(name = "category_sync_status")
     private int categorySyncStatus = 0;
 
+    /** 分类唯一名称（JOIN category 表获得，用于区分 record 的 category_unique_name） */
+    @ColumnInfo(name = "category_unique_name")
+    @Entity.java.foreignKey
+    private String joinedCategoryUniqueName = "";
+
+
 
     public long getId() {
         return id;
@@ -229,5 +235,14 @@ public class RecordEntity {
     public void setCategorySyncStatus(int categorySyncStatus) {
         this.categorySyncStatus = categorySyncStatus;
     }
+
+    public String getJoinedCategoryUniqueName() {
+        return joinedCategoryUniqueName;
+    }
+
+    public void setJoinedCategoryUniqueName(String joinedCategoryUniqueName) {
+        this.joinedCategoryUniqueName = joinedCategoryUniqueName != null ? joinedCategoryUniqueName : "";
+    }
+
 
 }
