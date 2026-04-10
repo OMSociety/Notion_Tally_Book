@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.edit.record;
 
 import android.app.Activity;
-import android.support.v4.view.PagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
