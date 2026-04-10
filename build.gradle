@@ -61,6 +61,7 @@ ext {
     workVersion = '2.9.0'
     
     // 其他
+    fastjson = 'com.alibaba:fastjson:2.0.45.android'
     dashscopeSdk = 'com.alibaba:dashscope-sdk-java:2.20.0'
     timber = 'com.jakewharton.timber:timber:5.0.1'
 
