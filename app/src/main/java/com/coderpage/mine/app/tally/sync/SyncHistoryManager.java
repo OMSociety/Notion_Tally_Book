@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.sync;
 
 import android.content.Context;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.app.tally.persistence.sql.dao.SyncHistoryDao;
@@ -53,10 +53,10 @@ public class SyncHistoryManager {
             // 自动清理，只保留最近 MAX_HISTORY_SIZE 条
             dao.keepRecent(MAX_HISTORY_SIZE);
 
-            Log.i(TAG, "Sync logged: " + direction
+            Timber.i(TAG, "Sync logged: " + direction
                     + " (uploaded=" + localUpdated + ", pulled=" + notionUpdated + ")");
         } catch (Exception e) {
-            Log.e(TAG, "Failed to log sync", e);
+            Timber.e(TAG, "Failed to log sync", e);
         }
     }
 
@@ -80,9 +80,9 @@ public class SyncHistoryManager {
             entity.setStatus(2); // 失败
             dao.insert(entity);
             dao.keepRecent(MAX_HISTORY_SIZE);
-            Log.e(TAG, "Sync failure logged: " + direction + " - " + errorMsg);
+            Timber.e(TAG, "Sync failure logged: " + direction + " - " + errorMsg);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to log sync failure", e);
+            Timber.e(TAG, "Failed to log sync failure", e);
         }
     }
 
@@ -102,9 +102,9 @@ public class SyncHistoryManager {
                     + " fields=" + conflict.conflictingFields);
             entity.setStatus(1);
             dao.insert(entity);
-            Log.w(TAG, "Conflict logged: " + conflict.notionId);
+            Timber.w(TAG, "Conflict logged: " + conflict.notionId);
         } catch (Exception e) {
-            Log.e(TAG, "Failed to log conflict", e);
+            Timber.e(TAG, "Failed to log conflict", e);
         }
     }
 
