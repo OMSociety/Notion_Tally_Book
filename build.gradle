@@ -62,7 +62,8 @@ ext {
     
     // 其他
     fastjson = 'com.alibaba:fastjson:2.0.45.android'
-    dashscopeSdk = 'com.alibaba:dashscope-sdk-java:2.20.0'
+    // 可选依赖，app 模块默认不引入。如需 AI 记账功能，解注下行并确保 DashScope API Key 配置正确
+    // dashscopeSdk = 'com.alibaba:dashscope-sdk-java:2.20.0'
     excelPoi = 'com.github.nicbell:poi-android:3.17'
     timber = 'com.jakewharton.timber:timber:5.0.1'
 
