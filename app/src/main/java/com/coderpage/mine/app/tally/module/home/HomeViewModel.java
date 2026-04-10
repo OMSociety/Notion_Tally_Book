@@ -20,7 +20,6 @@ import com.coderpage.mine.app.tally.module.edit.RecordEditActivity;
 import com.coderpage.mine.app.tally.module.home.model.HomeDisplayData;
 import com.coderpage.mine.app.tally.module.home.model.HomeMonthModel;
 import com.coderpage.mine.app.tally.module.home.model.HomeTodayDayRecordsModel;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.preference.SettingPreference;
 import com.coderpage.mine.app.tally.ui.dialog.MenuDialog;
 
@@ -100,7 +99,7 @@ public class HomeViewModel extends AndroidViewModel implements LifecycleObserver
                 double todayIncomeTotalAmount = mRepository.getTodayInComeTotalAmount();
 
                 List<Pair<String, Double>> categoryExpenseTotal = mRepository.getCategoryExpenseTotal();
-                List<Record> todayRecordList = mRepository.getTodayRecordList();
+                List<RecordEntity> todayRecordList = mRepository.getTodayRecordList();
 
                 HomeMonthModel monthModel = new HomeMonthModel();
                 monthModel.setMonthExpenseAmount(monthExpenseTotalAmount);
@@ -116,7 +115,7 @@ public class HomeViewModel extends AndroidViewModel implements LifecycleObserver
                 dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_MONTH_INFO, monthModel));
                 dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_RECENT_DAY_INFO, todayRecordsModel));
 
-                for (Record record : todayRecordList) {
+                for (RecordEntity record : todayRecordList) {
                     dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_RECORD_ITEM, record));
                 }
                 mDataList.setValue(dataList);
