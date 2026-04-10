@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.module.backup;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -30,7 +30,7 @@ public class BackupFileActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.tally_module_backup_activity_backup_file);
-        mViewModel = ViewModelProviders.of(this).get(BackupFileViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(BackupFileViewModel.class);
 
         subscribeUi();
     }
