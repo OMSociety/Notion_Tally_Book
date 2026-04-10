@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.home;
 
 import android.Manifest;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -65,7 +65,7 @@ public class HomeActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.module_home_activity_home);
-        mViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         getLifecycle().addObserver(mViewModel);
 
         // 检查是否已同意隐私政策
@@ -221,7 +221,7 @@ public class HomeActivity extends BaseActivity {
         });
 
         RecyclerView recyclerView = mBinding.recyclerView;
-        mAdapter = new HomeAdapter(this, mViewModel, ViewModelProviders.of(this).get(RecordItemViewModel.class));
+        mAdapter = new HomeAdapter(this, mViewModel, new ViewModelProvider(this).get(RecordItemViewModel.class));
 
         ItemMarginDecoration itemMarginDecoration = new ItemMarginDecoration(0, 0, 0, 0);
         // 最后一个 ITEM 距离底部距离大一些，防止被底部按钮遮挡
