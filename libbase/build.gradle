@@ -38,6 +38,8 @@ dependencies {
     api "com.google.android.material:material:${rootProject.materialDesign}"
     api "androidx.constraintlayout:constraintlayout:${rootProject.androidxConstraintLayout}"
 
+    api 'com.jakewharton.timber:timber:5.0.1'
+
     testImplementation rootProject.junit
     androidTestImplementation rootProject.androidxTestRunner
     androidTestImplementation rootProject.androidxTestEspresso
