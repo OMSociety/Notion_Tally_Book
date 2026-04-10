@@ -131,7 +131,7 @@ public abstract class TallyDatabase extends RoomDatabase {
                 values.put(COLUMN_RECORD_SYNC_STATUS, 0);
                 long id = db.insert(TABLE_CATEGORY, SQLiteDatabase.CONFLICT_NONE, values);
 
-                Timber."TallyDatabase", "insert expense category. id:" + id + " name:" + categoryItem.name);
+                Timber.tag("TallyDatabase").i("insert expense category. id:" + id + " name:" + categoryItem.name);
             }
             db.setTransactionSuccessful();
             db.endTransaction();
