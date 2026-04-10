@@ -20,6 +20,7 @@ import com.coderpage.mine.app.tally.persistence.sql.dao.RecordDao;
 import com.coderpage.mine.app.tally.persistence.sql.dao.SyncHistoryDao;
 import com.coderpage.mine.app.tally.persistence.sql.entity.CategoryEntity;
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
+import com.coderpage.mine.app.tally.persistence.sql.entity.SyncHistoryEntity;
 
 import java.util.ArrayList;
 import java.util.List;
