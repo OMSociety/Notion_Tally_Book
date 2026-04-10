@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.module.home.model.HomeDisplayData;
 import com.coderpage.mine.app.tally.module.records.RecordItemViewModel;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +68,8 @@ class HomeAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                         return true;
 
                     case HomeDisplayData.TYPE_RECORD_ITEM:
-                        Record oldRecord = (Record) oldData.getInternal();
-                        Record newRecord = (Record) newData.getInternal();
+                        RecordEntity oldRecord = (RecordEntity) oldData.getInternal();
+                        RecordEntity newRecord = (RecordEntity) newData.getInternal();
                         return oldRecord.getId() == newRecord.getId();
 
                     default:
