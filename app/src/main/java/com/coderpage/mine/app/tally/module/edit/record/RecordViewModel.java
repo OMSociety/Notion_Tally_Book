@@ -32,7 +32,6 @@ import com.coderpage.mine.app.tally.eventbus.EventRecordUpdate;
 import com.coderpage.mine.app.tally.module.edit.category.CategoryManagerActivity;
 import com.coderpage.mine.app.tally.module.edit.model.Category;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.ui.dialog.TextEditDialog;
 import com.coderpage.mine.app.tally.utils.DatePickUtils;
 import com.coderpage.mine.utils.AndroidUtils;
@@ -64,7 +63,7 @@ public class RecordViewModel extends AndroidViewModel implements LifecycleObserv
     private long mRecordId;
     private long mDate;
     private double mAmount;
-    private Record mRecord;
+    private RecordEntity mRecord;
     private Category mCategorySettingItem;
     private RecordRepository mRepository;
 
@@ -323,12 +322,12 @@ public class RecordViewModel extends AndroidViewModel implements LifecycleObserv
         }
 
         boolean isNewRecord = mRecord == null;
-        Record record;
+        RecordEntity record;
         if (mRecord != null) {
             record = mRecord;
         } else {
-            record = new Record();
-            record.setType(mType == RecordType.EXPENSE ? Record.TYPE_EXPENSE : Record.TYPE_INCOME);
+            record = new RecordEntity();
+            record.setType(mType == RecordType.EXPENSE ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
             record.setSyncId(AndroidUtils.generateUUID());
         }
         record.setAmount(mAmount);
