@@ -1,7 +1,6 @@
 package com.coderpage.mine.app.tally.persistence.sql.dao;
 
 import androidx.room.Dao;
-import androidx.room.SkipQueryVerification;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -9,7 +8,6 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
-import com.coderpage.mine.app.tally.persistence.model.RecordWithCategory;
 import com.coderpage.mine.app.tally.persistence.model.RecordCategoryGroup;
 import com.coderpage.mine.app.tally.persistence.model.RecordGroup;
 
@@ -20,7 +18,6 @@ import java.util.List;
  * @since 0.6.0
  */
 @Dao
-@SkipQueryVerification
 public interface RecordDao {
 
     /***
@@ -34,7 +31,7 @@ public interface RecordDao {
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_id = :id")
-    RecordWithCategory queryById(long id);
+    RecordEntity queryById(long id);
 
     /**
      * 通过关键字查询
@@ -48,7 +45,7 @@ public interface RecordDao {
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where category_name like :keyWord or record_desc like :keyWord order by record_time desc limit :limit offset :offset")
-    List<RecordWithCategory> queryByKeyWord(String keyWord, long limit, long offset);
+    List<RecordEntity> queryByKeyWord(String keyWord, long limit, long offset);
 
     /**
      * 查询记录
@@ -63,7 +60,7 @@ public interface RecordDao {
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_type == :type and record_time >= :startTime and record_time <= :endTime order by record_time desc limit :limit offset :offset")
-    List<RecordWithCategory> query(int type, long startTime, long endTime, long limit, long offset);
+    List<RecordEntity> query(int type, long startTime, long endTime, long limit, long offset);
 
     /**
      * 查询记录
@@ -80,7 +77,7 @@ public interface RecordDao {
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_type == :type and record_time >= :startTime and record_time <= :endTime and category_unique_name in (:categoryNameArray) " +
             "order by record_time desc limit :limit offset :offset")
-    List<RecordWithCategory> query(int type, long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
+    List<RecordEntity> query(int type, long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
 
     /**
      * 查询所有类型记录
@@ -94,7 +91,7 @@ public interface RecordDao {
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :startTime and record_time <= :endTime order by record_time desc limit :limit offset :offset")
-    List<RecordWithCategory> queryAll(long startTime, long endTime, long limit, long offset);
+    List<RecordEntity> queryAll(long startTime, long endTime, long limit, long offset);
 
     /**
      * 查询记录
@@ -110,7 +107,7 @@ public interface RecordDao {
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :startTime and record_time <= :endTime and category_unique_name in (:categoryNameArray) " +
             "order by record_time desc limit :limit offset :offset")
-    List<RecordWithCategory> queryAll(long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
+    List<RecordEntity> queryAll(long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
 
     /**
      * 插入记录
@@ -168,7 +165,7 @@ public interface RecordDao {
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :start and record_time<= :end and record_type = 0 " +
             "order by record_time DESC")
-    List<RecordWithCategory> queryExpenseBetweenTimeTimeDesc(long start, long end);
+    List<RecordEntity> queryExpenseBetweenTimeTimeDesc(long start, long end);
 
     /***
      * 查询指定时间区间收入记录，按日期降序排序
@@ -183,7 +180,7 @@ public interface RecordDao {
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :start and record_time<= :end and record_type = 1 " +
             "order by record_time DESC")
-    List<RecordWithCategory> queryIncomeBetweenTimeTimeDesc(long start, long end);
+    List<RecordEntity> queryIncomeBetweenTimeTimeDesc(long start, long end);
 
     /**
      * 查询指定时间区间内的月支出数据
@@ -287,7 +284,7 @@ public interface RecordDao {
     @Query("select * " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name")
-    List<RecordWithCategory> queryAll();
+    List<RecordEntity> queryAll();
 
     /***
      * 查询指定时间区间内的所有记录（收入和支出），按日期降序排序
@@ -302,6 +299,6 @@ public interface RecordDao {
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where (:start is null or record_time >= :start) and (:end is null or record_time<= :end) " +
             "order by record_time DESC")
-    List<RecordWithCategory> queryAllBetweenTimeTimeDesc(Long start, Long end);
+    List<RecordEntity> queryAllBetweenTimeTimeDesc(Long start, Long end);
 
 }
