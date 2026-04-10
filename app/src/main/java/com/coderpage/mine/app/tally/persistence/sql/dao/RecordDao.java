@@ -41,8 +41,7 @@ public interface RecordDao {
      * @param offset  分页偏移
      * @return 查询结果
      */
-    @Query("select * " +
-            "from record " +
+    @Query("select record.* from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where category_name like :keyWord or record_desc like :keyWord order by record_time desc limit :limit offset :offset")
     List<RecordEntity> queryByKeyWord(String keyWord, long limit, long offset);
@@ -56,9 +55,7 @@ public interface RecordDao {
      * @param limit     最大数量
      * @param offset    分页偏移
      */
-    @Query("select * " +
-            "from record " +
-            "left outer join category on record.record_category_unique_name=category.category_unique_name " +
+    @Query("select record.* from record " +
             "where record_type == :type and record_time >= :startTime and record_time <= :endTime order by record_time desc limit :limit offset :offset")
     List<RecordEntity> query(int type, long startTime, long endTime, long limit, long offset);
 
