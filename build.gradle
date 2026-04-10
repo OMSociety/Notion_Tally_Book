@@ -35,10 +35,12 @@ ext {
     androidxRecyclerView = '1.3.2'
     androidxCardView = '1.0.0'
     androidxPercentLayout = '1.0.0'
+    androidxSwipeRefreshLayout = '1.1.0'
     androidxMultidex = '2.0.1'
     
     // Material Design
     materialDesign = '1.11.0'
+    materialCalendarview = 'com.prolificinteractive:material-calendarview:1.3.0'
     
     // Architecture Components
     roomVersion = '2.6.1'
@@ -49,25 +51,21 @@ ext {
     
     // 第三方库
     eventBus = 'org.greenrobot:eventbus:3.3.1'
-    materialCalendarview = 'com.prolificinteractive:material-calendarview:2.0.1'
     mpAndroidChart = 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    refreshLayout = 'io.github.scouse9021:SwipeRefreshLayout:1.1.0'
     arounter = "com.alibaba:arouter-api:1.5.1"
     arounterProcessor = "com.alibaba:arouter-compiler:1.5.2"
     
     // 网络
     okhttp3 = 'com.squareup.okhttp3:okhttp:4.12.0'
     okhttp3Logging = 'com.squareup.okhttp3:logging-interceptor:4.12.0'
-    
-    // Retrofit（libupdate 依赖）
     retrofit = 'com.squareup.retrofit2:retrofit:2.9.0'
-    retrofitConverterFastjson = 'com.squareup.retrofit2:converter-gson:2.9.0'
+    retrofitConverterGson = 'com.squareup.retrofit2:converter-gson:2.9.0'
     
     // WorkManager
     workVersion = '2.9.0'
     
     // 其他
-    fastjson = 'com.alibaba:fastjson:2.0.45.android'
+    fastjson = 'com.alibaba:fastjson:1.2.83'
     excelPoi = 'com.github.nicbell:poi-android:3.17'
     timber = 'com.jakewharton.timber:timber:5.0.1'
 
