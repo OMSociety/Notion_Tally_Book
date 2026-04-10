@@ -37,6 +37,7 @@ ext {
     androidxPercentLayout = '1.0.0'
     androidxSwipeRefreshLayout = '1.1.0'
     androidxMultidex = '2.0.1'
+    androidxAnnotation = '1.7.1'
     
     // Material Design
     materialDesign = '1.11.0'
