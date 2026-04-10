@@ -79,4 +79,9 @@
     <color name="bgCategoryExpenseNormal">#08000000</color>
     <color name="bgCategoryExpenseSelected">@color/expenseColor</color>
 
+
+    <!-- Notion Sync Setting colors -->
+    <color name="text_primary">#ff3e3e3e</color>
+    <color name="text_secondary">#ff666666</color>
+    <color name="accent">#0F956F</color>
 </resources>
