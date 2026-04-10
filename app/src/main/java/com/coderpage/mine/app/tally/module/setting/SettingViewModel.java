@@ -2,8 +2,8 @@ package com.coderpage.mine.app.tally.module.setting;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Intent;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
