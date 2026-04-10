@@ -1,8 +1,8 @@
 package com.coderpage.mine.app.tally.module.backup;
 
-import static com.coderpage.base.utils.LogUtils.LOGE;
-import static com.coderpage.base.utils.LogUtils.LOGI;
-import static com.coderpage.base.utils.LogUtils.makeLogTag;
+
+
+
 
 import android.content.Context;
 
@@ -34,7 +34,7 @@ import java.util.Locale;
 
 class BackupCache {
 
-    private static final String TAG = makeLogTag(BackupCache.class);
+    private static final String TAG = "BackupCache";
     private static final String BACKUP_FOLDER_NAME = "backup";
     private static final String BACKUP_FILE_NAME = "backup";
     private static final String AUTOMATIC_BACKUP_FILE_NAME = "automatic_backup";
