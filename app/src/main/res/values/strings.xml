@@ -65,7 +65,7 @@
     <string name="tally_module_home_non_income_place_holder">暂无收入</string>
     <string name="tally_module_home_budget_label">预算剩余</string>
     <string name="tally_module_home_non_budget_place_holder">未设置预算</string>
-    <string name="tally_module_home_recent3day_tip">今日支出 %s&#160;&#160;&#160;收入 %s</string>
+    <string name="tally_module_home_recent3day_tip">今日支出 %1$s&#160;&#160;&#160;收入 %2$s</string>
     <string name="tally_module_home_check_chart">查看图表分析</string>
 
     <!-- tally chart activity -->
