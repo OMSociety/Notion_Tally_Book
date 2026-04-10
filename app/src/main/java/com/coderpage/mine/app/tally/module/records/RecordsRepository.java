@@ -5,7 +5,6 @@ import com.coderpage.base.common.IError;
 import com.coderpage.base.common.NonThrowError;
 import com.coderpage.base.error.ErrorCode;
 import com.coderpage.concurrency.MineExecutors;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.app.tally.persistence.sql.dao.RecordDao;
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
@@ -27,7 +26,7 @@ class RecordsRepository {
      * @param query    查询条件
      * @param callback 回调
      */
-    void queryRecords(int page, int pageSize, RecordQuery query, Callback<List<Record>, IError> callback) {
+    void queryRecords(int page, int pageSize, RecordQuery query, Callback<List<RecordEntity>, IError> callback) {
         MineExecutors.ioExecutor().execute(() -> {
 
             int type = query.getType();
@@ -37,7 +36,7 @@ class RecordsRepository {
             long offset = ((page - 1) * pageSize);
             String[] categoryArray = query.getCategoryUniqueNameArray();
 
-            List<Record> recordList;
+            List<RecordEntity> recordList;
             RecordDao recordDao = TallyDatabase.getInstance().recordDao();
 
             if (type == RecordQuery.TYPE_ALL) {
