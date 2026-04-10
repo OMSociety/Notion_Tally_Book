@@ -9,6 +9,12 @@ import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
  * @since 0.6.0
  */
 
+/**
+ * @deprecated 请使用 {@link com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity} 替代
+ * @author lc.
+ * @since 0.6.0
+ */
+@Deprecated
 public class Record {
 
     /** 记录类型: 支出 */
