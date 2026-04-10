@@ -62,6 +62,20 @@ public class RecordEntity {
     @ColumnInfo(name = "record_type")
     private int type;
 
+    // ===== 以下字段用于 JOIN category 表后的数据映射（Room 自动填充） =====
+
+    /** 分类名称（JOIN category 表获得） */
+    @ColumnInfo(name = "category_name")
+    private String categoryName = "";
+
+    /** 分类图标（JOIN category 表获得） */
+    @ColumnInfo(name = "category_icon")
+    private String categoryIcon = "";
+
+    /** 分类排序（JOIN category 表获得） */
+    @ColumnInfo(name = "category_order")
+    private int categoryOrder = 0;
+
     public long getId() {
         return id;
     }
@@ -142,5 +156,29 @@ public class RecordEntity {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName != null ? categoryName : "";
+    }
+
+    public String getCategoryIcon() {
+        return categoryIcon;
+    }
+
+    public void setCategoryIcon(String categoryIcon) {
+        this.categoryIcon = categoryIcon != null ? categoryIcon : "";
+    }
+
+    public int getCategoryOrder() {
+        return categoryOrder;
+    }
+
+    public void setCategoryOrder(int categoryOrder) {
+        this.categoryOrder = categoryOrder;
     }
 }
