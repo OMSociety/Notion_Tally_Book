@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Design TabLayout styles from com.google.android.material -->
     <style name="Widget.Design.TabLayout" parent="Widget.AppCompat.TabLayout">
         <item name="tabIndicatorColor">?attr/colorAccent</item>
         <item name="tabIndicatorHeight">2dp</item>
@@ -8,7 +7,6 @@
         <item name="tabPaddingEnd">12dp</item>
         <item name="tabTextAppearance">@style/TextAppearance.Design.Tab</item>
     </style>
-
     <style name="TextAppearance.Design.Tab" parent="TextAppearance.AppCompat.Body2">
         <item name="android:textSize">14sp</item>
     </style>
