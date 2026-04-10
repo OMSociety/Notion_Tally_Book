@@ -75,6 +75,22 @@ public class RecordEntity {
     /** 分类排序（JOIN category 表获得） */
     @ColumnInfo(name = "category_order")
     private int categoryOrder = 0;
+    /** 分类ID（JOIN category 表获得） */
+    @ColumnInfo(name = "category_id")
+    private long categoryId = 0;
+
+    /** 分类类型（JOIN category 表获得） */
+    @ColumnInfo(name = "category_type")
+    private int categoryType = 0;
+
+    /** 分类账户ID（JOIN category 表获得） */
+    @ColumnInfo(name = "category_account_id")
+    private long categoryAccountId = 0;
+
+    /** 分类同步状态（JOIN category 表获得） */
+    @ColumnInfo(name = "category_sync_status")
+    private int categorySyncStatus = 0;
+
 
     public long getId() {
         return id;
@@ -181,4 +197,37 @@ public class RecordEntity {
     public void setCategoryOrder(int categoryOrder) {
         this.categoryOrder = categoryOrder;
     }
+
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public int getCategoryType() {
+        return categoryType;
+    }
+
+    public void setCategoryType(int categoryType) {
+        this.categoryType = categoryType;
+    }
+
+    public long getCategoryAccountId() {
+        return categoryAccountId;
+    }
+
+    public void setCategoryAccountId(long categoryAccountId) {
+        this.categoryAccountId = categoryAccountId;
+    }
+
+    public int getCategorySyncStatus() {
+        return categorySyncStatus;
+    }
+
+    public void setCategorySyncStatus(int categorySyncStatus) {
+        this.categorySyncStatus = categorySyncStatus;
+    }
+
 }
