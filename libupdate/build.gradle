@@ -37,7 +37,7 @@ dependencies {
     api "com.google.android.material:material:${rootProject.materialDesign}"
     api rootProject.fastjson
     api rootProject.retrofit
-    api rootProject.retrofitConverterFastjson
+    api rootProject.retrofitConverterGson
     api rootProject.okhttp3Logging
 
     testImplementation rootProject.junit
