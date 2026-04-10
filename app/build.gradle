@@ -103,6 +103,9 @@ android {
 }
 
 dependencies {
+    // 项目模块
+    implementation project(':libbase')
+    implementation project(':libupdate')
     // AndroidX Core
     implementation "androidx.core:core:${rootProject.androidxCore}"
     implementation "androidx.core:core-ktx:${rootProject.androidxCoreKtx}"
