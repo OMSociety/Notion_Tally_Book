@@ -32,7 +32,6 @@ import com.coderpage.mine.app.tally.common.utils.BaseLoadDelegate;
 import com.coderpage.mine.app.tally.eventbus.EventRecordAdd;
 import com.coderpage.mine.app.tally.eventbus.EventRecordDelete;
 import com.coderpage.mine.app.tally.eventbus.EventRecordUpdate;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.utils.DateUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -68,20 +67,20 @@ public class RecordsViewModel extends BaseViewModel implements LifecycleObserver
             .build();
     private RecordsRepository mRepository;
     /** 数据加载代理。处理数据的刷新、加载更多等操作 */
-    private BaseLoadDelegate<Record> mLoadDelegate;
+    private BaseLoadDelegate<RecordEntity> mLoadDelegate;
 
     public RecordsViewModel(Application application) {
         super(application);
         mToolbarTitleBase = ResUtils.getString(application, R.string.tally_toolbar_title_records);
         mRepository = new RecordsRepository();
-        mLoadDelegate = new BaseLoadDelegate<Record>(15) {
+        mLoadDelegate = new BaseLoadDelegate<RecordEntity>(15) {
             @Override
-            public void requestData(int page, int pageSize, Callback<List<Record>, IError> callback) {
+            public void requestData(int page, int pageSize, Callback<List<RecordEntity>, IError> callback) {
                 mRepository.queryRecords(page, pageSize, mQuery, callback);
             }
 
             @Override
-            public void onRequestFinish(RequestType type, List<Record> dataList, @Nullable IError error) {
+            public void onRequestFinish(RequestType type, List<RecordEntity> dataList, @Nullable IError error) {
                 super.onRequestFinish(type, dataList, error);
                 if (error != null) {
                     showToastShort(error.msg());
@@ -200,7 +199,7 @@ public class RecordsViewModel extends BaseViewModel implements LifecycleObserver
      * @param source 源数据列表
      * @return 格式化后的数据列表
      */
-    private List<Object> formatRecordList(List<Record> source) {
+    private List<Object> formatRecordList(List<RecordEntity> source) {
         List<Object> currentDisplayList = mRecordList.getValue() == null ? new ArrayList<>() : mRecordList.getValue();
         if (source == null || source.isEmpty()) {
             return currentDisplayList;
