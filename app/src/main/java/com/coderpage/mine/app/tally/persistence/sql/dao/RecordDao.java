@@ -71,7 +71,7 @@ public interface RecordDao {
     @Query("select * " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
-            "where record_type == :type and record_time >= :startTime and record_time <= :endTime and category_unique_name in (:categoryNameArray) " +
+            "where record_type == :type and record_time >= :startTime and record_time <= :endTime and category.category_unique_name in (:categoryNameArray) " +
             "order by record_time desc limit :limit offset :offset")
     List<RecordEntity> query(int type, long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
 
@@ -101,7 +101,7 @@ public interface RecordDao {
     @Query("select * " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
-            "where record_time >= :startTime and record_time <= :endTime and category_unique_name in (:categoryNameArray) " +
+            "where record_time >= :startTime and record_time <= :endTime and category.category_unique_name in (:categoryNameArray) " +
             "order by record_time desc limit :limit offset :offset")
     List<RecordEntity> queryAll(long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
 
