@@ -1,6 +1,7 @@
 package com.coderpage.mine.app.tally.persistence.sql.dao;
 
 import androidx.room.Dao;
+import androidx.room.SkipQueryVerification;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -18,6 +19,7 @@ import java.util.List;
  * @since 0.6.0
  */
 @Dao
+@SkipQueryVerification
 public interface RecordDao {
 
     /***
