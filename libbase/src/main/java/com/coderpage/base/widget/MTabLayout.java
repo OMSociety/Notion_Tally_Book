@@ -50,7 +50,6 @@ import android.view.animation.Interpolator;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.R;
 import android.widget.TextView;
 
 import com.coderpage.base.R;
