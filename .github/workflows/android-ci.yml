@@ -32,7 +32,7 @@ jobs:
       - name: Build debug APK (official flavor)
         run: |
           chmod +x gradlew
-          ./gradlew assembleOfficialDebug --no-daemon
+          ./gradlew assembleOfficialDebug --no-daemon --stacktrace --info
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
