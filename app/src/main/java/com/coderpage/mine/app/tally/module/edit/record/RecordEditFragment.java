@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.module.edit.record;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
@@ -43,7 +43,7 @@ public class RecordEditFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewModel = ViewModelProviders.of(this).get(RecordViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(RecordViewModel.class);
         mBinding = DataBindingUtil.inflate(inflater, R.layout.tally_module_edit_fragment, container, false);
         getLifecycle().addObserver(mViewModel);
 
