@@ -15,7 +15,6 @@ import com.coderpage.mine.app.tally.eventbus.EventRecordDelete;
 import com.coderpage.mine.app.tally.module.chart.TallyChartActivity;
 import com.coderpage.mine.app.tally.module.detail.RecordDetailActivity;
 import com.coderpage.mine.app.tally.module.edit.RecordEditActivity;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -38,7 +37,7 @@ public class RecordItemViewModel extends BaseViewModel {
     }
 
     /** 格式化金额 */
-    public String formatMoney(Record record) {
+    public String formatMoney(RecordEntity record) {
         if (record == null) {
             return "--";
         }
@@ -52,14 +51,14 @@ public class RecordItemViewModel extends BaseViewModel {
      * @param activity {@link Activity}
      * @param record   记录 ITEM
      */
-    public void onItemClick(View view, Activity activity, Record record) {
+    public void onItemClick(View view, Activity activity, RecordEntity record) {
         if (CommonUtils.isViewFastDoubleClick(view) || record == null) {
             return;
         }
-        if (record.getType() == Record.TYPE_EXPENSE) {
+        if (record.getType() == RecordEntity.TYPE_EXPENSE) {
             RecordDetailActivity.openExpenseDetail(activity, record.getId());
         }
-        if (record.getType() == Record.TYPE_INCOME) {
+        if (record.getType() == RecordEntity.TYPE_INCOME) {
             RecordDetailActivity.openIncomeDetail(activity, record.getId());
         }
     }
@@ -71,16 +70,16 @@ public class RecordItemViewModel extends BaseViewModel {
      * @param activity {@link Activity}
      * @param record   记录 ITEM
      */
-    public boolean onItemLongClick(View view, Activity activity, Record record) {
+    public boolean onItemLongClick(View view, Activity activity, RecordEntity record) {
         new AlertDialog.Builder(activity).setItems(R.array.recordItemLongClickOption, (dialog, which) -> {
             switch (which) {
 
                 // 修改
                 case 0:
-                    if (record.getType() == Record.TYPE_EXPENSE) {
+                    if (record.getType() == RecordEntity.TYPE_EXPENSE) {
                         RecordEditActivity.openAsUpdateExpense(activity, record.getId());
                     }
-                    if (record.getType() == Record.TYPE_INCOME) {
+                    if (record.getType() == RecordEntity.TYPE_INCOME) {
                         RecordEditActivity.openAsUpdateIncome(activity, record.getId());
                     }
                     break;
