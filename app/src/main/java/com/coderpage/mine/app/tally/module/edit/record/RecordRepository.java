@@ -7,6 +7,7 @@ import com.coderpage.concurrency.MineExecutors;
 import com.coderpage.mine.app.tally.common.RecordType;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
+import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,9 @@ public class RecordRepository {
      */
     public void saveRecord(RecordEntity record, SimpleCallback<Result<Long, IError>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            long id = database.recordDao().insert(record.createEntity());
+            // 新记录默认未同步，下次同步会推送至 Notion
+            record.setSyncStatus(0);
+            long id = database.recordDao().insert(record);
             MineExecutors.executeOnUiThread(() -> callback.success(new Result<>(id, null)));
         });
     }
@@ -88,7 +91,7 @@ public class RecordRepository {
         MineExecutors.ioExecutor().execute(() -> {
             // 修改已同步记录时，重置同步状态，下次同步会上传变更
             record.setSyncStatus(0);
-            long id = database.recordDao().update(record.createEntity());
+            long id = database.recordDao().update(record);
             MineExecutors.executeOnUiThread(() -> callback.success(new Result<>(id, null)));
         });
     }
