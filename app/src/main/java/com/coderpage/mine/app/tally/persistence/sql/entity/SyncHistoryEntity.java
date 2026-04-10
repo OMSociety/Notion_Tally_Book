@@ -1,8 +1,8 @@
 package com.coderpage.mine.app.tally.persistence.sql.entity;
 
-import android.arch.persistence.room.Entity;
+import androidx.room.Entity;
 import com.coderpage.mine.app.tally.persistence.sql.DatabaseConstants;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.PrimaryKey;
 
 /**
  * 同步历史记录实体
