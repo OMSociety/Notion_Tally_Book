@@ -3,7 +3,7 @@ package com.coderpage.mine.app.tally.sync;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.coderpage.mine.app.tally.config.NotionConfig;
 import com.coderpage.mine.persistence.entity.TallyRecord;
@@ -276,7 +276,7 @@ public class NotionSyncManager {
                 if (retryCount < MAX_RETRY_COUNT) {
                     uploadWithRetry(record, retryCount + 1, synced, failed, latch);
                 } else {
-                    Log.e(TAG, "Upload failed after " + MAX_RETRY_COUNT + " retries: " + error);
+                    Timber.e(TAG, "Upload failed after " + MAX_RETRY_COUNT + " retries: " + error);
                     failed.incrementAndGet();
                     latch.countDown();
                 }
@@ -417,7 +417,7 @@ public class NotionSyncManager {
         
         if (conflicts.isEmpty()) return null;
         
-        Log.w(TAG, "Conflict detected for " + notion.getNotionId() + ": " + conflicts);
+        Timber.w(TAG, "Conflict detected for " + notion.getNotionId() + ": " + conflicts);
         
         return new SyncConflict.Builder()
             .notionId(notion.getNotionId())
@@ -556,7 +556,7 @@ public class NotionSyncManager {
 
                     @Override
                     public void onError(String error) {
-                        Log.e(TAG, "Update record failed: " + error);
+                        Timber.e(TAG, "Update record failed: " + error);
                         latch.countDown();
                     }
                 });
