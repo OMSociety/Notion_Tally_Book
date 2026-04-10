@@ -89,6 +89,8 @@ android {
 }
 
 dependencies {
+    // TwinklingRefreshLayout (来自 JitPack)
+    implementation 'com.github.lcodecorex:TwinklingRefreshLayout:v1.03'
     // 项目模块
     implementation project(':libbase')
     implementation project(':libupdate')
