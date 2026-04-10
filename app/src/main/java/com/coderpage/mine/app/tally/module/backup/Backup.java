@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.backup;
 
-import static com.coderpage.base.utils.LogUtils.LOGE;
-import static com.coderpage.base.utils.LogUtils.makeLogTag;
+
+
 import static com.coderpage.base.utils.UIUtils.showToastShort;
 
 import android.content.Context;
@@ -17,7 +17,7 @@ import com.coderpage.base.common.IError;
 import com.coderpage.base.common.NonThrowError;
 import com.coderpage.base.utils.ArrayUtils;
 import com.coderpage.base.utils.CommonUtils;
-import com.coderpage.base.utils.LogUtils;
+import timber.log.Timber;
 import com.coderpage.concurrency.AsyncTaskExecutor;
 import com.coderpage.mine.BuildConfig;
 import com.coderpage.mine.MineApp;
@@ -60,7 +60,7 @@ import java.util.Locale;
 
 public class Backup {
 
-    private static final String TAG = makeLogTag(Backup.class);
+    private static final String TAG = "Backup";
 
     /**
      * 备份过程回调；
@@ -152,7 +152,7 @@ public class Backup {
                 return;
             }
 
-            LogUtils.LOGD(TAG,"Read backup json file: " + file.getAbsolutePath());
+            Timber.tag(TAG).d("Read backup json file: " + file.getAbsolutePath());
 
             if (!file.exists()) {
                 listener.failure(new NonThrowError(ErrorCode.ILLEGAL_ARGS, "File not exist"));
