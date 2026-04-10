@@ -245,12 +245,12 @@ public interface RecordDao {
      * @param end   结束时间
      * @return 查询到的分类支出数据
      */
-    @Query("select category.category_type,category.category_id,count(*),sum(record_amount),record_time,category_unique_name,category_name,category_icon " +
+    @Query("select category_type,category_id,count(*) as count,sum(record_amount) as amount,category_unique_name,category_name,category_icon " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :start and record_time<= :end and record_type = 0 " +
-            "group by category.category_id " +
-            "order by sum(record_amount) ASC")
+            "group by category_id " +
+            "order by amount ASC")
     List<RecordCategoryGroup> queryExpenseCategoryGroup(long start, long end);
 
     /**
@@ -260,12 +260,12 @@ public interface RecordDao {
      * @param end   结束时间
      * @return 查询到的分类收入数据
      */
-    @Query("select category.category_type,category.category_id,count(*),sum(record_amount),record_time,category_unique_name,category_name,category_icon " +
+    @Query("select category_type,category_id,count(*) as count,sum(record_amount) as amount,category_unique_name,category_name,category_icon " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :start and record_time<= :end and record_type = 1 " +
-            "group by category.category_id " +
-            "order by sum(record_amount) ASC")
+            "group by category_id " +
+            "order by amount ASC")
     List<RecordCategoryGroup> queryIncomeCategoryGroup(long start, long end);
 
     /**
