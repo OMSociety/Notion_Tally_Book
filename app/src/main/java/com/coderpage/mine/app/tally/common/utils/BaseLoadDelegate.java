@@ -2,7 +2,7 @@ package com.coderpage.mine.app.tally.common.utils;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
