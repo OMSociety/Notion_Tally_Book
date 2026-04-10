@@ -37,8 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize"
-            app:tr_autoLoadMore="false"
-            app:tr_enable_loadmore="false">
+                        app:tr_enable_loadmore="false">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerView"
