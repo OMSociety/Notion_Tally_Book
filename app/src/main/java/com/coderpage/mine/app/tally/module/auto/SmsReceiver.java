@@ -13,7 +13,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.coderpage.base.utils.UIUtils;
 import com.coderpage.mine.MineApp;
@@ -47,7 +47,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
         // 检查是否启用了短信识别功能
         if (!isSmsRecognitionEnabled(context)) {
-            Log.d(TAG, "短信识别功能未开启");
+            Timber.d(TAG, "短信识别功能未开启");
             return;
         }
 
@@ -73,7 +73,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 String sender = smsMessage.getDisplayOriginatingAddress();
                 String messageBody = smsMessage.getMessageBody();
 
-                Log.d(TAG, "发件人: " + sender + ", 内容: " + messageBody);
+                Timber.d(TAG, "发件人: " + sender + ", 内容: " + messageBody);
 
                 // 检查是否在检测名单中
                 if (isInDetectionList(context, sender)) {
@@ -101,7 +101,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 return Boolean.parseBoolean(keyValue.getValue());
             }
         } catch (Exception e) {
-            Log.e(TAG, "获取短信识别开关状态失败", e);
+            Timber.e(TAG, "获取短信识别开关状态失败", e);
         }
         return false; // 默认关闭
     }
@@ -124,7 +124,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "获取检测名单失败", e);
+            Timber.e(TAG, "获取检测名单失败", e);
         }
         return false;
     }
@@ -291,7 +291,7 @@ public class SmsReceiver extends BroadcastReceiver {
             if (result.isOk()) {
                 record.setId(result.data());
                 EventBus.getDefault().post(new EventRecordAdd(record));
-                Log.d(TAG, "记录保存成功: " + record.getId());
+                Timber.d(TAG, "记录保存成功: " + record.getId());
                 // 添加成功提示
                 UIUtils.showToastShort(context, "短信记账成功: " +
                         (type == RecordType.EXPENSE ? "支出" : "收入") +
@@ -300,7 +300,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 // 发送通知到通知中心
                 sendNotification(context, type, amount);
             } else {
-                Log.e(TAG, "记录保存失败: " + result.error());
+                Timber.e(TAG, "记录保存失败: " + result.error());
             }
         });
     }
