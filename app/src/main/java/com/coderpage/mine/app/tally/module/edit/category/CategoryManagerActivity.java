@@ -1,13 +1,13 @@
 package com.coderpage.mine.app.tally.module.edit.category;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,7 +44,7 @@ public class CategoryManagerActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.tally_module_edit_category_activity_manager);
-        mViewModel = ViewModelProviders.of(this).get(CategoryManagerViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(CategoryManagerViewModel.class);
         getLifecycle().addObserver(mViewModel);
         initView();
         subscribeUi();
