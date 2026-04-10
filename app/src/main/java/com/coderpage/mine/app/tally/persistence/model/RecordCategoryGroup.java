@@ -23,11 +23,11 @@ public class RecordCategoryGroup {
     private long categoryId;
 
     /** 该分类记录数量 */
-    @ColumnInfo(name = "count")
+    @ColumnInfo(name = "cnt")
     private long count;
 
     /** 总金额 */
-    @ColumnInfo(name = "amount")
+    @ColumnInfo(name = "total")
     private double amount;
 
     /** 分类唯一不变名称 */
