@@ -2,7 +2,7 @@ package com.coderpage.mine.app.tally.module.records;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -51,7 +51,7 @@ public class RecordsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(self(), R.layout.tally_module_records_activity);
-        mViewModel = ViewModelProviders.of(this).get(RecordsViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(RecordsViewModel.class);
         getLifecycle().addObserver(mViewModel);
         initView();
         subscribeUi();
