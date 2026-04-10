@@ -17,6 +17,8 @@ import android.widget.Toast;
 import java.text.DecimalFormat;
 import java.util.concurrent.Executor;
 
+import com.coderpage.lib.update.R;
+
 /**
  * @author lc. 2017-09-23 23:50
  * @since 0.5.0
