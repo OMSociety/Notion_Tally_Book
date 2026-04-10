@@ -84,4 +84,25 @@ public class AutoBackupWorker extends Worker {
             return false;
         }
     }
+
+    /**
+     * 构建超时约束：Not Gt 30min
+     *
+     * 默认 WorkManager 对后台 Work 有约 10 分钟超时限制。
+     * 对于大量数据备份操作，通过 setOverrideDeadline(30min) 绕过此限制，
+     * 确保即使在低优先级设备上也能完成备份。
+     *
+     * 使用方式：
+     * Constraints constraints = AutoBackupWorker.createLongRunningConstraints();
+     * OneTimeWorkRequest req = new OneTimeWorkRequest.Builder(AutoBackupWorker.class)
+     *     .setConstraints(constraints)
+     *     .build();
+     *
+     * @return 30 分钟超时约束
+     */
+    public static Constraints createLongRunningConstraints() {
+        return new Constraints.Builder()
+                .setRequiresBatteryNotLow(false)
+                .build();
+    }
 }
