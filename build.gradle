@@ -68,6 +68,7 @@ ext {
     // 其他
     dashscopeSdk = 'com.alibaba:dashscope-sdk-java:2.20.0'
     lombok = 'org.projectlombok:lombok:1.18.30'
+    timber = 'com.jakewharton.timber:timber:5.0.1'
     excelPoi = 'com.github.nicbell:poi-android:3.17'
 
     // 测试
