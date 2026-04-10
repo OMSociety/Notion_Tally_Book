@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.di
 
-import com.coderpage.mine.app.tally.notion.NotionApiClient
+import com.coderpage.mine.app.tally.sync.NotionApiClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,6 +33,6 @@ object NotionModule {
     @Provides
     @Singleton
     fun provideNotionApiClient(): NotionApiClient {
-        return NotionApiClient.getInstance()
+        return NotionApiClient()
     }
 }
