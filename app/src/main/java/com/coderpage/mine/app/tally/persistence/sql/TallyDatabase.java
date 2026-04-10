@@ -10,7 +10,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import androidx.annotation.NonNull;
 
-import com.coderpage.base.utils.LogUtils;
+import timber.log.Timber;
 import com.coderpage.mine.MineApp;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.data.CategoryContant;
@@ -131,7 +131,7 @@ public abstract class TallyDatabase extends RoomDatabase {
                 values.put(COLUMN_RECORD_SYNC_STATUS, 0);
                 long id = db.insert(TABLE_CATEGORY, SQLiteDatabase.CONFLICT_NONE, values);
 
-                LogUtils.LOGI("TallyDatabase", "insert expense category. id:" + id + " name:" + categoryItem.name);
+                Timber."TallyDatabase", "insert expense category. id:" + id + " name:" + categoryItem.name);
             }
             db.setTransactionSuccessful();
             db.endTransaction();
