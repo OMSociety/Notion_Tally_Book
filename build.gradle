@@ -12,7 +12,7 @@ buildscript {
 }
 
 def props = new Properties()
-props.load(new FileInputStream("${rootDir}/local.properties"))
+if (file("${rootDir}/local.properties").exists()) { props.load(new FileInputStream("${rootDir}/local.properties")) }
 props.each { key, val ->
     project.ext.set(key, val)
 }
