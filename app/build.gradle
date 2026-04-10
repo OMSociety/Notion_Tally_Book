@@ -99,10 +99,12 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.androidxConstraintLayout}"
     implementation "androidx.recyclerview:recyclerview:${rootProject.androidxRecyclerView}"
     implementation "androidx.cardview:cardview:${rootProject.androidxCardView}"
-    implementation "androidx.percentlayout:percent:${rootProject.androidxPercentLayout}"
+    implementation "androidx.percentlayout:percentlayout:${rootProject.androidxPercentLayout}"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:${rootProject.androidxSwipeRefreshLayout}"
     implementation "androidx.multidex:multidex:${rootProject.androidxMultidex}"
     
     // Material Design
+    implementation rootProject.materialCalendarview
     implementation "com.google.android.material:material:${rootProject.materialDesign}"
     
     // Architecture Components
@@ -122,9 +124,7 @@ dependencies {
     
     // 第三方库
     implementation rootProject.eventBus
-    implementation rootProject.materialCalendarview
     implementation rootProject.mpAndroidChart
-    implementation rootProject.refreshLayout
     implementation rootProject.timber
     
     // ARouter
