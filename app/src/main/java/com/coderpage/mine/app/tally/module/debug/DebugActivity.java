@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.module.debug;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -23,7 +23,7 @@ public class DebugActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.tally_module_debug_activity);
-        mViewModel = ViewModelProviders.of(this).get(DebugViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(DebugViewModel.class);
 
         subscribeUi();
     }
