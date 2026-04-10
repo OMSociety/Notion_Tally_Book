@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.ui.dialog;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -51,7 +51,7 @@ public class MenuDialog extends DialogFragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.tally_dialog_menu, container, false);
-        mViewModel = ViewModelProviders.of(this).get(MenuDialogViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(MenuDialogViewModel.class);
         initView();
         subscribeUi();
         return mBinding.getRoot();
