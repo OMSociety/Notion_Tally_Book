@@ -154,6 +154,7 @@
 
         <service
             android:name="com.talkingdata.sdk.TDAntiCheatingService"
+            android:exported="true"
             android:process="com.talkingdata.sdk.TDAntiCheatingService">
             <intent-filter>
                 <action android:name="com.talkingdata.sdk.TDAntiCheatingService" />
