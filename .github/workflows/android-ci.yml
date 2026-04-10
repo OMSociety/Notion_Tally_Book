@@ -27,7 +27,9 @@ jobs:
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       - name: Build debug APK (official flavor)
-        run: ./gradlew assembleOfficialDebug --no-daemon
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleOfficialDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
