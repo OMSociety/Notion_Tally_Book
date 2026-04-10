@@ -140,6 +140,7 @@ dependencies {
     implementation rootProject.refreshLayout
     implementation rootProject.dashscopeSdk
     implementation rootProject.lombok
+    implementation rootProject.timber
     annotationProcessor rootProject.lombok
     
     // ARouter
