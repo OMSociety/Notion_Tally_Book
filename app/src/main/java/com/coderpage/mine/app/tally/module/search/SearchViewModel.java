@@ -16,7 +16,6 @@ import com.coderpage.base.utils.ArrayUtils;
 import com.coderpage.base.utils.CommonUtils;
 import com.coderpage.framework.BaseViewModel;
 import com.coderpage.mine.app.tally.common.utils.BaseLoadDelegate;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,26 +40,26 @@ public class SearchViewModel extends BaseViewModel {
     /** 搜索历史列表 */
     private MutableLiveData<List<String>> mSearchHistoryList = new MutableLiveData<>();
     /** 搜索结果列表 */
-    private MutableLiveData<List<Record>> mSearchResultList = new MutableLiveData<>();
+    private MutableLiveData<List<RecordEntity>> mSearchResultList = new MutableLiveData<>();
 
     private Handler mHandler;
     private Runnable mSearchPendingTask = this::search;
     private SearchRepository mRepository;
-    private BaseLoadDelegate<Record> mLoadDelegate;
+    private BaseLoadDelegate<RecordEntity> mLoadDelegate;
 
     public SearchViewModel(Application application) {
         super(application);
         mHandler = new Handler();
         mRepository = new SearchRepository();
-        mLoadDelegate = new BaseLoadDelegate<Record>(15) {
+        mLoadDelegate = new BaseLoadDelegate<RecordEntity>(15) {
             @Override
-            public void requestData(int page, int pageSize, Callback<List<Record>, IError> callback) {
+            public void requestData(int page, int pageSize, Callback<List<RecordEntity>, IError> callback) {
                 String keyword = mSearchKeyWord.get();
                 mRepository.queryRecords(page, pageSize, keyword, callback);
             }
 
             @Override
-            public void onRequestFinish(RequestType type, List<Record> dataList, @Nullable IError error) {
+            public void onRequestFinish(RequestType type, List<RecordEntity> dataList, @Nullable IError error) {
                 if (error != null) {
                     showToastShort(error.msg());
                     return;
@@ -99,7 +98,7 @@ public class SearchViewModel extends BaseViewModel {
         return mSearchHistoryList;
     }
 
-    LiveData<List<Record>> getSearchResultList() {
+    LiveData<List<RecordEntity>> getSearchResultList() {
         return mSearchResultList;
     }
 
