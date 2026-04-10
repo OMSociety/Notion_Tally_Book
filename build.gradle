@@ -27,7 +27,7 @@ ext {
     targetSdkVersion = 34
     compileSdkVersion = 34
     
-    // AndroidX 版本（迁移完成）
+    // AndroidX 版本
     androidxAppCompat = '1.6.1'
     androidxCore = '1.12.0'
     androidxCoreKtx = '1.12.0'
@@ -40,11 +40,11 @@ ext {
     // Material Design
     materialDesign = '1.11.0'
     
-    // Architecture Components（Room 2.6.x）
+    // Architecture Components
     roomVersion = '2.6.1'
     lifecycleVersion = '2.6.2'
     
-    // Kotlin Coroutines（支持 Room）
+    // Kotlin Coroutines
     kotlinxCoroutines = '1.7.3'
     
     // 第三方库
@@ -58,6 +58,10 @@ ext {
     // 网络
     okhttp3 = 'com.squareup.okhttp3:okhttp:4.12.0'
     okhttp3Logging = 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    
+    // Retrofit（libupdate 依赖）
+    retrofit = 'com.squareup.retrofit2:retrofit:2.9.0'
+    retrofitConverterFastjson = 'com.squareup.retrofit2:converter-gson:2.9.0'
     
     // WorkManager
     workVersion = '2.9.0'
