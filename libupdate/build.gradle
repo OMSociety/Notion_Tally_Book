@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.coderpage.libupdate'
+    namespace 'com.coderpage.lib.update'
     compileSdk rootProject.compileSdkVersion
 
     defaultConfig {
