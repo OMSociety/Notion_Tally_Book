@@ -20,14 +20,22 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
+      - name: Debug gradlew
+        run: |
+          ls -la gradlew
+          head -5 gradlew
+          file gradlew
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build debug APK (official flavor)
-        run: ./gradlew assembleOfficialDebug --no-daemon
+        run: ./gradlew assembleOfficialDebug --no-daemon --stacktrace
+        shell: bash
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: app-debug
           path: app/build/outputs/apk/official/debug/*.apk
