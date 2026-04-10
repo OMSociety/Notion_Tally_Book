@@ -9,7 +9,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
-import android.databinding.ObservableField;
+import androidx.databinding.ObservableField;
 import android.support.v4.app.FragmentActivity;
 import android.util.Pair;
 

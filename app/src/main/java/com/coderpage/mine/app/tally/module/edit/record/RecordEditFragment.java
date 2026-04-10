@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.edit.record;
 
 import androidx.lifecycle.ViewModelProvider;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;

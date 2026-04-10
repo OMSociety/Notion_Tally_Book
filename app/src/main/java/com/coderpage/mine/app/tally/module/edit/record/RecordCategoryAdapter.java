@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.edit.record;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

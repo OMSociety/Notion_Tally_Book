@@ -5,7 +5,7 @@ import android.app.Application;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import android.content.Intent;
-import android.databinding.ObservableField;
+import androidx.databinding.ObservableField;
 import androidx.annotation.NonNull;
 import android.util.Log;
 

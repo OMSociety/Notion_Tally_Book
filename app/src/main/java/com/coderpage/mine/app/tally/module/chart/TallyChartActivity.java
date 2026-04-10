@@ -3,7 +3,7 @@ package com.coderpage.mine.app.tally.module.chart;
 import android.app.Activity;
 import androidx.lifecycle.ViewModelProvider;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
