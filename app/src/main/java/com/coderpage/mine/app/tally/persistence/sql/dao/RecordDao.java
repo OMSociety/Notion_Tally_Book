@@ -41,9 +41,8 @@ public interface RecordDao {
      * @param offset  分页偏移
      * @return 查询结果
      */
-    @Query("select record.* from record " +
-            "left outer join category on record.record_category_unique_name=category.category_unique_name " +
-            "where category_name like :keyWord or record_desc like :keyWord order by record_time desc limit :limit offset :offset")
+    @Query("select * from record " +
+            "where record_desc like :keyWord order by record_time desc limit :limit offset :offset")
     List<RecordEntity> queryByKeyWord(String keyWord, long limit, long offset);
 
     /**
@@ -242,12 +241,12 @@ public interface RecordDao {
      * @param end   结束时间
      * @return 查询到的分类支出数据
      */
-    @Query("select category_type,category_id,count(*) as count,sum(record_amount) as amount,category_unique_name,category_name,category_icon " +
+    @Query("select category.category_type,category.category_id,count(*) as cnt,sum(record.record_amount) as total,category.category_unique_name,category.category_name,category.category_icon " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
-            "where record_time >= :start and record_time<= :end and record_type = 0 " +
-            "group by category_id " +
-            "order by amount ASC")
+            "where record.record_time >= :start and record.record_time <= :end and record.record_type = 0 " +
+            "group by category.category_id " +
+            "order by total ASC")
     List<RecordCategoryGroup> queryExpenseCategoryGroup(long start, long end);
 
     /**
@@ -257,12 +256,12 @@ public interface RecordDao {
      * @param end   结束时间
      * @return 查询到的分类收入数据
      */
-    @Query("select category_type,category_id,count(*) as count,sum(record_amount) as amount,category_unique_name,category_name,category_icon " +
+    @Query("select category.category_type,category.category_id,count(*) as cnt,sum(record.record_amount) as total,category.category_unique_name,category.category_name,category.category_icon " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
-            "where record_time >= :start and record_time<= :end and record_type = 1 " +
-            "group by category_id " +
-            "order by amount ASC")
+            "where record.record_time >= :start and record.record_time <= :end and record.record_type = 1 " +
+            "group by category.category_id " +
+            "order by total ASC")
     List<RecordCategoryGroup> queryIncomeCategoryGroup(long start, long end);
 
     /**
