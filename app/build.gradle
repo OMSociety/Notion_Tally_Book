@@ -138,20 +138,15 @@ dependencies {
     implementation rootProject.eventBus
     implementation rootProject.materialCalendarview
     implementation rootProject.mpAndroidChart
-    implementation rootProject.fastjson
     implementation rootProject.refreshLayout
-    implementation rootProject.dashscopeSdk
-    implementation rootProject.lombok
     implementation rootProject.timber
-    annotationProcessor rootProject.lombok
     
     // ARouter
     implementation rootProject.arounter
     annotationProcessor rootProject.arounterProcessor
     
     // 网络
-    implementation rootProject.retrofit
-    implementation rootProject.retrofitConverterGson
+ConverterGson
     implementation rootProject.okhttp3
     implementation rootProject.okhttp3Logging
     
