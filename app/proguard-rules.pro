@@ -150,3 +150,54 @@
 # Keep data classes
 -keep class com.coderpage.mine.persistence.entity.** { *; }
 -keep class com.coderpage.mine.app.tally.sync.** { *; }
+
+# ============== Room 数据库 ==============
+# Room 使用注解处理器 + 反射查找 DAO 和 Schema
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+
+# ============== WorkManager ==============
+-dontwarn androidx.work.**
+-keep class androidx.work.** { *; }
+-keep class * extends androidx.work.Worker
+-keep class * extends androidx.work.ListenableWorker {
+    public <init>(android.content.Context,androidx.work.WorkerParameters);
+}
+
+# ============== Kotlin Coroutines ==============
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepclassmembers class kotlinx.coroutines.** {
+    volatile <fields>;
+}
+-keepclassmembers class kotlin.coroutines.SafeContinuation {
+    volatile <fields>;
+}
+-dontwarn kotlinx.coroutines.**
+
+# ============== Kotlin 标准库 & Metadata ==============
+-keep class kotlin.Metadata { *; }
+-keepclassmembers class kotlin.Metadata {
+    public <methods>;
+}
+
+# ============== Kotlinx Serialization ==============
+-dontwarn org.jetbrains.kotlinx.**
+
+# ============== MPAndroidChart ==============
+-keep class com.github.mikephil.charting.** { *; }
+
+# ============== MaterialCalendarView ==============
+-keep class com.prolificinteractive.materialcalendarview.** { *; }
+
+# ============== androidx.annotation ==============
+-keep class androidx.annotation.** { *; }
+-dontwarn androidx.annotation.Keep
+
+# ============== DataBinding ==============
+-keep class * extends androidx.databinding.ViewDataBinding { *; }
+
+# ============== 兼容旧 support 库警告抑制 ==============
+-dontwarn android.support.v4.**
+-dontwarn android.support.v7.**
