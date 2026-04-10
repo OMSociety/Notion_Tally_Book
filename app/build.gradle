@@ -94,6 +94,7 @@ dependencies {
     implementation project(':libupdate')
     // AndroidX Core
     implementation "androidx.core:core:${rootProject.androidxCore}"
+    implementation "androidx.annotation:annotation:${rootProject.androidxAnnotation}"
     implementation "androidx.core:core-ktx:${rootProject.androidxCoreKtx}"
     implementation "androidx.appcompat:appcompat:${rootProject.androidxAppCompat}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.androidxConstraintLayout}"
