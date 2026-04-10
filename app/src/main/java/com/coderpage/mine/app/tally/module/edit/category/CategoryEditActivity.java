@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.edit.category;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -41,7 +41,7 @@ public class CategoryEditActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.tally_module_edit_category_activity_edit);
-        mViewModel = ViewModelProviders.of(this).get(CategoryEditViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(CategoryEditViewModel.class);
         getLifecycle().addObserver(mViewModel);
 
         initView();
