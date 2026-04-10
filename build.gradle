@@ -46,6 +46,7 @@ ext {
     // Architecture Components
     roomVersion = '2.6.1'
     lifecycleVersion = '2.6.2'
+    databindingVersion = '8.2.2'
     
     // Kotlin Coroutines
     kotlinxCoroutines = '1.7.3'
