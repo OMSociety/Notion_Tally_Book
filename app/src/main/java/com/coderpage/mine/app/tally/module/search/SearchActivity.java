@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.module.search;
 
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,7 +41,7 @@ public class SearchActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_search);
-        mViewModel = ViewModelProviders.of(this).get(SearchViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         overridePendingTransition(0, 0);
 
         initView();
