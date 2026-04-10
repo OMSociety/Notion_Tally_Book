@@ -220,22 +220,6 @@ public class TallyRecord {
         return entity.getSyncStatus();
     }
 
-    /**
-     * 获取删除状态（软删除标志，用于 Notion 同步）
-     * 0 = 未删除（活跃），1 = 已删除
-     */
-    public int getDeleteStatus() {
-        return entity.getDelete();
-    }
-
-    /**
-     * 设置删除状态（软删除标志，用于 Notion 同步）
-     * @param status 0 = 未删除（活跃），1 = 已删除
-     */
-    public void setDeleteStatus(int status) {
-        entity.setDelete(status);
-    }
-
     public int getType() {
         return entity.getType();
     }
