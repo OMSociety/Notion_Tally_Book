@@ -10,7 +10,7 @@
             type="com.coderpage.mine.app.tally.module.edit.category.CategoryEditViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -23,7 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraint.ConstraintLayout
             android:id="@+id/lyTop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,14 +69,14 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:background="@drawable/bg_category_expense_selected">
 
-                <android.support.v7.widget.AppCompatImageView
+                <androidx.v7.widget.AppCompatImageView
                     categoryIcon="@{vm.categoryIcon}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     tools:src="@drawable/ic_category_expense_other_selected" />
             </FrameLayout>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraint.ConstraintLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -87,7 +87,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/lyTop">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.v7.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -116,6 +116,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintWidth_percent="0.5" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraint.ConstraintLayout>
 
 </layout>

@@ -24,7 +24,7 @@
             type="com.coderpage.mine.app.tally.module.edit.record.RecordViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/main_content"
@@ -40,7 +40,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraint.ConstraintLayout
                 android:id="@+id/lyHeadInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:background="@drawable/bg_category_expense_selected">
 
-                    <android.support.v7.widget.AppCompatImageView
+                    <androidx.v7.widget.AppCompatImageView
                         categoryIcon="@{category.internal.icon}"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -125,7 +125,7 @@
                     android:background="@color/divider"
                     app:layout_constraintTop_toBottomOf="@id/lySelectCategoryIcon" />
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraint.ConstraintLayout>
 
             <com.coderpage.mine.app.tally.module.edit.widget.CategoryViewPager
                 android:id="@+id/category_viewpager"
@@ -151,7 +151,7 @@
 
         </LinearLayout>
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
@@ -242,7 +242,7 @@
                 app:layout_constraintTop_toTopOf="@id/tvNum1"
                 app:layout_constraintWidth_percent="0.25" />
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.v7.widget.AppCompatImageView
                 android:id="@+id/ivDelete"
                 style="@style/TextAppearance.TallyNumInputItem"
                 android:layout_width="0dp"
@@ -398,8 +398,8 @@
                 app:layout_constraintStart_toEndOf="@id/tvNum6"
                 app:layout_constraintTop_toBottomOf="@id/ivDelete" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraint.ConstraintLayout>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraint.ConstraintLayout>
 
 </layout>

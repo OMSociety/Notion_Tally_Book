@@ -12,7 +12,7 @@
             type="com.coderpage.mine.app.tally.module.backup.BackupFileManagerViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -102,5 +102,5 @@
             android:layout_marginEnd="@dimen/padding_normal"
             android:background="@color/divider"
             app:layout_constraintBottom_toBottomOf="parent" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraint.ConstraintLayout>
 </layout>

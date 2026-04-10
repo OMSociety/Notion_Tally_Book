@@ -12,7 +12,7 @@
             type="com.coderpage.mine.app.tally.module.edit.category.CategoryManagerViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:background="@drawable/bg_category_expense_selected">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.v7.widget.AppCompatImageView
                 android:id="@+id/ivCategoryIcon"
                 categoryIcon="@{data.icon}"
                 android:layout_width="match_parent"
@@ -57,7 +57,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="购物" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.v7.widget.AppCompatImageView
             android:layout_width="46dp"
             android:layout_height="0dp"
             android:background="@drawable/bg_clickable_view_40dp"
@@ -69,6 +69,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_icon_menu_dot_h" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraint.ConstraintLayout>
 
 </layout>

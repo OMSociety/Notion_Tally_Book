@@ -20,7 +20,7 @@
             type="com.coderpage.mine.app.tally.module.detail.RecordData" />
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
         tools:context=".app.tally.module.detail.ExpenseDetailActivity">
 
         <!-- toolbar -->
-        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        <androidx.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/toolbar"
             style="@style/Widget.Toolbar"
@@ -39,7 +39,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:titleTextColor="@color/appTextColorPrimary" />
 
-        <android.support.v7.widget.CardView xmlns:app="http://schemas.android.com/apk/res-auto"
+        <androidx.v7.widget.CardView xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:card_view="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
                         android:background="@{data.type == vm.TYPE_EXPENSE ? @drawable/bg_category_expense : @drawable/bg_category_income}"
                         android:padding="@dimen/spacing_normal">
 
-                        <android.support.v7.widget.AppCompatImageView
+                        <androidx.v7.widget.AppCompatImageView
                             categoryIcon="@{data.categoryIcon}"
                             selected="@{true}"
                             android:layout_width="match_parent"
@@ -195,7 +195,7 @@
 
             </LinearLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.v7.widget.CardView>
 
         <!-- 底部导航 -->
         <View
@@ -220,5 +220,5 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraint.ConstraintLayout>
 </layout>

@@ -6,7 +6,7 @@
 
         <variable
             name="activity"
-            type="android.support.v4.app.FragmentActivity" />
+            type="androidx.v4.app.FragmentActivity" />
 
         <variable
             name="vm"
@@ -14,7 +14,7 @@
 
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
         android:fitsSystemWindows="true">
 
         <!-- toolbar -->
-        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        <androidx.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/toolbar"
             style="@style/Widget.Toolbar"
@@ -39,13 +39,13 @@
             android:layout_marginTop="?attr/actionBarSize"
                         app:tr_enable_loadmore="false">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.v7.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraint.ConstraintLayout
             android:id="@+id/btnAddRecord"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/ivBottomMenu">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.v7.widget.AppCompatImageView
                 android:id="@+id/ivAddNewRecord"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
@@ -88,7 +88,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/ivAddNewRecord"
                 app:layout_constraintTop_toTopOf="parent" />
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraint.ConstraintLayout>
 
         <FrameLayout
             android:id="@+id/ivBottomMenu"
@@ -106,7 +106,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.v7.widget.AppCompatImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
@@ -114,5 +114,5 @@
                 app:srcCompat="@drawable/ic_menu" />
 
         </FrameLayout>
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraint.ConstraintLayout>
 </layout>

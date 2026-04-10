@@ -18,7 +18,7 @@
             type="com.coderpage.mine.app.tally.module.home.HomeMonthInfoViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -110,7 +110,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="￥10000.00" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.v7.widget.AppCompatImageView
             selected="@{!safeUnbox(vm.hideMoney)}"
             android:layout_width="60dp"
             android:layout_height="0dp"
@@ -124,7 +124,7 @@
             app:srcCompat="@drawable/ic_eye_selector"
             tools:src="@drawable/ic_eye_open" />
 
-        <android.support.v7.widget.AppCompatImageView
+        <androidx.v7.widget.AppCompatImageView
             android:id="@+id/ivChart"
             android:layout_width="wrap_content"
             android:layout_height="45dp"
@@ -150,5 +150,5 @@
             app:layout_constraintStart_toEndOf="@id/ivChart"
             app:layout_constraintTop_toTopOf="@id/ivChart" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraint.ConstraintLayout>
 </layout>

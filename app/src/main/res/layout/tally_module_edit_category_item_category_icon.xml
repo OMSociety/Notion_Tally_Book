@@ -16,7 +16,7 @@
             type="com.coderpage.mine.app.tally.module.edit.category.CategoryEditViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -38,13 +38,13 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:background="@color/bgCategoryExpenseNormal">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.v7.widget.AppCompatImageView
                 categoryIcon="@{categoryIcon}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:src="@drawable/ic_category_expense_shopping" />
         </FrameLayout>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraint.ConstraintLayout>
 
 </layout>
