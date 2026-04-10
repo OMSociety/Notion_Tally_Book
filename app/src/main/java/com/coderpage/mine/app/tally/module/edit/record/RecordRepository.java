@@ -6,7 +6,6 @@ import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.concurrency.MineExecutors;
 import com.coderpage.mine.app.tally.common.RecordType;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 
 import java.util.ArrayList;
@@ -59,9 +58,9 @@ public class RecordRepository {
      * @param recordId 记录 ID
      * @param callback 回调
      */
-    public void queryRecordById(long recordId, SimpleCallback<Record> callback) {
+    public void queryRecordById(long recordId, SimpleCallback<RecordEntity> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            Record record = database.recordDao().queryById(recordId);
+            RecordEntity record = database.recordDao().queryById(recordId);
             MineExecutors.executeOnUiThread(() -> callback.success(record));
         });
     }
@@ -72,7 +71,7 @@ public class RecordRepository {
      * @param record   记录数据
      * @param callback 回调
      */
-    public void saveRecord(Record record, SimpleCallback<Result<Long, IError>> callback) {
+    public void saveRecord(RecordEntity record, SimpleCallback<Result<Long, IError>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
             long id = database.recordDao().insert(record.createEntity());
             MineExecutors.executeOnUiThread(() -> callback.success(new Result<>(id, null)));
@@ -85,7 +84,7 @@ public class RecordRepository {
      * @param record   记录数据
      * @param callback 回调
      */
-    public void updateExpense(Record record, SimpleCallback<Result<Long, IError>> callback) {
+    public void updateExpense(RecordEntity record, SimpleCallback<Result<Long, IError>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
             // 修改已同步记录时，重置同步状态，下次同步会上传变更
             record.setSyncStatus(0);
