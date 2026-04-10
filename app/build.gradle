@@ -89,8 +89,8 @@ android {
 }
 
 dependencies {
-    // 项目模块
-    implementation project(':libbase')
+    // 项目模块 (api 声明以传递依赖)
+    api project(':libbase')
     implementation project(':libupdate')
     // AndroidX Core
     implementation "androidx.core:core:${rootProject.androidxCore}"
