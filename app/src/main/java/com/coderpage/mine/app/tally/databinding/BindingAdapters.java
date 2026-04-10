@@ -1,9 +1,9 @@
 package com.coderpage.mine.app.tally.databinding;
 
 import android.view.View;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
 import androidx.appcompat.widget.AppCompatImageView;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.cardview.widget.CardView;
 import androidx.databinding.BindingAdapter;
 
 /**
@@ -20,10 +20,18 @@ public class BindingAdapters {
     }
     
     /**
+     * 处理 visibility boolean 绑定
+     */
+    @BindingAdapter("android:visibility")
+    public static void setVisibility(View view, boolean visible) {
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+    
+    /**
      * 处理 categoryIcon String 绑定
      */
     @BindingAdapter("categoryIcon")
-    public static void setCategoryIcon(AppCompatImageView view, String icon) {
+    public static void setCategoryIcon(ImageView view, String icon) {
         if (icon == null || icon.isEmpty()) {
             return;
         }
@@ -41,26 +49,26 @@ public class BindingAdapters {
     }
     
     /**
-     * 处理 onClick 绑定
+     * 处理 onClick lambda (通用)
      */
     @BindingAdapter("android:onClick")
-    public static void setOnClick(View view, View.OnClickListener listener) {
+    public static void setOnClick(View view, android.view.View.OnClickListener listener) {
         view.setOnClickListener(listener);
     }
     
     /**
-     * 处理 FrameLayout click
+     * 处理 AppCompatImageView click
      */
     @BindingAdapter("android:onClick")
-    public static void setFrameLayoutClick(FrameLayout view, View.OnClickListener listener) {
+    public static void setOnClick(AppCompatImageView view, android.view.View.OnClickListener listener) {
         view.setOnClickListener(listener);
     }
     
     /**
-     * 处理 ConstraintLayout click
+     * 处理 CardView click
      */
     @BindingAdapter("android:onClick")
-    public static void setConstraintLayoutClick(ConstraintLayout view, View.OnClickListener listener) {
+    public static void setOnClick(CardView view, android.view.View.OnClickListener listener) {
         view.setOnClickListener(listener);
     }
 }
