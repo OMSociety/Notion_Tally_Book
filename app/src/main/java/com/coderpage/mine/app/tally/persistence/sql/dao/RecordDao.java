@@ -27,7 +27,7 @@ public interface RecordDao {
      *
      * @return 查询到的记录
      */
-    @Query("select * " +
+    @Query("select record.* " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_id = :id")
@@ -68,7 +68,7 @@ public interface RecordDao {
      * @param offset            分页偏移
      * @param categoryNameArray 分类
      */
-    @Query("select * " +
+    @Query("select record.* " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_type == :type and record_time >= :startTime and record_time <= :endTime and category.category_unique_name in (:categoryNameArray) " +
@@ -83,7 +83,7 @@ public interface RecordDao {
      * @param limit     最大数量
      * @param offset    分页偏移
      */
-    @Query("select * " +
+    @Query("select record.* " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :startTime and record_time <= :endTime order by record_time desc limit :limit offset :offset")
@@ -98,7 +98,7 @@ public interface RecordDao {
      * @param offset            分页偏移
      * @param categoryNameArray 分类
      */
-    @Query("select * " +
+    @Query("select record.* " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :startTime and record_time <= :endTime and category.category_unique_name in (:categoryNameArray) " +
@@ -156,7 +156,7 @@ public interface RecordDao {
      *
      * @return 查询到的所有记录
      */
-    @Query("select * " +
+    @Query("select record.* " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :start and record_time<= :end and record_type = 0 " +
@@ -171,7 +171,7 @@ public interface RecordDao {
      *
      * @return 查询到的所有记录
      */
-    @Query("select * " +
+    @Query("select record.* " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :start and record_time<= :end and record_type = 1 " +
@@ -277,7 +277,7 @@ public interface RecordDao {
      *
      * @return 查询到的所有记录
      */
-    @Query("select * " +
+    @Query("select record.* " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name")
     List<RecordEntity> queryAll();
@@ -290,7 +290,7 @@ public interface RecordDao {
      *
      * @return 查询到的所有记录
      */
-    @Query("select * " +
+    @Query("select record.* " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where (:start is null or record_time >= :start) and (:end is null or record_time<= :end) " +
