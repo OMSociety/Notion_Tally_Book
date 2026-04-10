@@ -24,7 +24,6 @@ import com.coderpage.mine.MineApp;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.error.ErrorCode;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.app.tally.persistence.sql.dao.CategoryDao;
 import com.coderpage.mine.app.tally.persistence.sql.entity.CategoryEntity;
@@ -411,9 +410,9 @@ public class Backup {
             categoryList.add(category);
         }
 
-        List<Record> recordEntityList = database.recordDao().queryAll();
+        List<RecordEntity> recordEntityList = database.recordDao().queryAll();
         recordList = new ArrayList<>(recordEntityList.size());
-        for (Record entity : recordEntityList) {
+        for (RecordEntity entity : recordEntityList) {
             BackupModelRecord expense = new BackupModelRecord();
             expense.setAmount(entity.getAmount());
             expense.setDesc(entity.getDesc());
@@ -455,7 +454,7 @@ public class Backup {
         AsyncTaskExecutor.execute(() -> {
 
             //查询数据
-            List<Record> records = database.recordDao().queryAllBetweenTimeTimeDesc(startDate, endDate);
+            List<RecordEntity> records = database.recordDao().queryAllBetweenTimeTimeDesc(startDate, endDate);
             if (records == null || records.size() == 0) {
                 exportTips(MineApp.getAppContext(), "导出失败: 没有查询到账单记录");
                 return;
@@ -492,20 +491,20 @@ public class Backup {
      * @param file 目标文件
      * @param records 记录列表
      */
-    private void writeCsvFile(File file, List<Record> records) {
+    private void writeCsvFile(File file, List<RecordEntity> records) {
         try {
             java.io.FileWriter fileWriter = new java.io.FileWriter(file);
             // 写入CSV头部
             fileWriter.append("时间,分类,金额,类型,备注\n");
 
             // 写入数据行
-            for (Record record : records) {
+            for (RecordEntity record : records) {
                 // 格式化时间
                 String time = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
                         .format(new java.util.Date(record.getTime()));
 
                 // 获取类型文本
-                String type = record.getType() == Record.TYPE_EXPENSE ? "支出" : "收入";
+                String type = record.getType() == RecordEntity.TYPE_EXPENSE ? "支出" : "收入";
 
                 // 写入一行数据
                 fileWriter.append("\"")
@@ -539,7 +538,7 @@ public class Backup {
         }
     }
 
-    private void writeExcelFile(File file, List<Record> records) {
+    private void writeExcelFile(File file, List<RecordEntity> records) {
         try {
             // 创建工作簿
             Workbook workbook = new HSSFWorkbook();
@@ -556,7 +555,7 @@ public class Backup {
 
             // 填充数据
             for (int i = 0; i < records.size(); i++) {
-                Record record = records.get(i);
+                RecordEntity record = records.get(i);
                 Row row = sheet.createRow(i + 1);
 
                 // 时间
@@ -571,7 +570,7 @@ public class Backup {
                 row.createCell(2).setCellValue(record.getAmount());
 
                 // 类型
-                String type = record.getType() == Record.TYPE_EXPENSE ? "支出" : "收入";
+                String type = record.getType() == RecordEntity.TYPE_EXPENSE ? "支出" : "收入";
                 row.createCell(3).setCellValue(type);
 
                 // 备注
