@@ -6,7 +6,6 @@ import com.coderpage.base.common.NonThrowError;
 import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.error.ErrorCode;
 import com.coderpage.concurrency.MineExecutors;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 
@@ -17,9 +16,9 @@ import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 
 class RecordDetailRepository {
 
-    void queryExpense(long expenseId, Callback<Record, IError> callback) {
+    void queryExpense(long expenseId, Callback<RecordEntity, IError> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            Record expense = TallyDatabase.getInstance().recordDao().queryById(expenseId);
+            RecordEntity expense = TallyDatabase.getInstance().recordDao().queryById(expenseId);
             if (expense == null) {
                 MineExecutors.executeOnUiThread(() -> callback.failure(new NonThrowError(ErrorCode.SQL_ERR, "EMPTY DATA")));
             } else {
@@ -28,9 +27,9 @@ class RecordDetailRepository {
         });
     }
 
-    void queryIncome(long incomeId, Callback<Record, IError> callback) {
+    void queryIncome(long incomeId, Callback<RecordEntity, IError> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            Record income = TallyDatabase.getInstance().recordDao().queryById(incomeId);
+            RecordEntity income = TallyDatabase.getInstance().recordDao().queryById(incomeId);
             if (income == null) {
                 MineExecutors.executeOnUiThread(() -> callback.failure(new NonThrowError(ErrorCode.SQL_ERR, "EMPTY DATA")));
             } else {
