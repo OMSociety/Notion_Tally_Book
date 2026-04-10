@@ -95,18 +95,18 @@ dependencies {
     // AndroidX Core
     implementation "androidx.core:core:${rootProject.androidxCore}"
     implementation "androidx.annotation:annotation:${rootProject.androidxAnnotation}"
-    implementation "androidx.annotation:annotation-experimental:${rootProject.androidxAnnotation}"
+    
     
     // AndroidX AppCompat (传递依赖)
     implementation "androidx.appcompat:appcompat:${rootProject.androidxAppCompat}"
-    implementation "androidx.fragment:fragment:${rootProject.androidxAppCompat}"
-    implementation "androidx.legacy:legacy-support-v4:${rootProject.androidxAppCompat}"
+    
+    
     
     // AndroidX RecyclerView
     implementation "androidx.recyclerview:recyclerview:${rootProject.androidxRecyclerView}"
     
     // AndroidX ViewPager
-    implementation "androidx.viewpager:viewpager:${rootProject.androidxAppCompat}"
+    
     
     // AndroidX Lifecycle
     implementation "androidx.lifecycle:lifecycle-common:${rootProject.lifecycleVersion}"
