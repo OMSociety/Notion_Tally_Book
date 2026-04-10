@@ -15,7 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
-import android.util.Log;
+import timber.log.Timber;
 
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationOutput;
@@ -72,7 +72,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
                 try {
                     processAndPrintImage(imageUri);
                 } catch (Exception e) {
-                    Log.e(TAG, "处理图片时出错", e);
+                    Timber.e(TAG, "处理图片时出错", e);
                     throw new RuntimeException(e);
                 }
             }
@@ -131,7 +131,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
                 saveRecordDirectly(amount);
 
             } catch (Exception e) {
-                Log.e(TAG, "ai请求失败", e);
+                Timber.e(TAG, "ai请求失败", e);
                 String title = "AI自动记账失败";
                 String content = "错误" + e.getMessage();
                 sendNotification(context, title, content);
@@ -171,7 +171,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
 
             return Base64.encodeToString(bytes, Base64.NO_WRAP);
         } catch (Exception e) {
-            Log.e(TAG, "图片转换Base64失败", e);
+            Timber.e(TAG, "图片转换Base64失败", e);
             return null;
         }
     }
@@ -294,7 +294,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
             if (result.isOk()) {
                 record.setId(result.data());
                 EventBus.getDefault().post(new EventRecordAdd(record));
-                Log.d(TAG, "记录保存成功: " + record.getId());
+                Timber.d(TAG, "记录保存成功: " + record.getId());
 
                 String title = "AI自动记账成功:";
                 String content = (type == RecordType.EXPENSE ? "支出" : "收入") +
@@ -307,7 +307,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
 
 //                sendNotification(context, title, content);
             } else {
-                Log.e(TAG, "记录保存失败: " + result.error());
+                Timber.e(TAG, "记录保存失败: " + result.error());
             }
         });
     }
@@ -372,7 +372,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
                 return keyValue.getValue();
             }
         } catch (Exception e) {
-            Log.e(TAG, "获取 API Key 失败", e);
+            Timber.e(TAG, "获取 API Key 失败", e);
         }
         // 返回默认的 API Key
         return null;
@@ -394,7 +394,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
                 return keyValue.getValue();
             }
         } catch (Exception e) {
-            Log.e(TAG, "获取 AI 模型名称失败", e);
+            Timber.e(TAG, "获取 AI 模型名称失败", e);
         }
         // 返回默认的模型名称
         return "qwen2.5-vl-32b-instruct";
