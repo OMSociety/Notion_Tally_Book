@@ -5,6 +5,10 @@ plugins {
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
+kapt {
+    correctErrorTypes = true
+}
+
 android {
     namespace 'com.coderpage.mine'
     compileSdk rootProject.compileSdkVersion

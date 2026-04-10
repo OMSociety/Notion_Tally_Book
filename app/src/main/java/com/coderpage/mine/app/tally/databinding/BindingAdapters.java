@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.ImageView;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.databinding.BindingAdapter;
 
 /**
@@ -49,7 +50,17 @@ public class BindingAdapters {
     }
     
     /**
-     * 处理 onClick lambda (通用)
+     * 处理 categoryIcon ObservableField<String> 绑定
+     */
+    @BindingAdapter("categoryIcon")
+    public static void setCategoryIcon(AppCompatImageView view, androidx.lifecycle.ObservableField<String> icon) {
+        if (icon != null && icon.get() != null) {
+            setCategoryIcon((ImageView) view, icon.get());
+        }
+    }
+    
+    /**
+     * 处理 onClick (通用 View)
      */
     @BindingAdapter("android:onClick")
     public static void setOnClick(View view, android.view.View.OnClickListener listener) {
@@ -69,6 +80,14 @@ public class BindingAdapters {
      */
     @BindingAdapter("android:onClick")
     public static void setOnClick(CardView view, android.view.View.OnClickListener listener) {
+        view.setOnClickListener(listener);
+    }
+    
+    /**
+     * 处理 ConstraintLayout click
+     */
+    @BindingAdapter("android:onClick")
+    public static void setOnClick(ConstraintLayout view, android.view.View.OnClickListener listener) {
         view.setOnClickListener(listener);
     }
 }
