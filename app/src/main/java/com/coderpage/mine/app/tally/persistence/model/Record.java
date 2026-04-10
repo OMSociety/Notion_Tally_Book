@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.persistence.model;
 
-import android.arch.persistence.room.ColumnInfo;
+import androidx.room.ColumnInfo;
 
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 

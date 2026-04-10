@@ -3,7 +3,7 @@ package com.coderpage.mine.app.tally.ui.dialog;
 import android.app.Application;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import android.support.v4.app.DialogFragment;
+import androidx.fragment.app.DialogFragment;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.coderpage.base.utils.ResUtils;

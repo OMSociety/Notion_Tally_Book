@@ -3,7 +3,7 @@ package com.coderpage.mine.app.tally.module.debug;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.coderpage.base.cache.Cache;
 import com.coderpage.base.utils.LogUtils;

@@ -3,9 +3,9 @@ package com.coderpage.mine.app.tally.module.home;
 import android.app.Activity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.databinding.DataBindingUtil;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.diff.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 

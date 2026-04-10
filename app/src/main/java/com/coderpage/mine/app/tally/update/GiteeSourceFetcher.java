@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.update;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.coderpage.base.utils.LogUtils;

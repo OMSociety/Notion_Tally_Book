@@ -2,7 +2,7 @@ package com.coderpage.mine.app.tally.module.records;
 
 import android.app.Activity;
 import android.app.Application;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 
 import com.coderpage.base.common.Callback;
