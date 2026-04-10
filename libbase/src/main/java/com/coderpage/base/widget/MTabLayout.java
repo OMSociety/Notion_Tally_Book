@@ -24,11 +24,11 @@ import androidx.annotation.RestrictTo;
 import androidx.annotation.StringRes;
 import androidx.core.util.Pools;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.PagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 import androidx.core.view.PointerIconCompat;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.ViewPager;
-import androidx.core.view.animation.FastOutSlowInInterpolator;
+import androidx.viewpager.widget.ViewPager;
+import androidx.dynamicanimation.animation.FastOutSlowInInterpolator;
 import androidx.core.widget.TextViewCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -61,9 +61,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-import static androidx.core.view.ViewPager.SCROLL_STATE_DRAGGING;
-import static androidx.core.view.ViewPager.SCROLL_STATE_IDLE;
-import static androidx.core.view.ViewPager.SCROLL_STATE_SETTLING;
+import static androidx.viewpager.widget.ViewPager.SCROLL_STATE_DRAGGING;
+import static androidx.viewpager.widget.ViewPager.SCROLL_STATE_IDLE;
+import static androidx.viewpager.widget.ViewPager.SCROLL_STATE_SETTLING;
 
 /**
  * @author : liuchao
