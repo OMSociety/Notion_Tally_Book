@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.home;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.databinding.DataBindingUtil;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.util.DiffUtil;
@@ -33,7 +33,7 @@ class HomeAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     HomeAdapter(FragmentActivity activity, HomeViewModel viewModel, RecordItemViewModel recordItemViewModel) {
         mActivity = activity;
         mViewModel = viewModel;
-        mMonthInfoViewModel = ViewModelProviders.of(activity).get(HomeMonthInfoViewModel.class);
+        mMonthInfoViewModel = new ViewModelProvider(activity).get(HomeMonthInfoViewModel.class);
         mRecordItemViewModel = recordItemViewModel;
         mInflater = LayoutInflater.from(mActivity);
     }
