@@ -28,7 +28,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.core.view.PointerIconCompat;
 import androidx.core.view.ViewCompat;
 import androidx.viewpager.widget.ViewPager;
-import androidx.dynamicanimation.animation.FastOutSlowInInterpolator;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.core.widget.TextViewCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -50,6 +50,7 @@ import android.view.animation.Interpolator;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.R;
 import android.widget.TextView;
 
 import com.coderpage.base.R;
@@ -2206,7 +2207,7 @@ public class MTabLayout extends HorizontalScrollView {
     }
 
     private final int[] APPCOMPAT_CHECK_ATTRS = {
-            androidx.appcompat.appcompat.R.attr.colorPrimary
+            android.R.attr.colorPrimary
     };
 
     void checkAppCompatTheme(Context context) {
