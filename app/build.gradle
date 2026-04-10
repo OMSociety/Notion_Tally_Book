@@ -87,10 +87,6 @@ android {
             dimension 'channel'
             buildConfigField 'String', 'CHANNEL', '"baidu"'
         }
-        wandoujia {
-            dimension 'channel'
-            buildConfigField 'String', 'CHANNEL', '"wandoujia"'
-        }
         googleplay {
             dimension 'channel'
             buildConfigField 'String', 'CHANNEL', '"googleplay"'
