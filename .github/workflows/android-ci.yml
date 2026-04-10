@@ -20,18 +20,14 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Debug gradlew
-        run: |
-          ls -la gradlew
-          head -5 gradlew
-          file gradlew
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Create local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       - name: Build debug APK (official flavor)
-        run: ./gradlew assembleOfficialDebug --no-daemon --stacktrace
-        shell: bash
+        run: ./gradlew assembleOfficialDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
