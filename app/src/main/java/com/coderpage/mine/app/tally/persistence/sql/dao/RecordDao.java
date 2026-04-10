@@ -9,6 +9,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
+import com.coderpage.mine.app.tally.persistence.model.RecordWithCategory;
 import com.coderpage.mine.app.tally.persistence.model.RecordCategoryGroup;
 import com.coderpage.mine.app.tally.persistence.model.RecordGroup;
 
@@ -33,7 +34,7 @@ public interface RecordDao {
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_id = :id")
-    RecordEntity queryById(long id);
+    RecordWithCategory queryById(long id);
 
     /**
      * 通过关键字查询
@@ -286,7 +287,7 @@ public interface RecordDao {
     @Query("select * " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name")
-    List<RecordEntity> queryAll();
+    List<RecordWithCategory> queryAll();
 
     /***
      * 查询指定时间区间内的所有记录（收入和支出），按日期降序排序
