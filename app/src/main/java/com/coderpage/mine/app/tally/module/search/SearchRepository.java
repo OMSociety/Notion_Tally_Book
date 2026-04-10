@@ -8,7 +8,6 @@ import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
 import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.concurrency.MineExecutors;
-import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.persistence.database.MineDatabase;
 import com.coderpage.mine.persistence.entity.KeyValue;
@@ -32,12 +31,12 @@ class SearchRepository {
      * @param keyWord  关键字
      * @param callback 回调
      */
-    void queryRecords(int page, int pageSize, String keyWord, Callback<List<Record>, IError> callback) {
+    void queryRecords(int page, int pageSize, String keyWord, Callback<List<RecordEntity>, IError> callback) {
         MineExecutors.ioExecutor().execute(() -> {
             long limit = pageSize;
             long offset = ((page - 1) * pageSize);
 
-            List<Record> recordList = TallyDatabase.getInstance().recordDao()
+            List<RecordEntity> recordList = TallyDatabase.getInstance().recordDao()
                     .queryByKeyWord("%" + keyWord + "%", limit, offset);
             callback.success(recordList);
         });
