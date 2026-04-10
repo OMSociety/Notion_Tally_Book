@@ -136,7 +136,7 @@ dependencies {
     
     // ARouter
     implementation rootProject.arounter
-    annotationProcessor rootProject.arounterProcessor
+    kapt rootProject.arounterProcessor
     
     // 网络
     implementation rootProject.okhttp3
