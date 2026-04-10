@@ -128,7 +128,7 @@ dependencies {
     implementation rootProject.timber
     
     // TwinklingRefreshLayout (来自 JitPack)
-    implementation 'com.github.lcodecorex:TwinklingRefreshLayout:1.0.7'
+    implementation 'com.github.lcodecorex:TwinklingRefreshLayout:v1.03'
 
     implementation rootProject.eventBus
     implementation rootProject.mpAndroidChart
