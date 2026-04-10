@@ -3,7 +3,7 @@ plugins {
 }
 
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.devtools.ksp'
 
 android {
     namespace 'com.coderpage.mine'
@@ -126,7 +126,7 @@ dependencies {
     
     // Architecture Components
     implementation "androidx.room:room-runtime:${rootProject.roomVersion}"
-    kapt "androidx.room:room-compiler:${rootProject.roomVersion}"
+    ksp "androidx.room:room-compiler:${rootProject.roomVersion}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${rootProject.lifecycleVersion}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${rootProject.lifecycleVersion}"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:${rootProject.lifecycleVersion}"
@@ -153,7 +153,7 @@ dependencies {
     
     // ARouter
     implementation rootProject.arounter
-    kapt rootProject.arounterProcessor
+    ksp rootProject.arounterProcessor
     
     // 网络
     implementation rootProject.okhttp3
@@ -168,11 +168,4 @@ dependencies {
     testImplementation rootProject.mockito
 }
 
-kapt {
-    correctErrorTypes = true
-    arguments {
-        arg("room.schemaLocation", "$projectDir/schemas")
-        arg("room.incremental", "true")
-        arg("room.expandProjection", "true")
-    }
 }
