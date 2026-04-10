@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.persistence.model;
 
-import androidx.room.ColumnInfo;
+import android.arch.persistence.room.ColumnInfo;
 
 /**
  * @author lc.
@@ -23,11 +23,11 @@ public class RecordCategoryGroup {
     private long categoryId;
 
     /** 该分类记录数量 */
-    @ColumnInfo(name = "cnt")
+    @ColumnInfo(name = "count(*)")
     private long count;
 
     /** 总金额 */
-    @ColumnInfo(name = "total")
+    @ColumnInfo(name = "sum(record_amount)")
     private double amount;
 
     /** 分类唯一不变名称 */
