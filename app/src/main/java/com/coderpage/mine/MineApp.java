@@ -1,7 +1,7 @@
 package com.coderpage.mine;
 
 import android.app.Application;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.util.SparseArray;
 
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -10,6 +10,7 @@ import com.coderpage.base.widget.LoadingLayout;
 import com.coderpage.framework.Framework;
 import com.coderpage.mine.app.tally.update.UpdateUtils;
 import com.tendcloud.tenddata.TCAgent;
+import timber.log.Timber;
 
 /**
  * @author abner-l. 2017-02-05
@@ -29,6 +30,7 @@ public class MineApp extends Application {
         if (BuildConfig.DEBUG) {
             ARouter.openDebug();
             ARouter.openLog();
+            Timber.plant(new Timber.DebugTree());
         }
         if (!BuildConfig.DEBUG) {
             TCAgent.init(this, BuildConfig.TALKING_DATA_APP_ID, BuildConfig.FLAVOR);
