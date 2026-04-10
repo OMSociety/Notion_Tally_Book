@@ -5,8 +5,6 @@ import android.os.Environment;
 
 import java.io.File;
 
-import static com.coderpage.base.utils.LogUtils.LOGE;
-import static com.coderpage.base.utils.LogUtils.makeLogTag;
 
 /**
  * @author abner-l. 2017-06-01
@@ -14,7 +12,7 @@ import static com.coderpage.base.utils.LogUtils.makeLogTag;
 
 public class Cache {
 
-    private static final String TAG = makeLogTag(Cache.class);
+    private static final String TAG = "Cache";
 
     /** SD卡 目录 */
     private static String SD_CARD_ROOT_PATH = Environment.getExternalStorageDirectory().getPath();
@@ -38,7 +36,7 @@ public class Cache {
         if (!cacheFolder.exists()) {
             boolean mkDirOk = cacheFolder.mkdir();
             if (!mkDirOk) {
-                LOGE(TAG, "create cache folder failed");
+                android.util.Log.e(TAG, "create cache folder failed");
             }
         }
         return cacheFolder;
