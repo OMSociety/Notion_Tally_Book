@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.chart;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -98,7 +98,7 @@ public class TallyChartActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.tally_module_chart_tally_chart_activity);
-        mViewModel = ViewModelProviders.of(this).get(TallyChartViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(TallyChartViewModel.class);
         getLifecycle().addObserver(mViewModel);
 
         initView();
