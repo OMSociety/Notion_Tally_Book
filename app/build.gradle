@@ -33,34 +33,16 @@ android {
             excludes += 'META-INF/okio.kotlin_module'
         }
     }
-
-    signingConfigs {
-        release {
-            keyAlias rootProject.keyAlias
-            keyPassword rootProject.keyPassword
-            storeFile file(rootProject.keyStore)
-            storePassword rootProject.storePassword
-        }
-        debug {
-            keyAlias rootProject.keyAlias
-            keyPassword rootProject.keyPassword
-            storeFile file(rootProject.keyStore)
-            storePassword rootProject.storePassword
-        }
-    }
     
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-            buildConfigField 'String', 'TALKING_DATA_APP_ID', ""$rootProject.talkingDataId""
+            signingConfig signingConfigs.debug
         }
         debug {
             minifyEnabled false
-            signingConfig signingConfigs.debug
-            buildConfigField 'String', 'TALKING_DATA_APP_ID', ""$rootProject.talkingDataId""
         }
     }
     
