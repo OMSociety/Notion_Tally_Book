@@ -3,8 +3,8 @@ package com.coderpage.mine.persistence.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 /**
  * @author lc. 2019-03-30 08:50
