@@ -24,6 +24,8 @@ import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.coderpage.mine.app.tally.persistence.sql.DatabaseConstants.*;
+
 /**
  * @author lc. 2018-05-20 15:28
  * @since 0.6.0
@@ -120,14 +122,14 @@ public abstract class TallyDatabase extends RoomDatabase {
             // 插入分类
             for (CategoryItem categoryItem : categoryList) {
                 ContentValues values = new ContentValues(4);
-                values.put("category_unique_name", categoryItem.uniqueName);
-                values.put("category_name", categoryItem.name);
-                values.put("category_icon", categoryItem.icon);
-                values.put("category_type", categoryItem.type);
-                values.put("category_order", 0);
-                values.put("category_account_id", 0);
-                values.put("category_sync_status", 0);
-                long id = db.insert("category", SQLiteDatabase.CONFLICT_NONE, values);
+                values.put(COLUMN_CATEGORY_UNIQUE_NAME, categoryItem.uniqueName);
+                values.put(COLUMN_CATEGORY_NAME, categoryItem.name);
+                values.put(COLUMN_CATEGORY_ICON, categoryItem.icon);
+                values.put(COLUMN_CATEGORY_TYPE, categoryItem.type);
+                values.put(COLUMN_CATEGORY_ORDER, 0);
+                values.put(COLUMN_RECORD_ACCOUNT_ID, 0);
+                values.put(COLUMN_RECORD_SYNC_STATUS, 0);
+                long id = db.insert(TABLE_CATEGORY, SQLiteDatabase.CONFLICT_NONE, values);
 
                 LogUtils.LOGI("TallyDatabase", "insert expense category. id:" + id + " name:" + categoryItem.name);
             }
@@ -203,45 +205,59 @@ public abstract class TallyDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE category RENAME TO category040");
 
             // 创建记录表
-            database.execSQL("CREATE TABLE record ("
-                    + "record_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-                    // 分类-唯一名称
-                    + "record_category_unique_name TEXT,"
-                    + "record_amount REAL NOT NULL,"
-                    + "record_desc TEXT NOT NULL DEFAULT '',"
-                    + "record_time INTEGER NOT NULL,"
-                    + "record_account_id INTEGER NOT NULL DEFAULT 0,"
-                    + "record_sync_id TEXT NOT NULL,"
-                    + "record_sync_status INTEGER NOT NULL DEFAULT 0,"
-                    + "record_delete INTEGER NOT NULL DEFAULT 0,"
-                    + "record_type INTEGER NOT NULL DEFAULT 0,"
-                    + "UNIQUE (record_sync_id) ON CONFLICT IGNORE)"
+            database.execSQL("CREATE TABLE " + TABLE_RECORD + " ("
+                    + COLUMN_RECORD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+                    + COLUMN_RECORD_CATEGORY_UNIQUE_NAME + " TEXT,"
+                    + COLUMN_RECORD_AMOUNT + " REAL NOT NULL,"
+                    + COLUMN_RECORD_DESC + " TEXT NOT NULL DEFAULT '',"
+                    + COLUMN_RECORD_TIME + " INTEGER NOT NULL,"
+                    + COLUMN_RECORD_ACCOUNT_ID + " INTEGER NOT NULL DEFAULT 0,"
+                    + COLUMN_RECORD_SYNC_ID + " TEXT NOT NULL,"
+                    + COLUMN_RECORD_SYNC_STATUS + " INTEGER NOT NULL DEFAULT 0,"
+                    + COLUMN_RECORD_DELETE + " INTEGER NOT NULL DEFAULT 0,"
+                    + COLUMN_RECORD_TYPE + " INTEGER NOT NULL DEFAULT 0,"
+                    + "UNIQUE (" + COLUMN_RECORD_SYNC_ID + ") ON CONFLICT IGNORE)"
             );
 
             // 创建分类表
-            database.execSQL("CREATE TABLE category ("
-                    + "category_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-                    + "category_unique_name TEXT NOT NULL,"
-                    + "category_name TEXT,"
-                    + "category_icon TEXT NOT NULL,"
-                    + "category_order INTEGER NOT NULL DEFAULT(0),"
-                    + "category_type INTEGER NOT NULL DEFAULT(0),"
-                    + "category_account_id INTEGER NOT NULL DEFAULT(0),"
-                    + "category_sync_status INTEGER NOT NULL DEFAULT(0),"
-                    + "UNIQUE (category_unique_name) ON CONFLICT IGNORE)");
+            database.execSQL("CREATE TABLE " + TABLE_CATEGORY + " ("
+                    + COLUMN_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+                    + COLUMN_CATEGORY_UNIQUE_NAME + " TEXT NOT NULL,"
+                    + COLUMN_CATEGORY_NAME + " TEXT,"
+                    + COLUMN_CATEGORY_ICON + " TEXT NOT NULL,"
+                    + COLUMN_CATEGORY_ORDER + " INTEGER NOT NULL DEFAULT(0),"
+                    + COLUMN_CATEGORY_TYPE + " INTEGER NOT NULL DEFAULT(0),"
+                    + COLUMN_RECORD_ACCOUNT_ID + " INTEGER NOT NULL DEFAULT(0),"
+                    + COLUMN_RECORD_SYNC_STATUS + " INTEGER NOT NULL DEFAULT(0),"
+                    + "UNIQUE (" + COLUMN_CATEGORY_UNIQUE_NAME + ") ON CONFLICT IGNORE)");
 
-            database.execSQL("CREATE UNIQUE INDEX index_record_record_sync_id on record(record_sync_id)");
-            database.execSQL("CREATE UNIQUE INDEX index_category_category_unique_name on category(category_unique_name)");
+            database.execSQL("CREATE UNIQUE INDEX index_record_record_sync_id on "
+                    + TABLE_RECORD + "(" + COLUMN_RECORD_SYNC_ID + ")");
+            database.execSQL("CREATE UNIQUE INDEX index_category_category_unique_name on "
+                    + TABLE_CATEGORY + "(" + COLUMN_CATEGORY_UNIQUE_NAME + ")");
 
             // 同步记录表数据。新加的 record_category_unique_name 使用 category_icon 填充
-            database.execSQL("INSERT INTO record (" +
-                    "record_id,record_category_unique_name,record_amount,record_desc,record_time,record_account_id,record_sync_id,record_sync_status,record_delete,record_type) SELECT " +
+            database.execSQL("INSERT INTO " + TABLE_RECORD + " (" +
+                    COLUMN_RECORD_ID + "," +
+                    COLUMN_RECORD_CATEGORY_UNIQUE_NAME + "," +
+                    COLUMN_RECORD_AMOUNT + "," +
+                    COLUMN_RECORD_DESC + "," +
+                    COLUMN_RECORD_TIME + "," +
+                    COLUMN_RECORD_ACCOUNT_ID + "," +
+                    COLUMN_RECORD_SYNC_ID + "," +
+                    COLUMN_RECORD_SYNC_STATUS + "," +
+                    COLUMN_RECORD_DELETE + "," +
+                    COLUMN_RECORD_TYPE + ") SELECT " +
                     "expense_id,category_icon,expense_amount,expense_desc,expense_time,expense_account_id,expense_sync_id,expense_synced,0,0 " +
                     "FROM expense040 LEFT OUTER JOIN category040 ON expense040.category_id=category040.category_id");
 
             // 同步分类表数据。 0.6.0 版本之前没有 category_unique_name，使用 categoryIcon 字段填充
-            database.execSQL("INSERT INTO category (" +
-                    "category_id,category_name,category_unique_name,category_icon,category_order) SELECT " +
+            database.execSQL("INSERT INTO " + TABLE_CATEGORY + " (" +
+                    COLUMN_CATEGORY_ID + "," +
+                    COLUMN_CATEGORY_NAME + "," +
+                    COLUMN_CATEGORY_UNIQUE_NAME + "," +
+                    COLUMN_CATEGORY_ICON + "," +
+                    COLUMN_CATEGORY_ORDER + ") SELECT " +
                     "category_id,category_name,category_icon,category_icon,category_order FROM category040");
 
             // 插入默认的收入分类
@@ -260,11 +276,11 @@ public abstract class TallyDatabase extends RoomDatabase {
             database.beginTransaction();
             for (CategoryItem categoryIncome : incomeCategoryList) {
                 ContentValues values = new ContentValues(4);
-                values.put("category_unique_name", categoryIncome.uniqueName);
-                values.put("category_name", categoryIncome.name);
-                values.put("category_icon", categoryIncome.icon);
-                values.put("category_type", categoryIncome.type);
-                database.insert("category", SQLiteDatabase.CONFLICT_IGNORE, values);
+                values.put(COLUMN_CATEGORY_UNIQUE_NAME, categoryIncome.uniqueName);
+                values.put(COLUMN_CATEGORY_NAME, categoryIncome.name);
+                values.put(COLUMN_CATEGORY_ICON, categoryIncome.icon);
+                values.put(COLUMN_CATEGORY_TYPE, categoryIncome.type);
+                database.insert(TABLE_CATEGORY, SQLiteDatabase.CONFLICT_IGNORE, values);
             }
             database.setTransactionSuccessful();
             database.endTransaction();
