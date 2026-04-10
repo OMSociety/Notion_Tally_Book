@@ -35,6 +35,7 @@
 
         <activity
             android:name=".app.tally.module.home.HomeActivity"
+            android:exported="true"
             android:label="@string/tally_toolbar_title_main"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally">
@@ -48,7 +49,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.coderpage.mine.app.tally.module.auto.ImageReceiverActivity">
+        <activity android:name="com.coderpage.mine.app.tally.module.auto.ImageReceiverActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -127,7 +129,8 @@
             android:label="@string/tally_toolbar_title_debug"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
-        <activity android:name=".app.tally.module.search.SearchActivity">
+        <activity android:name=".app.tally.module.search.SearchActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -150,6 +153,7 @@
 
         <service
             android:name="com.talkingdata.sdk.TDAntiCheatingService"
+            android:exported="true"
             android:process="com.talkingdata.sdk.TDAntiCheatingService">
             <intent-filter>
                 <action android:name="com.talkingdata.sdk.TDAntiCheatingService" />
