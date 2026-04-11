@@ -1,6 +1,10 @@
 package com.coderpage.mine.app.tally.databinding;
 
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.databinding.BindingAdapter;
+import androidx.lifecycle.ObservableField;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -23,16 +27,93 @@ public class CommonBindAdapter {
 
     private static final DecimalFormat MONEY_DECIMAL_FORMAT = new DecimalFormat("0.00");
 
-    /** 设置分类 ICON */
+    // ==================== categoryIcon 适配器 ====================
+
+    /** 设置分类 ICON - String 类型 */
     @BindingAdapter(value = {"categoryIcon"}, requireAll = false)
     public static void setCategoryIcon(ImageView imageView, String categoryIconName) {
         int resId = CategoryIconHelper.resId(categoryIconName);
         imageView.setImageResource(resId);
     }
 
-    /**
-     * 显示金额
-     */
+    /** 设置分类 ICON - AppCompatImageView */
+    @BindingAdapter(value = {"categoryIcon"}, requireAll = false)
+    public static void setCategoryIcon(AppCompatImageView imageView, String categoryIconName) {
+        int resId = CategoryIconHelper.resId(categoryIconName);
+        imageView.setImageResource(resId);
+    }
+
+    /** 设置分类 ICON - ObservableField 类型 */
+    @BindingAdapter(value = {"categoryIcon"}, requireAll = false)
+    public static void setCategoryIcon(ImageView imageView, ObservableField<String> categoryIconName) {
+        if (categoryIconName != null && categoryIconName.get() != null) {
+            setCategoryIcon(imageView, categoryIconName.get());
+        }
+    }
+
+    /** 设置分类 ICON - AppCompatImageView + ObservableField */
+    @BindingAdapter(value = {"categoryIcon"}, requireAll = false)
+    public static void setCategoryIcon(AppCompatImageView imageView, ObservableField<String> categoryIconName) {
+        if (categoryIconName != null && categoryIconName.get() != null) {
+            setCategoryIcon((ImageView) imageView, categoryIconName.get());
+        }
+    }
+
+    // ==================== visibility 适配器 ====================
+
+    /** 设置 visibility - int 类型 (View.VISIBLE / GONE / INVISIBLE) */
+    @BindingAdapter(value = {"android:visibility"}, requireAll = false)
+    public static void setVisibility(View view, int visibility) {
+        view.setVisibility(visibility);
+    }
+
+    /** 设置 visibility - boolean 类型 */
+    @BindingAdapter(value = {"android:visibility"}, requireAll = false)
+    public static void setVisibility(View view, boolean visible) {
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    /** 设置 visibility - ConstraintLayout + int */
+    @BindingAdapter(value = {"android:visibility"}, requireAll = false)
+    public static void setVisibility(ConstraintLayout view, int visibility) {
+        view.setVisibility(visibility);
+    }
+
+    /** 设置 visibility - ConstraintLayout + boolean */
+    @BindingAdapter(value = {"android:visibility"}, requireAll = false)
+    public static void setVisibility(ConstraintLayout view, boolean visible) {
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    // ==================== onClick 适配器 ====================
+
+    /** 设置 onClick - 通用 View */
+    @BindingAdapter(value = {"android:onClick"}, requireAll = false)
+    public static void setOnClick(View view, View.OnClickListener listener) {
+        view.setOnClickListener(listener);
+    }
+
+    /** 设置 onClick - ConstraintLayout */
+    @BindingAdapter(value = {"android:onClick"}, requireAll = false)
+    public static void setOnClick(ConstraintLayout view, View.OnClickListener listener) {
+        view.setOnClickListener(listener);
+    }
+
+    /** 设置 onClick - CardView */
+    @BindingAdapter(value = {"android:onClick"}, requireAll = false)
+    public static void setOnClick(CardView view, View.OnClickListener listener) {
+        view.setOnClickListener(listener);
+    }
+
+    /** 设置 onClick - AppCompatImageView */
+    @BindingAdapter(value = {"android:onClick"}, requireAll = false)
+    public static void setOnClick(AppCompatImageView view, View.OnClickListener listener) {
+        view.setOnClickListener(listener);
+    }
+
+    // ==================== 其他适配器 ====================
+
+    /** 显示金额 */
     @BindingAdapter(value = {"selected"}, requireAll = false)
     public static void setViewSelect(View view, boolean selected) {
         if (view != null) {
