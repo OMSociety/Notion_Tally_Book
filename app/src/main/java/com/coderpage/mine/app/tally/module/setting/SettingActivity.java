@@ -63,49 +63,6 @@ public class SettingActivity extends BaseActivity {
             }
         });
 
-        // 初始化短信识别开关按钮
-        Button btnRecognitionSwitch = findViewById(R.id.btnRecognitionSwitch);
-        // 设置初始状态
-        btnRecognitionSwitch.setText(mBinding.getVm().smsRecognitionEnabled.get() ? "已开启" : "已关闭");
-        btnRecognitionSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 在点击时检查权限
-                if (ContextCompat.checkSelfPermission(SettingActivity.this, Manifest.permission.RECEIVE_SMS)
-                        != PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(SettingActivity.this, Manifest.permission.READ_SMS)
-                                != PackageManager.PERMISSION_GRANTED) {
-
-                    // 如果没有权限，先请求权限
-                    ActivityCompat.requestPermissions(SettingActivity.this,
-                            new String[]{
-                                    Manifest.permission.RECEIVE_SMS,
-                                    Manifest.permission.READ_SMS
-                            }, 1001);
-                } else {
-                    // 如果已有权限，执行开关逻辑
-                    SettingViewModel viewModel = mBinding.getVm();
-                    boolean currentStatus = viewModel.smsRecognitionEnabled.get();
-                    boolean newStatus = !currentStatus;
-
-                    // 保存新状态到数据库
-                    viewModel.saveSmsRecognitionEnabled(newStatus);
-
-                    // 更新按钮文本
-                    btnRecognitionSwitch.setText(newStatus ? "已开启" : "已关闭");
-
-                    // 显示状态变更提示
-                    Toast.makeText(SettingActivity.this, newStatus ? "短信识别功能已开启" : "短信识别功能已关闭", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        // 监听开关状态变化以保持UI同步
-        mBinding.getVm().getSmsRecognitionEnabledLiveData().observe(this, enabled -> {
-            if (enabled != null) {
-                btnRecognitionSwitch.setText(enabled ? "已开启" : "已关闭");
-            }
-        });
         
         // 初始化 AI 设置按钮
         Button btnAiSetting = findViewById(R.id.btnAiSetting);
@@ -228,24 +185,6 @@ public class SettingActivity extends BaseActivity {
             public void afterTextChanged(Editable s) {
                 // 文本变化后保存 AI Model
                 mBinding.getVm().saveAiModel(s.toString());
-            }
-        });
-        // 为检测名单输入框添加监听
-        mBinding.etDetectionList.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // 不需要处理
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // 不需要处理
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // 文本变化后保存检测名单
-                mBinding.getVm().saveDetectionList(s.toString());
             }
         });
     }

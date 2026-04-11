@@ -24,7 +24,17 @@ public class UpdateUtils {
                 .checkNewVersion(context, checkCallBack);
     }
 
-    // 添加Gitee更新检查方法
+    // GitHub 版本检查方法
+    public static void startNewClientVersionCheckFromGitHub(Context context,
+                                                           Updater.NewVersionCheckCallBack checkCallBack) {
+        new Updater.Builder(context, new GitHubSourceFetcher())
+                .setExecutor(AsyncTaskExecutor.executor())
+                .setNotifyIcon(R.mipmap.ic_launcher)
+                .create()
+                .checkNewVersion(context, checkCallBack);
+    }
+
+    // 添加Gitee版本检查方法
     public static void startNewClientVersionCheckFromGitee(Context context,
                                                            Updater.NewVersionCheckCallBack checkCallBack) {
         new Updater.Builder(context, new GiteeSourceFetcher())
@@ -45,7 +55,7 @@ public class UpdateUtils {
                 .checkNewVersion(context);
     }
 
-    // 添加后台Gitee更新检查方法
+    // 添加后台Gitee版本检查方法
     public static void startNewClientVersionCheckBackgroundFromGitee(Context context) {
         new Updater.Builder(context, new GiteeSourceFetcher())
                 .setExecutor(AsyncTaskExecutor.executor())

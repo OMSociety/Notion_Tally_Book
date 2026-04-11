@@ -52,6 +52,11 @@ public class AiApiConfig {
             this.defaultUrl = defaultUrl;
             this.defaultModel = defaultModel;
         }
+        
+        @Override
+        public String toString() {
+            return name;
+        }
     }
     
     public AiApiConfig() {

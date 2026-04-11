@@ -169,10 +169,11 @@
     <string name="tally_about_check_new_version">检查更新</string>
     <string name="tally_about_find_new_version" formatted="false">新版本 %s(%d)</string>
     <string name="tally_about_title_about_app">关于应用</string>
-    <string name="tally_about_about_app_content">一个记账本应用, 简单干净. 我很喜欢这个记账本因为简单干净专注. 平时自己也在用, 但记账真的是一件需要有毅力的事情. 我想让这件事变得简单, 方便, 甚至不需要自己动手去完成. </string>
+    <string name="tally_about_about_app_content">基于原MINE记账本，增加Notion双向同步、AI图片识别等功能，让记账更简单便捷。</string>
     <string name="tally_about_title_developer_info">开发者</string>
     <string name="tally_about_title_about_me">关于我</string>
     <string name="tally_about_about_me_content">开发者：山海学社OMSociety
+
 开发辅助：Astrbot、MiniMax2.7</string>
 
     <string name="tally_about_title_wechat">微信公众号</string>
