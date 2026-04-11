@@ -731,14 +731,7 @@ public class BackupFileViewModel extends BaseViewModel {
                 // Get the Uri of the selected file
                 Uri uri = data.getData();
                 String path = FileUtils.getPath(activity, uri);
-                
-                // 检查是否是 CSV 文件
-                if (path != null && path.toLowerCase().endsWith(".csv")) {
-                    // 处理 CSV 导入
-                    importCsvFile(activity, path);
-                } else {
-                    onBackupFileSelectedFromFileSystem(activity, path);
-                }
+                onBackupFileSelectedFromFileSystem(activity, path);
             } else if (requestCode == 2) {
                 // 处理文件夹选择结果
                 Uri uri = data.getData();
@@ -763,35 +756,6 @@ public class BackupFileViewModel extends BaseViewModel {
                                            @NonNull int[] grantResults) {
         if (mPermissionReqHandler != null) {
             mPermissionReqHandler.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    /**
-     * 导入 CSV 文件
-     */
-    private void importCsvFile(Activity activity, String filePath) {
-        try {
-            java.io.File file = new java.io.File(filePath);
-            if (!file.exists()) {
-                showToastShort("文件不存在");
-                return;
-            }
-            
-            // 显示导入中
-            showToastShort("正在导入...");
-            
-            // 在后台线程导入
-            new Thread(() -> {
-                CsvImporter.ImportResult result = CsvImporter.importFromCsv(activity, file);
-                
-                // 在主线程显示结果
-                activity.runOnUiThread(() -> {
-                    showToastShort(result.message);
-                });
-            }).start();
-            
-        } catch (Exception e) {
-            showToastShort("导入失败: " + e.getMessage());
         }
     }
 

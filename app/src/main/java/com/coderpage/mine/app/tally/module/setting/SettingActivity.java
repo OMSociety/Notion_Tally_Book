@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -40,6 +41,7 @@ public class SettingActivity extends BaseActivity {
     // 其他
     private LinearLayout lyAbout;
     private LinearLayout lyUpdate;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +55,13 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void initToolbar() {
-        setToolbarAsBack(view -> finish());
-        if (getToolbar() != null) {
-            getToolbar().setTitle("设置");
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("设置");
         }
+        mToolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void initViews() {

@@ -140,15 +140,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/spacing_normal"
-                    android:text="@string/tally_about_developer"
-                    android:textColor="@color/appTextColorSecondary"
-                    android:textSize="@dimen/app_text_size_medium"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/spacing_normal"
-                    android:text="@string/tally_about_dev_helper"
+                    android:text="@string/tally_about_about_me_content"
                     android:textColor="@color/appTextColorSecondary"
                     android:textSize="@dimen/app_text_size_medium"/>
 

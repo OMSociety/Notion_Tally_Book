@@ -3,8 +3,8 @@ package com.coderpage.mine.app.tally.module.backup;
 import android.content.Context;
 import android.util.Log;
 
-import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
+import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,27 +15,18 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * CSV 导入工具类
- * 支持从老 MINE 记账本导出的 CSV 文件导入
+ * 支持通用 CSV 格式：时间,分类,金额,类型,备注
  * 
  * @author Flandre Scarlet
  */
 public class CsvImporter {
 
     private static final String TAG = "CsvImporter";
-    private static final SimpleDateFormat[] DATE_FORMATS = {
-        new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()),
-        new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
-        new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault()),
-        new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()),
-        new SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault()),
-        new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
-    };
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     /**
      * 从 CSV 文件导入记录
@@ -56,22 +47,26 @@ public class CsvImporter {
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
                 
-                // 跳过第一行（表头）
-                if (isFirstLine) {
-                    isFirstLine = false;
-                    if (line.contains("时间") || line.contains("日期") || 
-                        line.toLowerCase().contains("time") || line.toLowerCase().contains("date")) {
-                        continue;
-                    }
-                }
-                
                 // 跳过 BOM
                 if (line.startsWith("\uFEFF")) {
                     line = line.substring(1);
                 }
                 
+                // 跳过空行
                 if (line.trim().isEmpty()) {
                     continue;
+                }
+                
+                // 跳过第一行（表头）
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    // 检测是否是表头行
+                    String lowerLine = line.toLowerCase();
+                    if (lowerLine.contains("时间") || lowerLine.contains("分类") || 
+                        lowerLine.contains("金额") || lowerLine.contains("date") ||
+                        lowerLine.contains("category") || lowerLine.contains("amount")) {
+                        continue;
+                    }
                 }
                 
                 RecordEntity record = parseLine(line);
@@ -108,51 +103,75 @@ public class CsvImporter {
     private static RecordEntity parseLine(String line) {
         List<String> fields = parseCsvFields(line);
         
-        if (fields.isEmpty()) {
+        if (fields.size() < 3) {
             return null;
         }
         
         RecordEntity record = new RecordEntity();
         record.setTime(System.currentTimeMillis());
         record.setDesc("");
+        record.setType(RecordEntity.TYPE_EXPENSE); // 默认支出
         
-        // 尝试解析金额
-        for (String field : fields) {
-            try {
-                double amount = parseAmount(field.trim());
-                if (amount != 0) {
-                    record.setAmount(Math.abs(amount));
-                    String lineLower = line.toLowerCase();
-                    if (lineLower.contains("收入") || lineLower.contains("income")) {
-                        record.setType(RecordEntity.TYPE_INCOME);
-                    } else {
-                        record.setType(RecordEntity.TYPE_EXPENSE);
-                    }
-                    break;
-                }
-            } catch (NumberFormatException e) {
-                // 忽略
-            }
-        }
-        
-        if (record.getAmount() <= 0) {
-            return null;
-        }
-        
-        // 提取备注
+        // 尝试解析每个字段
         for (int i = 0; i < fields.size(); i++) {
             String field = fields.get(i).trim();
-            if (!isNumber(field) && !isDateTime(field) && !field.contains("收入") && 
-                !field.contains("支出") && !field.contains("expense") && !field.contains("income")) {
-                if (record.getDesc().isEmpty()) {
-                    record.setDesc(field);
+            
+            // 跳过空字段
+            if (field.isEmpty()) {
+                continue;
+            }
+            
+            // 尝试解析时间
+            if (record.getTime() == 0 || record.getTime() == System.currentTimeMillis()) {
+                long timestamp = parseDateTime(field);
+                if (timestamp > 0) {
+                    record.setTime(timestamp);
+                    continue;
                 }
             }
+            
+            // 尝试解析金额
+            double amount = parseAmount(field);
+            if (amount > 0) {
+                record.setAmount(amount);
+                continue;
+            }
+            
+            // 判断是收入还是支出
+            String lowerField = field.toLowerCase();
+            if (lowerField.contains("收入") || lowerField.contains("支出") ||
+                lowerField.contains("income") || lowerField.contains("expense") ||
+                lowerField.contains("支出") || lowerField.contains("收入")) {
+                if (lowerField.contains("收入")) {
+                    record.setType(RecordEntity.TYPE_INCOME);
+                } else {
+                    record.setType(RecordEntity.TYPE_EXPENSE);
+                }
+                continue;
+            }
+            
+            // 如果还没有设置分类，设置它
+            if (record.getCategoryUniqueName() == null || record.getCategoryUniqueName().isEmpty()) {
+                record.setCategoryUniqueName(field);
+            }
+            
+            // 如果还没有设置备注，设置它
+            if (record.getDesc().isEmpty()) {
+                record.setDesc(field);
+            }
+        }
+        
+        // 如果金额为0，跳过这条记录
+        if (record.getAmount() <= 0) {
+            return null;
         }
         
         return record;
     }
 
+    /**
+     * 解析 CSV 字段（处理带引号和转义的字段）
+     */
     private static List<String> parseCsvFields(String line) {
         List<String> fields = new ArrayList<>();
         StringBuilder field = new StringBuilder();
@@ -160,8 +179,15 @@ public class CsvImporter {
         
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
+            
             if (c == '"') {
-                inQuotes = !inQuotes;
+                if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                    // 转义的引号
+                    field.append('"');
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
             } else if (c == ',' && !inQuotes) {
                 fields.add(field.toString());
                 field = new StringBuilder();
@@ -169,34 +195,66 @@ public class CsvImporter {
                 field.append(c);
             }
         }
+        
         fields.add(field.toString());
         return fields;
     }
 
+    /**
+     * 解析日期时间
+     * 支持格式：2026-04-11 20:45, 2026-04-11, 2026/04/11 20:45
+     */
+    private static long parseDateTime(String str) {
+        if (str == null || str.isEmpty()) {
+            return 0;
+        }
+        
+        str = str.trim();
+        
+        // 尝试多种日期格式
+        String[] formats = {
+            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd",
+            "yyyy/MM/dd HH:mm",
+            "yyyy/MM/dd",
+            "yyyy.MM.dd HH:mm",
+            "yyyy.MM.dd"
+        };
+        
+        for (String format : formats) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(format);
+                return sdf.parse(str).getTime();
+            } catch (ParseException e) {
+                // 尝试下一个格式
+            }
+        }
+        
+        return 0;
+    }
+
+    /**
+     * 解析金额
+     */
     private static double parseAmount(String str) {
-        if (str == null || str.isEmpty()) return 0;
+        if (str == null || str.isEmpty()) {
+            return 0;
+        }
+        
+        // 移除货币符号、千分位分隔符和空格
+        str = str.trim()
+                .replaceAll("[¥$€£]", "")
+                .replaceAll(",", "")
+                .replaceAll("\\s", "");
+        
+        // 保留数字、小数点和负号
         str = str.replaceAll("[^\\d.-]", "");
+        
         try {
-            return Double.parseDouble(str);
+            return Math.abs(Double.parseDouble(str));
         } catch (NumberFormatException e) {
             return 0;
         }
-    }
-
-    private static boolean isNumber(String str) {
-        return parseAmount(str) != 0;
-    }
-
-    private static boolean isDateTime(String str) {
-        for (SimpleDateFormat format : DATE_FORMATS) {
-            try {
-                format.parse(str.trim());
-                return true;
-            } catch (ParseException e) {
-                // 忽略
-            }
-        }
-        return false;
     }
 
     public static class ImportResult {

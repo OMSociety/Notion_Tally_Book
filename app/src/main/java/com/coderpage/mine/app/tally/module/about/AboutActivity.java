@@ -75,8 +75,8 @@ public class AboutActivity extends BaseActivity {
             case R.id.lyAppInfo:
                 // 切换更新源
                 if (mCurrentUpdateSource == 0) {
-                    // 使用 GitHub 更新（默认）
-                    UpdateUtils.startNewClientVersionCheckFromGitHub(AboutActivity.this, new Updater.NewVersionCheckCallBack() {
+                    // 使用默认服务器更新
+                    UpdateUtils.startNewClientVersionCheck(AboutActivity.this, new Updater.NewVersionCheckCallBack() {
                         @Override
                         public void onFindNewVersion(ApkModel apkModel) {
                             mNewVersionTv.setText(getString(R.string.tally_about_find_new_version,

@@ -16,8 +16,6 @@ public class SettingPreference {
 
     private static final String KEY_HIDE_MONEY = "key_hide_money";
     private static final String KEY_BUDGET_MONTH = "key_budget_month";
-    
-    // AI 配置相关
     private static final String KEY_AI_API_URL = "key_ai_api_url";
     private static final String KEY_AI_API_KEY = "key_ai_api_key";
     private static final String KEY_AI_MODEL = "key_ai_model";
@@ -42,7 +40,10 @@ public class SettingPreference {
         getPreference(context).edit().putFloat(KEY_BUDGET_MONTH, budget).apply();
     }
 
-    // AI 配置方法
+    private static SharedPreferences getPreference(Context context) {
+        return context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    }
+
     public static String getAiApiUrl(Context context) {
         return getPreference(context).getString(KEY_AI_API_URL, "");
     }
@@ -65,9 +66,5 @@ public class SettingPreference {
 
     public static void setAiModel(Context context, String model) {
         getPreference(context).edit().putString(KEY_AI_MODEL, model).apply();
-    }
-
-    private static SharedPreferences getPreference(Context context) {
-        return context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
     }
 }

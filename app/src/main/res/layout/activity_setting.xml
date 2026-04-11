@@ -1,502 +1,262 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
 
-    <data>
-        <variable
-            name="vm"
-            type="com.coderpage.mine.app.tally.module.setting.SettingViewModel" />
-    </data>
-
-    <LinearLayout
+    <!-- Toolbar -->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/background">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:titleTextColor="@color/appTextColorPrimary"
+        app:navigationIcon="?attr/homeAsUpIndicator"/>
 
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/toolbar" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- AI 设置 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AI 图片识别"
+                android:textColor="@color/colorAccent"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="12dp"
+                android:background="@color/white"
+                android:layout_marginBottom="8dp">
 
-                <!-- 通用设置 -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="通用"
-                    android:textColor="@color/colorAccent"
+                    android:text="API URL"
                     android:textSize="14sp"
-                    android:layout_marginBottom="8dp"/>
+                    android:textColor="@color/appTextColorPrimary"
+                    android:layout_marginBottom="4dp"/>
 
-                <!-- 记账提醒 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="记账提醒"
-                            android:textSize="16sp"
-                            android:textColor="@color/appTextColorPrimary"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="每日提醒记账"
-                            android:textSize="12sp"
-                            android:textColor="@color/appTextColorThird"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <Switch
-                        android:id="@+id/switchReminder"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
-
-                <!-- 月度预算 -->
-                <LinearLayout
-                    android:id="@+id/lyBudget"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="16dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="月度预算"
-                            android:textSize="16sp"
-                            android:textColor="@color/appTextColorPrimary"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="设置每月预算上限"
-                            android:textSize="12sp"
-                            android:textColor="@color/appTextColorThird"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=">" android:textSize="20sp" android:textColor="@color/appTextColorThird" />
-                </LinearLayout>
-
-                <!-- Notion 同步 -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Notion 同步"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- Notion Token -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Notion Token"
-                        android:textSize="14sp"
-                        android:textColor="@color/appTextColorPrimary"
-                        android:layout_marginBottom="8dp"/>
-
-                    <EditText
-                        android:id="@+id/etNotionToken"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:hint="输入 Notion Integration Token"
-                        android:inputType="text"
-                        android:padding="8dp"
-                        
-                        android:textSize="14sp"/>
-                </LinearLayout>
-
-                <!-- Notion Database ID -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Database ID"
-                        android:textSize="14sp"
-                        android:textColor="@color/appTextColorPrimary"
-                        android:layout_marginBottom="8dp"/>
-
-                    <EditText
-                        android:id="@+id/etNotionDbId"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:hint="输入 Notion Database ID"
-                        android:inputType="text"
-                        android:padding="8dp"
-                        
-                        android:textSize="14sp"/>
-                </LinearLayout>
-
-                <!-- 自动同步开关 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="16dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="自动同步"
-                            android:textSize="16sp"
-                            android:textColor="@color/appTextColorPrimary"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="记账后自动同步到 Notion"
-                            android:textSize="12sp"
-                            android:textColor="@color/appTextColorThird"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <Switch
-                        android:id="@+id/switchAutoSync"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
-
-                <!-- AI 配置 -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="AI 图片识别"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- API URL -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="API URL"
-                        android:textSize="14sp"
-                        android:textColor="@color/appTextColorPrimary"
-                        android:layout_marginBottom="8dp"/>
-
-                    <EditText
-                        android:id="@+id/etAiApiUrl"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:hint="如: https://api.siliconflow.cn/v1"
-                        android:inputType="textUri"
-                        android:padding="8dp"
-                        
-                        android:textSize="14sp"/>
-                </LinearLayout>
-
-                <!-- API Key -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="API Key"
-                        android:textSize="14sp"
-                        android:textColor="@color/appTextColorPrimary"
-                        android:layout_marginBottom="8dp"/>
-
-                    <EditText
-                        android:id="@+id/etAiApiKey"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:hint="输入 API Key"
-                        android:inputType="textPassword"
-                        android:padding="8dp"
-                        
-                        android:textSize="14sp"/>
-                </LinearLayout>
-
-                <!-- 模型 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="模型"
-                        android:textSize="14sp"
-                        android:textColor="@color/appTextColorPrimary"
-                        android:layout_marginBottom="8dp"/>
-
-                    <EditText
-                        android:id="@+id/etAiModel"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:hint="如: Qwen/Qwen2-VL-7B-Instruct"
-                        android:inputType="text"
-                        android:padding="8dp"
-                        
-                        android:textSize="14sp"/>
-                </LinearLayout>
-
-                <!-- AI 测试按钮 -->
-                <Button
-                    android:id="@+id/btnTestAi"
+                <EditText
+                    android:id="@+id/etAiApiUrl"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="测试连接"
-                    android:layout_marginBottom="16dp"/>
-
-                <!-- 数据管理 -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="数据管理"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- 导入数据 -->
-                <LinearLayout
-                    android:id="@+id/lyImport"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="导入数据"
-                            android:textSize="16sp"
-                            android:textColor="@color/appTextColorPrimary"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="支持 CSV / JSON / Excel"
-                            android:textSize="12sp"
-                            android:textColor="@color/appTextColorThird"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=">" android:textSize="20sp" android:textColor="@color/appTextColorThird" />
-                </LinearLayout>
-
-                <!-- 导出数据 -->
-                <LinearLayout
-                    android:id="@+id/lyExport"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="导出数据"
-                            android:textSize="16sp"
-                            android:textColor="@color/appTextColorPrimary"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="导出为 CSV / Excel"
-                            android:textSize="12sp"
-                            android:textColor="@color/appTextColorThird"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=">" android:textSize="20sp" android:textColor="@color/appTextColorThird" />
-                </LinearLayout>
-
-                <!-- 清除数据 -->
-                <LinearLayout
-                    android:id="@+id/lyClear"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="16dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="清除数据"
-                            android:textSize="16sp"
-                            android:textColor="@color/appTextColorPrimary"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="清除所有记账数据"
-                            android:textSize="12sp"
-                            android:textColor="@color/appTextColorThird"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <Button
-                        android:id="@+id/btnClearData"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:text="清除"
-                        android:minWidth="80dp"
-                        android:textSize="12sp"/>
-                </LinearLayout>
-
-                <!-- 关于 -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="其他"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- 关于页面 -->
-                <LinearLayout
-                    android:id="@+id/lyAbout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="关于"
-                        android:textSize="16sp"
-                        android:textColor="@color/appTextColorPrimary"/>
-
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=">" android:textSize="20sp" android:textColor="@color/appTextColorThird" />
-                </LinearLayout>
-
-                <!-- 检查更新 -->
-                <LinearLayout
-                    android:id="@+id/lyUpdate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="12dp"
-                    android:background="@android:color/white">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="检查更新"
-                        android:textSize="16sp"
-                        android:textColor="@color/appTextColorPrimary"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="v1.0.0"
-                        android:textSize="14sp"
-                        android:textColor="@color/appTextColorThird"/>
-                </LinearLayout>
-
+                    android:hint="输入 API 地址"
+                    android:inputType="textUri"
+                    android:textSize="14sp"/>
             </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</layout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:background="@color/white"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="API Key"
+                    android:textSize="14sp"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etAiApiKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="输入 API Key"
+                    android:inputType="textPassword"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:background="@color/white"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="模型"
+                    android:textSize="14sp"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/etAiModel"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="如: Qwen/Qwen2-VL-7B-Instruct"
+                    android:inputType="text"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <!-- 数据管理 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="数据管理"
+                android:textColor="@color/colorAccent"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:id="@+id/lyImport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:background="@color/white"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="导入数据"
+                    android:textSize="16sp"
+                    android:textColor="@color/appTextColorPrimary"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=">"
+                    android:textSize="18sp"
+                    android:textColor="@color/appTextColorThird"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyExport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:background="@color/white"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="导出数据"
+                    android:textSize="16sp"
+                    android:textColor="@color/appTextColorPrimary"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=">"
+                    android:textSize="18sp"
+                    android:textColor="@color/appTextColorThird"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyClear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:background="@color/white"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="清除数据"
+                    android:textSize="16sp"
+                    android:textColor="@color/appTextColorPrimary"/>
+
+                <Button
+                    android:id="@+id/btnClearData"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="清除"
+                    android:minWidth="80dp"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <!-- 其他 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="其他"
+                android:textColor="@color/colorAccent"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:id="@+id/lyAbout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:background="@color/white"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="关于"
+                    android:textSize="16sp"
+                    android:textColor="@color/appTextColorPrimary"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=">"
+                    android:textSize="18sp"
+                    android:textColor="@color/appTextColorThird"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyUpdate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:background="@color/white">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="检查更新"
+                    android:textSize="16sp"
+                    android:textColor="@color/appTextColorPrimary"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="v1.0.0"
+                    android:textSize="14sp"
+                    android:textColor="@color/appTextColorThird"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
