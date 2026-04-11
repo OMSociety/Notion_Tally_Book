@@ -65,6 +65,31 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/tvAiUrlLabel"
+                        android:layout_width="80dp"
+                        android:layout_height="25dp"
+                        android:layout_marginTop="@dimen/spacing_normal"
+                        android:gravity="left|center_vertical"
+                        android:text="API URL"
+                        android:textColor="@color/appTextColorPrimary"
+                        android:textSize="@dimen/app_text_size_large"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvAiSettingTitle" />
+
+                    <EditText
+                        android:id="@+id/etApiUrl"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_normal"
+                        android:hint="输入 API 地址"
+                        android:inputType="textUri"
+                        android:text=""
+                        app:layout_constraintBottom_toBottomOf="@id/tvAiUrlLabel"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tvAiUrlLabel"
+                        app:layout_constraintTop_toTopOf="@id/tvAiUrlLabel" />
+
+                    <TextView
                         android:id="@+id/tvAiKeyLabel"
                         android:layout_width="80dp"
                         android:layout_height="25dp"
@@ -84,7 +109,7 @@
                         android:hint="@string/tally_setting_ai_key_hint"
                         android:inputType="text"
                         android:maxLength="300"
-                        android:text="@={vm.apiKey}"
+                        android:text=""
                         app:layout_constraintBottom_toBottomOf="@id/tvAiKeyLabel"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/tvAiKeyLabel"
@@ -110,7 +135,7 @@
                         android:hint="@string/tally_setting_ai_model_name"
                         android:inputType="text"
                         android:maxLength="300"
-                        android:text="@={vm.aiModel}"
+                        android:text=""
                         app:layout_constraintBottom_toBottomOf="@id/tvAiModelLabel"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/tvAiModelLabel"

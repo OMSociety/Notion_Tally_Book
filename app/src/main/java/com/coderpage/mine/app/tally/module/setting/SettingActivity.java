@@ -65,15 +65,6 @@ public class SettingActivity extends BaseActivity {
 
         
         // 初始化 AI 设置按钮
-        Button btnAiSetting = findViewById(R.id.btnAiSetting);
-        btnAiSetting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ARouter.getInstance()
-                    .build(TallyRouter.AI_SETTING)
-                    .navigation(SettingActivity.this);
-            }
-        });
 
         // 初始化 Notion 同步按钮
         Button btnSyncNow = findViewById(R.id.btnSyncNow);

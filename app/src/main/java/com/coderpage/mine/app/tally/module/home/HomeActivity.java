@@ -254,7 +254,7 @@ public class HomeActivity extends BaseActivity {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_tally_main, menu);
         MenuItem debugMenu = menu.findItem(R.id.menu_debug);
-        debugMenu.setVisible(BuildConfig.DEBUG);
+        debugMenu.setVisible(false);
         return true;
     }
 
