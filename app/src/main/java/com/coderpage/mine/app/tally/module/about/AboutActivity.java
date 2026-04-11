@@ -58,7 +58,6 @@ public class AboutActivity extends BaseActivity {
             Toast.makeText(this, BuildConfig.FLAVOR, Toast.LENGTH_SHORT).show();
             return true;
         });
-        findViewById(R.id.lyWeChatInfo).setOnClickListener(mOnClickListener);
         // 添加用户协议和隐私政策点击事件
         findViewById(R.id.lyUserAgreement).setOnClickListener(mOnClickListener);
         findViewById(R.id.lyPrivacyPolicy).setOnClickListener(mOnClickListener);
@@ -144,12 +143,6 @@ public class AboutActivity extends BaseActivity {
                         }
                     });
                 }
-                break;
-
-            // 微信公众号点击
-            case R.id.lyWeChatInfo:
-                copyWeChatNumber();
-                Toast.makeText(this, R.string.tally_about_wechat_copied, Toast.LENGTH_SHORT).show();
                 break;
 
             // 用户协议点击

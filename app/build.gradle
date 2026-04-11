@@ -59,19 +59,6 @@ android {
     flavorDimensions 'channel'
 
     productFlavors {
-
-        qh360 {
-            dimension 'channel'
-        }
-        yingyongbao {
-            dimension 'channel'
-        }
-        xiaomi {
-            dimension 'channel'
-        }
-        huawei {
-            dimension 'channel'
-        }
         official {
             dimension 'channel'
         }
@@ -107,7 +94,7 @@ uploader {
     apiServer = 'http://app.coderpage.com'
     token = rootProject.releaseToken
     appName = '我的记账本'
-    changeLog = file("${rootDir}/source/changelog/${rootProject.appVersionName}").text;
+    changeLog = file("${rootDir}/source/changelog/${rootProject.appVersionName}/changelog.txt").text;
     isRelease = true
 }
 
@@ -126,6 +113,7 @@ dependencies {
     api rootProject.retrofit
     api rootProject.retrofitConverterFastjson
     api rootProject.okhttp3InterceptorLogging
+    api rootProject.gson
     api rootProject.eventBus
     api rootProject.archRoomRuntime
     api rootProject.archLifecycleExtension
@@ -136,7 +124,6 @@ dependencies {
     api rootProject.constraintLayout
     api rootProject.arounter
 
-    api rootProject.dashscopeSdk
     api rootProject.multidex
     api rootProject.archWork
     api rootProject.excelPoi

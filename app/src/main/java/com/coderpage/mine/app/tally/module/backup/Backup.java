@@ -495,6 +495,8 @@ public class Backup {
     private void writeCsvFile(File file, List<Record> records) {
         try {
             java.io.FileWriter fileWriter = new java.io.FileWriter(file);
+            // UTF-8 BOM，确保 Excel 正确识别中文
+            fileWriter.append("\uFEFF");
             // 写入CSV头部
             fileWriter.append("时间,分类,金额,类型,备注\n");
 

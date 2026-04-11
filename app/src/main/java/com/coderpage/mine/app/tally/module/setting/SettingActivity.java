@@ -15,6 +15,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
+import com.alibaba.android.arouter.launcher.ARouter;
 import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -102,6 +104,44 @@ public class SettingActivity extends BaseActivity {
         mBinding.getVm().getSmsRecognitionEnabledLiveData().observe(this, enabled -> {
             if (enabled != null) {
                 btnRecognitionSwitch.setText(enabled ? "已开启" : "已关闭");
+            }
+        });
+        
+        // 初始化 AI 设置按钮
+        Button btnAiSetting = findViewById(R.id.btnAiSetting);
+        btnAiSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ARouter.getInstance()
+                    .build(TallyRouter.AI_SETTING)
+                    .navigation(SettingActivity.this);
+            }
+        });
+
+        // 初始化 Notion 同步按钮
+        Button btnSyncNow = findViewById(R.id.btnSyncNow);
+        btnSyncNow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingViewModel viewModel = mBinding.getVm();
+                // 先保存配置
+                viewModel.saveNotionToken(viewModel.notionToken.get());
+                viewModel.saveNotionDatabaseId(viewModel.notionDatabaseId.get());
+                // 开始同步
+                viewModel.startSync(SettingActivity.this);
+                Toast.makeText(SettingActivity.this, "开始同步...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        
+        // 初始化创建数据库按钮
+        Button btnCreateDatabase = findViewById(R.id.btnCreateDatabase);
+        btnCreateDatabase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 跳转到 Notion 数据库创建帮助页面
+                ARouter.getInstance()
+                    .build(TallyRouter.NOTION_DATABASE_HELP)
+                    .navigation(SettingActivity.this);
             }
         });
     }

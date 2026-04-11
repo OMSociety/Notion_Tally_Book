@@ -55,7 +55,7 @@ public abstract class TallyDatabase extends RoomDatabase {
      * @return 分类表操作
      */
     public abstract CategoryDao categoryDao();
-
+    
     public static TallyDatabase getInstance() {
         if (sInstance == null) {
             synchronized (TallyDatabase.class) {

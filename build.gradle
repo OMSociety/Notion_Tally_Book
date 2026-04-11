@@ -15,9 +15,9 @@ props.each { key, val ->
 }
 
 ext {
-    appVersionName = '0.7.4'
-    appVersionCode = 74
-    applicationId = 'com.coderpage.mine'
+    appVersionName = '1.0.0'
+    appVersionCode = 100
+    applicationId = 'com.notiontallybook'
 
     minSdkVersion = 18
     targetSdkVersion = 26
@@ -54,6 +54,7 @@ ext {
 
     retrofit = 'com.squareup.retrofit2:retrofit:2.0.0'
     retrofitConverterGson = 'com.squareup.retrofit2:converter-gson:2.0.0'
+    gson = 'com.google.code.gson:gson:2.10.1'
     retrofitConverterFastjson = 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
     okhttp3InterceptorLogging = 'com.squareup.okhttp3:logging-interceptor:3.2.0'
 
@@ -72,13 +73,19 @@ ext {
     powerMockXStream = 'org.powermock:powermock-classloading-xstream:1.6.4'
 
 
-    dashscopeSdk = 'com.alibaba:dashscope-sdk-java:2.20.0'
     multidex = 'androidx.multidex:multidex:2.0.1'
     lombok = 'org.projectlombok:lombok:1.18.26'
     archWork ="android.arch.work:work-runtime:1.0.1"
 
     excelPoi ='com.github.SUPERCILEX.poi-android:poi:3.17'
 
+
+    keyAlias = 'androiddebugkey'
+    keyPassword = 'android'
+    keyStore = 'debug.keystore'
+    storePassword = 'android'
+    talkingDataId = 'DEBUG_ID'
+    releaseToken = 'DEBUG_TOKEN'
 }
 
 allprojects {
@@ -92,4 +99,13 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+
+// Debug signing config (for local builds)
+
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
 }

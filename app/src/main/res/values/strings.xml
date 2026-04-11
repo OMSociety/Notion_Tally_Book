@@ -1,7 +1,7 @@
 <resources>
     <!-- app name -->
-    <string name="app_name">我的记账本</string>
-    <string name="searchable_label">mine</string>
+    <string name="app_name">Notion记账本</string>
+    <string name="searchable_label">Notion Tally Book</string>
     <string name="searchable_hint">搜索</string>
 
     <string name="drag_2_order">拖拽排序</string>
@@ -172,17 +172,14 @@
     <string name="tally_about_about_app_content">一个记账本应用, 简单干净. 我很喜欢这个记账本因为简单干净专注. 平时自己也在用, 但记账真的是一件需要有毅力的事情. 我想让这件事变得简单, 方便, 甚至不需要自己动手去完成. </string>
     <string name="tally_about_title_developer_info">开发者</string>
     <string name="tally_about_title_about_me">关于我</string>
-    <string name="tally_about_about_me_content">web程序员</string>
-    <string name="tally_about_title_send_email">发送邮件</string>
-    <string name="tally_about_send_email_content">个人邮箱 154929237@qq.com</string>
+    <string name="tally_about_about_me_content">开发者：山海学社OMSociety
+开发辅助：Astrbot、MiniMax2.7</string>
+
     <string name="tally_about_title_wechat">微信公众号</string>
     <string name="tally_about_wechat_content">微信公众号：没有! 没有你写它干嘛呢? (´・ω・`)</string>
     <string name="tally_about_wechat_copied">微信公众号已复制</string>
     <string name="tally_about_title_source_code">源代码</string>
-    <string name="tally_about_source_code_content">
-        我的代码在 Gitee( https://gitee.com/rocks-by-the-lake/mine )
-        原作者代码已托管在 GitHub( https://github.com/coderpage/Mine )
-    </string>
+    <string name="tally_about_source_code_content">https://github.com/OMSociety/Notion_Tally_Book</string>
     <string name="tyOther">其他</string>
     <string name="tyFoodAndBeverage">餐饮</string>
     <string name="tyTraffic">交通</string>

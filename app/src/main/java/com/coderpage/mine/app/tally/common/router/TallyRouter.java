@@ -21,4 +21,8 @@ public class TallyRouter {
     public static final String BACKUP_FILE = "/app/tally/backUpFile";
     /** 备份数据管理页 */
     public static final String BACKUP_FILE_MANAGER = "/app/tally/backUpFileManager";
+    /** Notion 数据库创建帮助 */
+    public static final String NOTION_DATABASE_HELP = "/app/tally/notionDatabaseHelp";
+    /** AI 识别设置 */
+    public static final String AI_SETTING = "/app/tally/aiSetting";
 }

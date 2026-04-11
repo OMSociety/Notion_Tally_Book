@@ -22,6 +22,10 @@ import com.coderpage.mine.app.tally.module.home.model.HomeMonthModel;
 import com.coderpage.mine.app.tally.module.home.model.HomeTodayDayRecordsModel;
 import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.preference.SettingPreference;
+import com.coderpage.mine.app.tally.sync.NotionSyncManager;
+import com.coderpage.mine.app.tally.sync.SyncToastHelper;
+import com.coderpage.mine.app.tally.config.NotionConfig;
+import android.widget.Toast;
 import com.coderpage.mine.app.tally.ui.dialog.MenuDialog;
 
 import org.greenrobot.eventbus.EventBus;
@@ -47,6 +51,8 @@ public class HomeViewModel extends AndroidViewModel implements LifecycleObserver
     private MutableLiveData<List<HomeDisplayData>> mDataList = new MutableLiveData<>();
 
     private HomRepository mRepository;
+    private NotionSyncManager syncManager;
+    private Activity mActivity;
 
     public HomeViewModel(Application application) {
         super(application);

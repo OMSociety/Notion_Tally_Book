@@ -1,47 +1,106 @@
-# Mine
-- 自己写的一个记账本应用, 简单干净.
-- 应用中使用的图标来自 [iconfont](http://iconfont.cn/) 和 [material-design-icons](https://github.com/google/material-design-icons)
-- 原作者微信公众号 搜索:MINE应用
+# Notion 记账本
 
-## 碎碎念
-- 最近看了<穷爸爸富爸爸>觉得记账是一个好习惯, 它可以给直观的看出来以这个月的花销是多少, 入账的每月现金流是多少. 花了多少钱.
-存下来多少钱. 虽然不能看出来你的投资回报, 但可以完美解决看着钱包发出疑问"哎! 我上个月工资去哪里了?"
+一款基于 Notion 的轻量级记账应用，支持本地记账与 Notion 云端实时双向同步。
 
-- 我非常喜欢这个项目,用了大概有2年时间. 期间没有遇到问题, 但是觉得打开输入金额, 标签, 真的太麻烦了. 我想要让他简单记录,
-自动记录. 是的现在你可以使用分享功能到记账本, 这样你就可以记录了. 非常的方便, 无论是截图分享, 还是相册分享都可以哦. 另外还实
-现了短信自动记录, 这是我梦寐以求的功能. 如果你担心隐私问题可以选择不使用短信功能.
+## 特性
 
-- 我不是专业的安卓开发者, 代码已经尽可能优化了. 所以如果你是专业的安卓开发者, 使用后同样喜欢该项目, 可以联系我加入到项目.
-  哦哦对了, 如果有想法或者建议可以给我创建lssues告诉我你的想法, 我会一一回复. 并且酌情考虑功能建议是否开启或者关闭.
-
-- 原作者新版的v0.8.0很漂亮的, 可惜没有开源, 也没有我想要的功能. 叹! 我下载一个放发行版里面了, 需要的自己拿.
+- **本地记账**：简单快速地记录日常收支
+- **Notion 同步**：本地数据实时双向同步至 Notion 云端，支持冲突智能处理
+- **AI 智能识别**：支持任意兼容 LLM API 的图片识别，自动识别账单信息
+- **数据安全**：本地自动备份 + 文件导出
 
 ## 新功能
-- ai能力来源于阿里云, 需要申请阿里百炼的账户: [阿里百炼控制台](https://bailian.console.aliyun.com/?tab=globalset#/efm/api_key)
 
-- ai调用的key是必填的, 否则无法使用. 模型名称可以不填, 我默认给了一个(qwen2.5-vl-32b-instruct), 0.7.3(正式版)费用的话嗯,,,,,目
-前输入价格：8元/百万tokens 输出价格：24元/百万tokens, 1080x2400的图片加上提示词加上输出大概是3分/次. 0.7.4版本
-中我增加了图片压缩, (qwen2.5-vl-32b-instruct)大概0.5分/每次. 当然我觉得阿里给的免费额度应该够用好几年了
+- **Notion 双向同步**：本地与 Notion 实时同步，支持冲突智能合并/覆盖策略
+- **通用 AI API**：支持 OpenAI、SiliconFlow、Claude 等任意兼容 LLM API
+- **冲突处理**：智能合并/覆盖策略处理同步冲突
+- **数据备份**：本地自动备份 + 文件导出
 
-- 短信能力基于安卓, 但是需要一些敏感权限, 短信识别是依靠关键词, 如果短信中同时存在支付类和收入类关键词, 那么就不会记录.
-例如: 支付宝收款: 20元. 存在支付和收款关键词, 那么就会忽略. 当然"支付宝"这种关键字做了处理, 识别的了.
+## 使用说明
 
-- 在原版的0.6.2版本的基础上增加了些新功能:
+### Notion 配置
 
-- - 增加ai调用识别能力
-- - 增加了短信自动识别能力 
-- - 增加清空全部记录
-- - 增加自动备份功能
-- - 增加文件导出功能
-- - 增加账单记录筛选功能
+1. 创建 Notion Integration
+   - 访问 [Notion Integrations](https://www.notion.so/my-integrations)
+   - 点击 "New integration" 创建
+   - 复制生成的 Token（以 `secret_` 开头）
 
-## 链接, 项目演示
-- 项目展示: [bilibili-我的记账本](https://www.bilibili.com/video/BV1S7vAzcEtr/?spm_id_from=333.337.search-card.all.click)
-- 我的博客简单介绍了项目  [阿旭的时光瓶](http://myblog.love/articles/101)
-- 原作者代码已托管在 GitHub(https://github.com/coderpage/Mine)
-- 我的代码在Gitee(https://gitee.com/rocks-by-the-lake/mine)
+2. 创建 Notion 数据库
+   - 在 Notion 中创建新页面
+   - 输入 `/table` 召唤块菜单，选择 "Table - Full page"
+   - 配置以下字段：
+     | 字段名称 | 类型 | 说明 |
+     |----------|------|------|
+     | 金额 | Number | 记账金额 |
+     | 类型 | Select | 支出/收入 |
+     | 分类 | Text | 分类名称 |
+     | 时间 | Date | 记账日期 |
+     | 备注 | Text | 备注说明 |
 
-## 下载
-- 也可以直接点击下载链接
-- 我的版本: https://pan.baidu.com/s/1CG6P8w69ynVRWIhjZAsxYw?pwd=wqbh 提取码: wqbh
-- 作者原版：https://mp.weixin.qq.com/s?__biz=MzIzNTgwNzk1Nw==&mid=2247483666&idx=1&sn=a13dfe72241b69240bc7b502f7233457&chksm=e8e034a8df97bdbe5d270e8e7001f2a5bd1ddcbb14c75544024c8ce72ad8cd3cc82a997df7df&xtrack=1&scene=0&subscene=274&sessionid=1755250754&clicktime=1755258252&enterid=1755258252&ascene=7&fasttmpl_type=0&fasttmpl_fullversion=7865762-zh_CN-zip&fasttmpl_flag=0&realreporttime=1755258252347&devicetype=android-35&version=28003d5a&nettype=WIFI&abtest_cookie=AAACAA%3D%3D&lang=zh_CN&session_us=gh_a027cefd7741&countrycode=CN&exportkey=n_ChQIAhIQcC6QJ0pprWWOmdJ9mpMrExLxAQIE97dBBAEAAAAAAJVGMIRnCOsAAAAOpnltbLcz9gKNyK89dVj0EnjhlsLKEWNLpAn8jl5jjyQfrlHkFV0%2FVJDOY3LoHKknxq56x3W68Gd9mfnwPxFeMS1ZoJVZQNcwxzQRl1vEg9vsQbB8BM3UQAADeR9aR8P0T6OS928T5tZ%2BHkFC86medGh%2By07zMk8GY6itRmAXXBJUioezrmoG4wDKaJ9hCe7itmB8FSH%2BnosSrkWdaZnfyKl0vd2CWHzR%2Bvcw4Wj1LyrCpv%2B5waTHiR%2FkDH%2BxOAszcc1jfSscC%2BoO9X3TwJ9l1eGswbel5FFafeo%3D&pass_ticket=W5oyb1AOUMIGxEXhZFQASaP0KvV2k2TjDSWDiamG6cY%2FNf%2FIOrEdyi4EnceMVpQp&wx_header=3
+3. 获取 Database ID
+   - 点击数据库右上角 `...` 菜单
+   - 选择 "Copy link to view"
+   - 从链接中提取 32 位字符作为 Database ID
+
+4. 授权 Integration
+   - 打开数据库页面
+   - 点击 `...` 菜单，选择 "Connections"
+   - 添加您的 Integration
+
+### AI 识别配置
+
+支持多种 AI 服务提供商：
+
+| 提供商 | API 地址 | 模型示例 |
+|--------|----------|---------|
+| SiliconFlow | `https://api.siliconflow.cn/v1` | `Qwen/Qwen2.5-VL-72B-Instruct` |
+| OpenAI | `https://api.openai.com/v1` | `gpt-4o` |
+| Claude | `https://api.anthropic.com/v1` | `claude-sonnet-4-7-20250611` |
+
+1. 在设置中选择提供商
+2. 填写 API Key
+3. 输入模型名称
+4. 点击"测试连接"验证配置
+
+## 技术栈
+
+- **客户端**：Android（Java）
+- **本地数据库**：Room
+- **云端**：Notion API
+- **AI**：OpenAI 兼容 API
+
+## 项目结构
+
+```
+app/src/main/java/com/coderpage/mine/
+├── app/tally/
+│   ├── ai/                    # AI 识别模块
+│   │   ├── AiApiConfig.java      # API 配置
+│   │   ├── AiRecognizer.java     # 识别器接口
+│   │   ├── OpenAiRecognizer.java # OpenAI 兼容实现
+│   │   └── AiSettingActivity.java # AI 设置页面
+│   ├── config/
+│   │   └── NotionConfig.java     # Notion 配置
+│   ├── sync/
+│   │   ├── NotionApiClient.java   # Notion API 客户端
+│   │   ├── NotionSyncManager.java # 同步管理器
+│   │   └── ConflictResolver.java  # 冲突处理
+│   ├── module/
+│   │   ├── home/             # 首页
+│   │   ├── edit/             # 记账编辑
+│   │   ├── setting/           # 设置页面
+│   │   └── auto/             # 图片识别
+│   └── persistence/
+│       ├── sql/               # Room 数据库
+│       └── model/             # 数据模型
+```
+
+## 注意事项
+
+- 请妥善保管您的 Notion API Token 和 AI API Key
+- 首次使用请先在设置中配置 Notion 和 AI
+- 同步前请确保 Notion 数据库字段已正确配置
+
+## 许可证
+
+本项目仅供学习交流使用。

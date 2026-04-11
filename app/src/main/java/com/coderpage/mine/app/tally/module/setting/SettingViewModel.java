@@ -18,6 +18,8 @@ import com.coderpage.mine.persistence.database.MineDatabase;
 import com.coderpage.mine.persistence.entity.KeyValue;
 
 import java.util.concurrent.ExecutorService;
+import com.coderpage.mine.app.tally.config.NotionConfig;
+import com.coderpage.mine.app.tally.sync.NotionSyncManager;
 import java.util.concurrent.Executors;
 
 /**
@@ -44,6 +46,15 @@ public class SettingViewModel extends BaseViewModel {
     public final ObservableField<String> aiModel = new ObservableField<>();
     public final ObservableField<Boolean> smsRecognitionEnabled = new ObservableField<>(false);
     public final ObservableField<String> detectionList = new ObservableField<>();
+    // Notion 同步相关
+    public final ObservableField<String> notionToken = new ObservableField<>();
+    public final ObservableField<String> notionDatabaseId = new ObservableField<>();
+    public final ObservableField<String> lastSyncTime = new ObservableField<>("从未同步");
+    public final ObservableField<Boolean> isSyncing = new ObservableField<>(false);
+    public final ObservableField<Boolean> autoSyncEnabled = new ObservableField<>(false);
+    
+    private NotionSyncManager syncManager;
+
 
     // 保留 MutableLiveData 用于内部状态管理（如果需要）
     private MutableLiveData<String> mApiKeyLiveData = new MutableLiveData<>();
@@ -105,6 +116,85 @@ public class SettingViewModel extends BaseViewModel {
     /**
      * 从数据库加载设置
      */
+    
+    /**
+     * 保存 Notion Token
+     */
+    public void saveNotionToken(String token) {
+        this.notionToken.set(token);
+        NotionConfig.getInstance(getApplication()).setIntegrationToken(token);
+    }
+    
+    /**
+     * 保存 Notion Database ID
+     */
+    public void saveNotionDatabaseId(String databaseId) {
+        this.notionDatabaseId.set(databaseId);
+        NotionConfig.getInstance(getApplication()).setDatabaseId(databaseId);
+    }
+    
+    /**
+     * 保存启动时自动同步设置
+     */
+    public void saveAutoSyncEnabled(boolean enabled) {
+        this.autoSyncEnabled.set(enabled);
+        NotionConfig.getInstance(getApplication()).setAutoSync(enabled);
+    }
+    
+    /**
+     * 开始同步
+     */
+    public void startSync(Activity activity) {
+        if (isSyncing.get() != null && isSyncing.get()) {
+            return;
+        }
+        
+        NotionConfig config = NotionConfig.getInstance(getApplication());
+        if (!config.isConfigured()) {
+            return;
+        }
+        
+        if (syncManager == null) {
+            syncManager = new NotionSyncManager(getApplication());
+        }
+        
+        isSyncing.set(true);
+        
+        syncManager.setSyncListener(new NotionSyncManager.SyncListener() {
+            @Override
+            public void onSyncStart() {
+            }
+            
+            @Override
+            public void onSyncProgress(int current, int total, String message) {
+            }
+            
+            @Override
+            public void onSyncComplete(NotionSyncManager.SyncResult result) {
+                isSyncing.set(false);
+                updateLastSyncTime();
+            }
+            
+            @Override
+            public void onSyncError(String error) {
+                isSyncing.set(false);
+            }
+        });
+        
+        syncManager.startSync();
+    }
+    
+    private void updateLastSyncTime() {
+        NotionConfig config = NotionConfig.getInstance(getApplication());
+        long lastSync = config.getLastSyncTime();
+        if (lastSync > 0) {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
+            lastSyncTime.set(sdf.format(new java.util.Date(lastSync)));
+        } else {
+            lastSyncTime.set("从未同步");
+        }
+    }
+
     private void loadSettings() {
         mDatabaseExecutor.execute(() -> {
             try {
@@ -114,6 +204,10 @@ public class SettingViewModel extends BaseViewModel {
                 KeyValue aiModelSetting = db.keyValueDao().query(SettingWorkerConst.KEY_AI_MODEL);
                 KeyValue smsRecognitionEnabledSetting = db.keyValueDao().query(SettingWorkerConst.KEY_SMS_RECOGNITION_ENABLED); // 新增
                 KeyValue detectionListSetting = db.keyValueDao().query(SettingWorkerConst.KEY_DETECTION_LIST);
+                
+                // 加载自动同步设置
+                NotionConfig notionConfig = NotionConfig.getInstance(getApplication());
+                boolean autoSyncEnabledValue = notionConfig.isAutoSyncEnabled();
 
                 runOnUiThread(() -> {
                     String apiKeyValue = apiKeySetting != null ? apiKeySetting.getValue() : "";
@@ -127,6 +221,7 @@ public class SettingViewModel extends BaseViewModel {
                     aiModel.set(aiModelValue);
                     detectionList.set(detectionListValue);
                     smsRecognitionEnabled.set(smsRecognitionEnabledValue); // 新增
+                    autoSyncEnabled.set(autoSyncEnabledValue); // 新增
                     mApiKeyLiveData.setValue(apiKeyValue);
                     mAiModelLiveData.setValue(aiModelValue);
                     mDetectionListLiveData.setValue(detectionListValue);
