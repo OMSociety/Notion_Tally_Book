@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        google()
+        maven { url "https://maven.google.com" }
         jcenter()
     }
     dependencies {
@@ -90,8 +90,7 @@ ext {
 
 allprojects {
     repositories {
-        maven { url "https://maven.aliyun.com/nexus/content/groups/public" }
-        google()
+        maven { url "https://maven.google.com" }
         jcenter()
         maven { url "https://jitpack.io" }
     }
