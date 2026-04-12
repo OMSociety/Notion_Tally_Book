@@ -52,10 +52,10 @@ public class SyncRepository {
 
     public void saveRemoteRecord(ConflictResolver.Record record) {
         try {
-            List<com.coderpage.mine.app.tally.persistence.model.Record> existing = recordDao.queryAll();
-            for (com.coderpage.mine.app.tally.persistence.model.Record existingRecord : existing) {
-                if (record.notionPageId != null &&
-                        record.notionPageId.equals(existingRecord.getSyncId().replace("notion:", ""))) {
+            if (record.notionPageId != null && !record.notionPageId.isEmpty()) {
+                com.coderpage.mine.app.tally.persistence.model.Record existingRecord =
+                        recordDao.queryBySyncId("notion:" + record.notionPageId);
+                if (existingRecord != null) {
                     existingRecord.setAmount(record.amount);
                     existingRecord.setTime(record.time);
                     existingRecord.setDesc(record.remark != null ? record.remark : "");
