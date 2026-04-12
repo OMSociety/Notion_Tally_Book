@@ -95,7 +95,7 @@ public class HomeMonthInfoViewModel extends BaseViewModel {
         if (data == null) {
             return ResUtils.getString(getApplication(), R.string.tally_module_home_non_income_place_holder);
         }
-        double monthIncomeAmount = data.getMonthInComeAmount();
+        double monthIncomeAmount = data.getMonthIncomeAmount();
         if (monthIncomeAmount == 0) {
             return ResUtils.getString(getApplication(), R.string.tally_module_home_non_income_place_holder);
         }

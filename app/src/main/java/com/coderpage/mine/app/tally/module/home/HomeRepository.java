@@ -21,18 +21,18 @@ import java.util.Map;
  * @since 0.6.0
  */
 
-class HomRepository {
+class HomeRepository {
 
     /** 近3日账单数量 */
     private int mRecent3DayRecordCount;
     /** 今日消费总额 */
     private double mTodayExpenseTotalAmount;
     /** 今日收入总额 */
-    private double mTodayInComeTotalAmount;
+    private double mTodayIncomeTotalAmount;
     /** 本月消费总额 */
     private double mCurrentMonthExpenseTotalAmount;
     /** 本月收入总额 */
-    private double mCurrentMonthInComeTotalAmount;
+    private double mCurrentMonthIncomeTotalAmount;
     /** 本月各个分类消费数据 */
     private List<Pair<String, Double>> mCategoryExpenseTotal = new ArrayList<>();
     /** 近3日账单记录 */
@@ -48,16 +48,16 @@ class HomRepository {
         return mTodayExpenseTotalAmount;
     }
 
-    double getTodayInComeTotalAmount() {
-        return mTodayInComeTotalAmount;
+    double getTodayIncomeTotalAmount() {
+        return mTodayIncomeTotalAmount;
     }
 
     double getCurrentMonthExpenseTotalAmount() {
         return mCurrentMonthExpenseTotalAmount;
     }
 
-    double getCurrentMonthInComeTotalAmount() {
-        return mCurrentMonthInComeTotalAmount;
+    double getCurrentMonthIncomeTotalAmount() {
+        return mCurrentMonthIncomeTotalAmount;
     }
 
     List<Pair<String, Double>> getCategoryExpenseTotal() {
@@ -144,9 +144,9 @@ class HomRepository {
 
             mRecent3DayRecordCount = recent3DayRecordCount;
             mTodayExpenseTotalAmount = todayExpenseTotalAmount;
-            mTodayInComeTotalAmount = todayIncomeTotalAmount;
+            mTodayIncomeTotalAmount = todayIncomeTotalAmount;
             mCurrentMonthExpenseTotalAmount = monthExpenseTotalAmount;
-            mCurrentMonthInComeTotalAmount = monthIncomeTotalAmount;
+            mCurrentMonthIncomeTotalAmount = monthIncomeTotalAmount;
             mRecent3DayRecordList.clear();
             mRecent3DayRecordList.addAll(recent3DayList);
             mTodayRecordList.clear();

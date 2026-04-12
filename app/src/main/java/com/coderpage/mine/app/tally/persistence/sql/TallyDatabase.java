@@ -13,7 +13,7 @@ import android.support.annotation.NonNull;
 import com.coderpage.base.utils.LogUtils;
 import com.coderpage.mine.MineApp;
 import com.coderpage.mine.R;
-import com.coderpage.mine.app.tally.data.CategoryContant;
+import com.coderpage.mine.app.tally.data.CategoryConstant;
 import com.coderpage.mine.app.tally.data.CategoryIconHelper;
 import com.coderpage.mine.app.tally.persistence.sql.dao.CategoryDao;
 import com.coderpage.mine.app.tally.persistence.sql.dao.RecordDao;
@@ -80,32 +80,32 @@ public abstract class TallyDatabase extends RoomDatabase {
 
             List<CategoryItem> categoryList = new ArrayList<>();
             // 初始化支出分类
-            categoryList.add(expenseCategory(CategoryContant.NAME_OTHER_EXPENSE, context.getString(R.string.tyOther), CategoryIconHelper.IC_NAME_OTHER));
-            categoryList.add(expenseCategory(CategoryContant.NAME_CAN_YIN, context.getString(R.string.tyFoodAndBeverage), CategoryIconHelper.IC_NAME_CAN_YIN));
-            categoryList.add(expenseCategory(CategoryContant.NAME_JIAO_TONG, context.getString(R.string.tyTraffic), CategoryIconHelper.IC_NAME_JIAO_TONG));
-            categoryList.add(expenseCategory(CategoryContant.NAME_GOU_WU, context.getString(R.string.tyShopping), CategoryIconHelper.IC_NAME_GOU_WU));
-            categoryList.add(expenseCategory(CategoryContant.NAME_FU_SHI, context.getString(R.string.tyClothes), CategoryIconHelper.IC_NAME_FU_SHI));
-            categoryList.add(expenseCategory(CategoryContant.NAME_RI_YONG_PIN, context.getString(R.string.tyDailyNecessities), CategoryIconHelper.IC_NAME_RI_YONG_PIN));
-            categoryList.add(expenseCategory(CategoryContant.NAME_YU_LE, context.getString(R.string.tyEntertainment), CategoryIconHelper.IC_NAME_YU_LE));
-            categoryList.add(expenseCategory(CategoryContant.NAME_SHI_CAI, context.getString(R.string.tyFoodIngredients), CategoryIconHelper.IC_NAME_SHI_CAI));
-            categoryList.add(expenseCategory(CategoryContant.NAME_LING_SHI, context.getString(R.string.tySnacks), CategoryIconHelper.IC_NAME_LING_SHI));
-            categoryList.add(expenseCategory(CategoryContant.NAME_YAN_JIU_CHA, context.getString(R.string.tyTobaccoAnTea), CategoryIconHelper.IC_NAME_YAN_JIU_CHA));
-            categoryList.add(expenseCategory(CategoryContant.NAME_XUE_XI, context.getString(R.string.tyStudy), CategoryIconHelper.IC_NAME_XUE_XI));
-            categoryList.add(expenseCategory(CategoryContant.NAME_YI_LIAO, context.getString(R.string.tyMedical), CategoryIconHelper.IC_NAME_YI_LIAO));
-            categoryList.add(expenseCategory(CategoryContant.NAME_ZHU_FANG, context.getString(R.string.tyHouse), CategoryIconHelper.IC_NAME_ZHU_FANG));
-            categoryList.add(expenseCategory(CategoryContant.NAME_SHUI_DIAN_MEI, context.getString(R.string.tyWaterElectricityCoal), CategoryIconHelper.IC_NAME_SHUI_DIAN_MEI));
-            categoryList.add(expenseCategory(CategoryContant.NAME_TONG_XUN, context.getString(R.string.tyCommunication), CategoryIconHelper.IC_NAME_TONG_XUN));
-            categoryList.add(expenseCategory(CategoryContant.NAME_REN_QING, context.getString(R.string.tyTheFavorPattern), CategoryIconHelper.IC_NAME_REN_QING));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_OTHER_EXPENSE, context.getString(R.string.tyOther), CategoryIconHelper.IC_NAME_OTHER));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_CAN_YIN, context.getString(R.string.tyFoodAndBeverage), CategoryIconHelper.IC_NAME_CAN_YIN));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_JIAO_TONG, context.getString(R.string.tyTraffic), CategoryIconHelper.IC_NAME_JIAO_TONG));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_GOU_WU, context.getString(R.string.tyShopping), CategoryIconHelper.IC_NAME_GOU_WU));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_FU_SHI, context.getString(R.string.tyClothes), CategoryIconHelper.IC_NAME_FU_SHI));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_RI_YONG_PIN, context.getString(R.string.tyDailyNecessities), CategoryIconHelper.IC_NAME_RI_YONG_PIN));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_YU_LE, context.getString(R.string.tyEntertainment), CategoryIconHelper.IC_NAME_YU_LE));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_SHI_CAI, context.getString(R.string.tyFoodIngredients), CategoryIconHelper.IC_NAME_SHI_CAI));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_LING_SHI, context.getString(R.string.tySnacks), CategoryIconHelper.IC_NAME_LING_SHI));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_YAN_JIU_CHA, context.getString(R.string.tyTobaccoAnTea), CategoryIconHelper.IC_NAME_YAN_JIU_CHA));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_XUE_XI, context.getString(R.string.tyStudy), CategoryIconHelper.IC_NAME_XUE_XI));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_YI_LIAO, context.getString(R.string.tyMedical), CategoryIconHelper.IC_NAME_YI_LIAO));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_ZHU_FANG, context.getString(R.string.tyHouse), CategoryIconHelper.IC_NAME_ZHU_FANG));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_SHUI_DIAN_MEI, context.getString(R.string.tyWaterElectricityCoal), CategoryIconHelper.IC_NAME_SHUI_DIAN_MEI));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_TONG_XUN, context.getString(R.string.tyCommunication), CategoryIconHelper.IC_NAME_TONG_XUN));
+            categoryList.add(expenseCategory(CategoryConstant.NAME_REN_QING, context.getString(R.string.tyTheFavorPattern), CategoryIconHelper.IC_NAME_REN_QING));
             // 初始化收入分类
-            categoryList.add(incomeCategory(CategoryContant.NAME_OTHER_IN_COME, context.getString(R.string.tyOther), CategoryIconHelper.IC_NAME_OTHER));
-            categoryList.add(incomeCategory(CategoryContant.NAME_XIN_ZI, context.getString(R.string.tyIncomeSalary), CategoryIconHelper.IC_NAME_XIN_ZI));
-            categoryList.add(incomeCategory(CategoryContant.NAME_JIANG_JIN, context.getString(R.string.tyIncomeReward), CategoryIconHelper.IC_NAME_JIANG_JIN));
-            categoryList.add(incomeCategory(CategoryContant.NAME_JIE_RU, context.getString(R.string.tyIncomeLend), CategoryIconHelper.IC_NAME_JIE_RU));
-            categoryList.add(incomeCategory(CategoryContant.NAME_SHOU_ZHAI, context.getString(R.string.tyIncomeDun), CategoryIconHelper.IC_NAME_SHOU_ZHAI));
-            categoryList.add(incomeCategory(CategoryContant.NAME_LI_XIN_SHOU_RU, context.getString(R.string.tyIncomeInterest), CategoryIconHelper.IC_NAME_LI_XIN_SHOU_RU));
-            categoryList.add(incomeCategory(CategoryContant.NAME_TOU_ZI_HUI_SHOU, context.getString(R.string.tyIncomeInvestRecovery), CategoryIconHelper.IC_NAME_TOU_ZI_HUI_SHOU));
-            categoryList.add(incomeCategory(CategoryContant.NAME_TOU_ZI_SHOU_YI, context.getString(R.string.tyIncomeInvestProfit), CategoryIconHelper.IC_NAME_TOU_ZI_SHOU_YI));
-            categoryList.add(incomeCategory(CategoryContant.NAME_YI_WAI_SUO_DE, context.getString(R.string.tyIncomeUnexpected), CategoryIconHelper.IC_NAME_YI_WAI_SUO_DE));
+            categoryList.add(incomeCategory(CategoryConstant.NAME_OTHER_INCOME, context.getString(R.string.tyOther), CategoryIconHelper.IC_NAME_OTHER));
+            categoryList.add(incomeCategory(CategoryConstant.NAME_XIN_ZI, context.getString(R.string.tyIncomeSalary), CategoryIconHelper.IC_NAME_XIN_ZI));
+            categoryList.add(incomeCategory(CategoryConstant.NAME_JIANG_JIN, context.getString(R.string.tyIncomeReward), CategoryIconHelper.IC_NAME_JIANG_JIN));
+            categoryList.add(incomeCategory(CategoryConstant.NAME_JIE_RU, context.getString(R.string.tyIncomeLend), CategoryIconHelper.IC_NAME_JIE_RU));
+            categoryList.add(incomeCategory(CategoryConstant.NAME_SHOU_ZHAI, context.getString(R.string.tyIncomeDun), CategoryIconHelper.IC_NAME_SHOU_ZHAI));
+            categoryList.add(incomeCategory(CategoryConstant.NAME_LI_XIN_SHOU_RU, context.getString(R.string.tyIncomeInterest), CategoryIconHelper.IC_NAME_LI_XIN_SHOU_RU));
+            categoryList.add(incomeCategory(CategoryConstant.NAME_TOU_ZI_HUI_SHOU, context.getString(R.string.tyIncomeInvestRecovery), CategoryIconHelper.IC_NAME_TOU_ZI_HUI_SHOU));
+            categoryList.add(incomeCategory(CategoryConstant.NAME_TOU_ZI_SHOU_YI, context.getString(R.string.tyIncomeInvestProfit), CategoryIconHelper.IC_NAME_TOU_ZI_SHOU_YI));
+            categoryList.add(incomeCategory(CategoryConstant.NAME_YI_WAI_SUO_DE, context.getString(R.string.tyIncomeUnexpected), CategoryIconHelper.IC_NAME_YI_WAI_SUO_DE));
 
             // 插入记录事务
             db.beginTransaction();
@@ -239,15 +239,15 @@ public abstract class TallyDatabase extends RoomDatabase {
             // 插入默认的收入分类
             Context context = MineApp.getAppContext();
             List<CategoryItem> incomeCategoryList = new ArrayList<>();
-            incomeCategoryList.add(incomeCategory(CategoryContant.NAME_OTHER_IN_COME, context.getString(R.string.tyOther), CategoryIconHelper.IC_NAME_OTHER));
-            incomeCategoryList.add(incomeCategory(CategoryContant.NAME_XIN_ZI, context.getString(R.string.tyIncomeSalary), CategoryIconHelper.IC_NAME_XIN_ZI));
-            incomeCategoryList.add(incomeCategory(CategoryContant.NAME_JIANG_JIN, context.getString(R.string.tyIncomeReward), CategoryIconHelper.IC_NAME_JIANG_JIN));
-            incomeCategoryList.add(incomeCategory(CategoryContant.NAME_JIE_RU, context.getString(R.string.tyIncomeLend), CategoryIconHelper.IC_NAME_JIE_RU));
-            incomeCategoryList.add(incomeCategory(CategoryContant.NAME_SHOU_ZHAI, context.getString(R.string.tyIncomeDun), CategoryIconHelper.IC_NAME_SHOU_ZHAI));
-            incomeCategoryList.add(incomeCategory(CategoryContant.NAME_LI_XIN_SHOU_RU, context.getString(R.string.tyIncomeInterest), CategoryIconHelper.IC_NAME_LI_XIN_SHOU_RU));
-            incomeCategoryList.add(incomeCategory(CategoryContant.NAME_TOU_ZI_HUI_SHOU, context.getString(R.string.tyIncomeInvestRecovery), CategoryIconHelper.IC_NAME_TOU_ZI_HUI_SHOU));
-            incomeCategoryList.add(incomeCategory(CategoryContant.NAME_TOU_ZI_SHOU_YI, context.getString(R.string.tyIncomeInvestProfit), CategoryIconHelper.IC_NAME_TOU_ZI_SHOU_YI));
-            incomeCategoryList.add(incomeCategory(CategoryContant.NAME_YI_WAI_SUO_DE, context.getString(R.string.tyIncomeUnexpected), CategoryIconHelper.IC_NAME_YI_WAI_SUO_DE));
+            incomeCategoryList.add(incomeCategory(CategoryConstant.NAME_OTHER_INCOME, context.getString(R.string.tyOther), CategoryIconHelper.IC_NAME_OTHER));
+            incomeCategoryList.add(incomeCategory(CategoryConstant.NAME_XIN_ZI, context.getString(R.string.tyIncomeSalary), CategoryIconHelper.IC_NAME_XIN_ZI));
+            incomeCategoryList.add(incomeCategory(CategoryConstant.NAME_JIANG_JIN, context.getString(R.string.tyIncomeReward), CategoryIconHelper.IC_NAME_JIANG_JIN));
+            incomeCategoryList.add(incomeCategory(CategoryConstant.NAME_JIE_RU, context.getString(R.string.tyIncomeLend), CategoryIconHelper.IC_NAME_JIE_RU));
+            incomeCategoryList.add(incomeCategory(CategoryConstant.NAME_SHOU_ZHAI, context.getString(R.string.tyIncomeDun), CategoryIconHelper.IC_NAME_SHOU_ZHAI));
+            incomeCategoryList.add(incomeCategory(CategoryConstant.NAME_LI_XIN_SHOU_RU, context.getString(R.string.tyIncomeInterest), CategoryIconHelper.IC_NAME_LI_XIN_SHOU_RU));
+            incomeCategoryList.add(incomeCategory(CategoryConstant.NAME_TOU_ZI_HUI_SHOU, context.getString(R.string.tyIncomeInvestRecovery), CategoryIconHelper.IC_NAME_TOU_ZI_HUI_SHOU));
+            incomeCategoryList.add(incomeCategory(CategoryConstant.NAME_TOU_ZI_SHOU_YI, context.getString(R.string.tyIncomeInvestProfit), CategoryIconHelper.IC_NAME_TOU_ZI_SHOU_YI));
+            incomeCategoryList.add(incomeCategory(CategoryConstant.NAME_YI_WAI_SUO_DE, context.getString(R.string.tyIncomeUnexpected), CategoryIconHelper.IC_NAME_YI_WAI_SUO_DE));
 
             database.beginTransaction();
             for (CategoryItem categoryIncome : incomeCategoryList) {

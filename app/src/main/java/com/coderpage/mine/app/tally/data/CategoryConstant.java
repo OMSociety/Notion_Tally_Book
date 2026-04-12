@@ -7,7 +7,7 @@ package com.coderpage.mine.app.tally.data;
  * 分类常量
  */
 
-public class CategoryContant {
+public class CategoryConstant {
 
     /** 其他-支出 */
     public static final String NAME_OTHER_EXPENSE = "Other";
@@ -43,7 +43,7 @@ public class CategoryContant {
     public static final String NAME_REN_QING = "RenQing";
 
     /** 其他-收入 */
-    public static final String NAME_OTHER_IN_COME = "OtherIncome";
+    public static final String NAME_OTHER_INCOME = "OtherIncome";
     /** 薪资 */
     public static final String NAME_XIN_ZI = "XinZi";
     /** 奖金 */

@@ -403,7 +403,7 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
                 callback.success(null);
             }
         } else {
-            mRepository.queryDailyInCome(startTime, endTime, new Callback<List<DailyData>, IError>() {
+            mRepository.queryDailyIncome(startTime, endTime, new Callback<List<DailyData>, IError>() {
                 @Override
                 public void success(List<DailyData> dailyDataList) {
                     dailyDataList = completeEmptyDailyData(startTime, endTime, dailyDataList);

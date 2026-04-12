@@ -17,7 +17,7 @@ public class HomeMonthModel {
     private double monthExpenseAmount;
 
     /** 月收入总额 */
-    private double monthInComeAmount;
+    private double monthIncomeAmount;
 
     /** 月分类消费数据 */
     private List<Pair<String, Double>> monthCategoryExpenseData;
@@ -30,12 +30,12 @@ public class HomeMonthModel {
         this.monthExpenseAmount = monthExpenseAmount;
     }
 
-    public double getMonthInComeAmount() {
-        return monthInComeAmount;
+    public double getMonthIncomeAmount() {
+        return monthIncomeAmount;
     }
 
-    public void setMonthInComeAmount(double monthInComeAmount) {
-        this.monthInComeAmount = monthInComeAmount;
+    public void setMonthIncomeAmount(double monthIncomeAmount) {
+        this.monthIncomeAmount = monthIncomeAmount;
     }
 
     public List<Pair<String, Double>> getMonthCategoryExpenseData() {

@@ -7,7 +7,7 @@
               android:paddingBottom="10dp"
               android:paddingTop="10dp">
 
-    <com.coderpage.lib.update.ProgressWheel
+    <com.coderpage.base.widget.ProgressWheel
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_gravity="center_vertical"

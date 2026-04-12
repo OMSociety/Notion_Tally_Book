@@ -50,13 +50,13 @@ public class HomeViewModel extends AndroidViewModel implements LifecycleObserver
     /** 首页数据列表 */
     private MutableLiveData<List<HomeDisplayData>> mDataList = new MutableLiveData<>();
 
-    private HomRepository mRepository;
+    private HomeRepository mRepository;
     private NotionSyncManager syncManager;
     private Activity mActivity;
 
     public HomeViewModel(Application application) {
         super(application);
-        mRepository = new HomRepository();
+        mRepository = new HomeRepository();
         mHideMoney.set(SettingPreference.getHideMoney(application));
         refresh();
     }
@@ -101,16 +101,16 @@ public class HomeViewModel extends AndroidViewModel implements LifecycleObserver
             if (result.isOk()) {
                 int recent3DayRecordCount = mRepository.getRecent3DayRecordCount();
                 double monthExpenseTotalAmount = mRepository.getCurrentMonthExpenseTotalAmount();
-                double monthInComeTotalAmount = mRepository.getCurrentMonthInComeTotalAmount();
+                double monthIncomeTotalAmount = mRepository.getCurrentMonthIncomeTotalAmount();
                 double todayExpenseTotalAmount = mRepository.getTodayExpenseTotalAmount();
-                double todayIncomeTotalAmount = mRepository.getTodayInComeTotalAmount();
+                double todayIncomeTotalAmount = mRepository.getTodayIncomeTotalAmount();
 
                 List<Pair<String, Double>> categoryExpenseTotal = mRepository.getCategoryExpenseTotal();
                 List<Record> todayRecordList = mRepository.getTodayRecordList();
 
                 HomeMonthModel monthModel = new HomeMonthModel();
                 monthModel.setMonthExpenseAmount(monthExpenseTotalAmount);
-                monthModel.setMonthInComeAmount(monthInComeTotalAmount);
+                monthModel.setMonthIncomeAmount(monthIncomeTotalAmount);
                 monthModel.setMonthCategoryExpenseData(categoryExpenseTotal);
 
                 HomeTodayDayRecordsModel todayRecordsModel = new HomeTodayDayRecordsModel();

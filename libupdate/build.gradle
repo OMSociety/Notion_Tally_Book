@@ -29,6 +29,7 @@ android {
 }
 
 dependencies {
+    api project(':libbase')
     api fileTree(include: ['*.jar'], dir: 'libs')
     api rootProject.appCompat
     api rootProject.design
