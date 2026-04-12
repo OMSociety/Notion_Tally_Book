@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 
 /**
  * @author lc. 2017-12-30 14:43
@@ -38,10 +39,20 @@ public class FileUtils {
                 return Environment.getExternalStorageDirectory() + "/" + split[1];
 
             } else if (isDownloadsDocument(uri)) {
-                // FIXME 下载目录导入崩溃 api 27
                 final String id = DocumentsContract.getDocumentId(uri);
-                uri = ContentUris.withAppendedId(
-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                if (id != null && id.startsWith("raw:")) {
+                    return id.substring(4);
+                }
+                try {
+                    uri = ContentUris.withAppendedId(
+                            Uri.parse("content://downloads/public_downloads"), Long.parseLong(id));
+                } catch (NumberFormatException e) {
+                    String path = getDataColumn(context, uri, null, null);
+                    if (!TextUtils.isEmpty(path)) {
+                        return path;
+                    }
+                    return "";
+                }
 
             } else if (isMediaDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -61,17 +72,8 @@ public class FileUtils {
         }
 
         if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = {MediaStore.Images.Media.DATA};
-            Cursor cursor = null;
-            try {
-                cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                if (cursor.moveToFirst()) {
-                    return cursor.getString(column_index);
-                }
-            } catch (Exception e) {
-                // no-op
-            }
+            String path = getDataColumn(context, uri, selection, selectionArgs);
+            return path == null ? "" : path;
 
         } else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
@@ -104,5 +106,25 @@ public class FileUtils {
      */
     public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
+        Cursor cursor = null;
+        try {
+            String[] projection = {"_data"};
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                int columnIndex = cursor.getColumnIndex("_data");
+                if (columnIndex >= 0) {
+                    return cursor.getString(columnIndex);
+                }
+            }
+        } catch (Exception ignored) {
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return "";
     }
 }

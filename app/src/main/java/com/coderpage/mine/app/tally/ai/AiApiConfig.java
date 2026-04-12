@@ -3,6 +3,8 @@ package com.coderpage.mine.app.tally.ai;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.coderpage.mine.app.tally.security.SensitiveDataCipher;
+
 /**
  * AI API 配置管理
  * 
@@ -108,7 +110,7 @@ public class AiApiConfig {
         prefs.edit()
             .putString(KEY_AI_PROVIDER, provider)
             .putString(KEY_AI_API_URL, apiUrl)
-            .putString(KEY_AI_API_KEY, apiKey)
+            .putString(KEY_AI_API_KEY, SensitiveDataCipher.encrypt(context, apiKey))
             .putString(KEY_AI_MODEL, model)
             .apply();
     }
@@ -119,7 +121,7 @@ public class AiApiConfig {
         AiApiConfig config = new AiApiConfig();
         config.setProvider(prefs.getString(KEY_AI_PROVIDER, PROVIDER_SILICONFLOW));
         config.setApiUrl(prefs.getString(KEY_AI_API_URL, ""));
-        config.setApiKey(prefs.getString(KEY_AI_API_KEY, ""));
+        config.setApiKey(SensitiveDataCipher.decrypt(context, prefs.getString(KEY_AI_API_KEY, "")));
         config.setModel(prefs.getString(KEY_AI_MODEL, ""));
         return config;
     }
