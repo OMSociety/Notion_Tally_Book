@@ -13,10 +13,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.coderpage.mine.R;
+import com.coderpage.mine.BuildConfig;
+import com.coderpage.mine.app.tally.ai.AiApiConfig;
+import com.coderpage.mine.app.tally.common.router.TallyRouter;
 import com.coderpage.mine.app.tally.module.about.AboutActivity;
 import com.coderpage.mine.app.tally.module.backup.BackupFileActivity;
-import com.coderpage.mine.app.tally.persistence.preference.SettingPreference;
 import com.coderpage.mine.ui.BaseActivity;
 
 /**
@@ -24,6 +27,7 @@ import com.coderpage.mine.ui.BaseActivity;
  * 
  * @author Flandre Scarlet
  */
+@Route(path = TallyRouter.SETTING)
 public class SettingActivity extends BaseActivity {
 
     private static final int REQUEST_PERMISSION = 100;
@@ -42,6 +46,7 @@ public class SettingActivity extends BaseActivity {
     private LinearLayout lyAbout;
     private LinearLayout lyUpdate;
     private Toolbar mToolbar;
+    private AiApiConfig mAiConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +81,10 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void loadSettings() {
-        etAiApiUrl.setText(SettingPreference.getAiApiUrl(this));
-        etAiApiKey.setText(SettingPreference.getAiApiKey(this));
-        etAiModel.setText(SettingPreference.getAiModel(this));
+        mAiConfig = AiApiConfig.load(this);
+        etAiApiUrl.setText(mAiConfig.getApiUrl());
+        etAiApiKey.setText(mAiConfig.getApiKey());
+        etAiModel.setText(mAiConfig.getModel());
     }
 
     private void setupListeners() {
@@ -87,7 +93,7 @@ public class SettingActivity extends BaseActivity {
         lyClear.setOnClickListener(v -> showClearDialog());
         lyAbout.setOnClickListener(v -> startActivity(new Intent(this, AboutActivity.class)));
         lyUpdate.setOnClickListener(v -> {
-            Toast.makeText(this, "当前已是最新版本 v1.0.0", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "当前已是最新版本 v" + BuildConfig.VERSION_NAME, Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -134,8 +140,12 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        SettingPreference.setAiApiUrl(this, etAiApiUrl.getText().toString().trim());
-        SettingPreference.setAiApiKey(this, etAiApiKey.getText().toString().trim());
-        SettingPreference.setAiModel(this, etAiModel.getText().toString().trim());
+        if (mAiConfig == null) {
+            mAiConfig = new AiApiConfig();
+        }
+        mAiConfig.setApiUrl(etAiApiUrl.getText().toString().trim());
+        mAiConfig.setApiKey(etAiApiKey.getText().toString().trim());
+        mAiConfig.setModel(etAiModel.getText().toString().trim());
+        mAiConfig.save(this);
     }
 }

@@ -212,12 +212,11 @@ public class NotionSyncManager {
         }
         
         // 6. 处理远程新增记录
-        for (ConflictResolver.Record remote : remoteRecords) {
-            if (remote.notionPageId != null && !remoteMap.values().contains(remote)) {
-                // 只在远程有 - 下载
-                saveRemoteRecord(remote);
-                result.downloadedCount++;
-            }
+        List<ConflictResolver.Record> remoteOnlyRecords =
+                SyncDiffHelper.findRemoteOnlyRecords(localRecords, remoteRecords);
+        for (ConflictResolver.Record remote : remoteOnlyRecords) {
+            saveRemoteRecord(remote);
+            result.downloadedCount++;
         }
     }
     
