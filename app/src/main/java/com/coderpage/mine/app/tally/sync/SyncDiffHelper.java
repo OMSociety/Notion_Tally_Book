@@ -39,6 +39,8 @@ public class SyncDiffHelper {
             }
             if (!localPageIds.contains(remote.notionPageId)) {
                 remoteOnly.add(remote);
+                // 避免重复 remote pageId 在多次同步中被重复下发，保证幂等
+                localPageIds.add(remote.notionPageId);
             }
         }
 

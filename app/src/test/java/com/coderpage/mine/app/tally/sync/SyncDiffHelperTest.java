@@ -41,4 +41,27 @@ public class SyncDiffHelperTest {
 
         Assert.assertTrue(result.isEmpty());
     }
+
+    @Test
+    public void findRemoteOnlyRecords_shouldBeIdempotentWhenRemoteHasDuplicatePageId() {
+        ConflictResolver.Record remote1 = new ConflictResolver.Record();
+        remote1.notionPageId = "dup_page";
+        ConflictResolver.Record remote2 = new ConflictResolver.Record();
+        remote2.notionPageId = "dup_page";
+
+        List<ConflictResolver.Record> result = SyncDiffHelper.findRemoteOnlyRecords(
+                null,
+                Arrays.asList(remote1, remote2));
+
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("dup_page", result.get(0).notionPageId);
+    }
+
+    @Test
+    public void findRemoteOnlyRecords_shouldReturnEmptyWhenRemoteRecordsMissing() {
+        List<ConflictResolver.Record> result = SyncDiffHelper.findRemoteOnlyRecords(
+                Arrays.asList(new ConflictResolver.Record()),
+                null);
+        Assert.assertTrue(result.isEmpty());
+    }
 }

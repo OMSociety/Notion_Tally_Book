@@ -78,6 +78,20 @@
 
 > 说明：当前构建依赖 Google Maven 仓库，网络环境需可访问 `dl.google.com` 才能完成依赖下载。
 
+## 构建前置条件与故障排查
+
+| 检查项 | 期望状态 | 常见失败现象 | 处理建议 |
+|---|---|---|---|
+| Java 版本 | JDK 8 | `Could not initialize class org.codehaus.groovy...` | 切换到 JDK 8 后重试（如 `JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-amd64`） |
+| `dl.google.com` DNS | 可解析 | `dl.google.com: No address associated with hostname` | 修复 DNS、配置公司网络白名单或代理放行 `dl.google.com` |
+| Google Maven 访问 | HTTPS 可达 | `Could not GET ... dl/android/maven2/...` | 检查代理/防火墙策略，确保可访问 `https://dl.google.com/dl/android/maven2/` |
+| 仓库源配置 | `google + mavenCentral + jitpack` | 依赖解析失败/源不一致 | 不回引 `jcenter()`，统一使用仓库根 `build.gradle` 当前配置 |
+
+建议在构建前执行：
+1. `java -version`（确认 JDK 8）
+2. `nslookup dl.google.com` 或 `getent hosts dl.google.com`
+3. `./gradlew test --no-daemon`
+
 ## 项目结构
 
 ```
