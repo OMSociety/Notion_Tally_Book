@@ -84,7 +84,7 @@ public class SettingViewModel extends BaseViewModel {
     public void saveApiKey(String apiKey) {
         this.apiKey.set(apiKey);
         mApiKeyLiveData.setValue(apiKey);
-        saveSetting(SettingWorkerConst.KEY_API_KEY, apiKey);
+        saveSetting(SettingWorkerConstant.KEY_API_KEY, apiKey);
     }
 
     /**
@@ -94,13 +94,13 @@ public class SettingViewModel extends BaseViewModel {
     public void saveDetectionList(String detectionList) {
         this.detectionList.set(detectionList);
         mDetectionListLiveData.setValue(detectionList);
-        saveSetting(SettingWorkerConst.KEY_DETECTION_LIST, detectionList);
+        saveSetting(SettingWorkerConstant.KEY_DETECTION_LIST, detectionList);
     }
 
     public void saveSmsRecognitionEnabled(boolean enabled) {
         this.smsRecognitionEnabled.set(enabled);
         mSmsRecognitionEnabledLiveData.setValue(enabled);
-        saveSetting(SettingWorkerConst.KEY_SMS_RECOGNITION_ENABLED, String.valueOf(enabled));
+        saveSetting(SettingWorkerConstant.KEY_SMS_RECOGNITION_ENABLED, String.valueOf(enabled));
     }
 
     /**
@@ -110,7 +110,7 @@ public class SettingViewModel extends BaseViewModel {
     public void saveAiModel(String aiModel) {
         this.aiModel.set(aiModel);
         mAiModelLiveData.setValue(aiModel);
-        saveSetting(SettingWorkerConst.KEY_AI_MODEL, aiModel);
+        saveSetting(SettingWorkerConstant.KEY_AI_MODEL, aiModel);
     }
 
     /**
@@ -200,10 +200,10 @@ public class SettingViewModel extends BaseViewModel {
             try {
                 MineDatabase db = MineDatabase.getInstance();
 
-                KeyValue apiKeySetting = db.keyValueDao().query(SettingWorkerConst.KEY_API_KEY);
-                KeyValue aiModelSetting = db.keyValueDao().query(SettingWorkerConst.KEY_AI_MODEL);
-                KeyValue smsRecognitionEnabledSetting = db.keyValueDao().query(SettingWorkerConst.KEY_SMS_RECOGNITION_ENABLED); // 新增
-                KeyValue detectionListSetting = db.keyValueDao().query(SettingWorkerConst.KEY_DETECTION_LIST);
+                KeyValue apiKeySetting = db.keyValueDao().query(SettingWorkerConstant.KEY_API_KEY);
+                KeyValue aiModelSetting = db.keyValueDao().query(SettingWorkerConstant.KEY_AI_MODEL);
+                KeyValue smsRecognitionEnabledSetting = db.keyValueDao().query(SettingWorkerConstant.KEY_SMS_RECOGNITION_ENABLED); // 新增
+                KeyValue detectionListSetting = db.keyValueDao().query(SettingWorkerConstant.KEY_DETECTION_LIST);
                 
                 // 加载自动同步设置
                 NotionConfig notionConfig = NotionConfig.getInstance(getApplication());

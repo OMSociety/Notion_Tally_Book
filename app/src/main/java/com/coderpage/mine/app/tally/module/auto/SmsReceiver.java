@@ -22,7 +22,7 @@ import com.coderpage.mine.app.tally.common.RecordType;
 import com.coderpage.mine.app.tally.eventbus.EventRecordAdd;
 import com.coderpage.mine.app.tally.module.edit.record.RecordRepository;
 import com.coderpage.mine.app.tally.module.home.HomeActivity;
-import com.coderpage.mine.app.tally.module.setting.SettingWorkerConst;
+import com.coderpage.mine.app.tally.module.setting.SettingWorkerConstant;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
 import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
@@ -94,7 +94,7 @@ public class SmsReceiver extends BroadcastReceiver {
         try {
             com.coderpage.mine.persistence.entity.KeyValue keyValue =
                     MineDatabase.getInstance().keyValueDao()
-                            .query(SettingWorkerConst.KEY_SMS_RECOGNITION_ENABLED);
+                            .query(SettingWorkerConstant.KEY_SMS_RECOGNITION_ENABLED);
 
             if (keyValue != null && keyValue.getValue() != null) {
                 return Boolean.parseBoolean(keyValue.getValue());
@@ -112,7 +112,7 @@ public class SmsReceiver extends BroadcastReceiver {
         try {
             com.coderpage.mine.persistence.entity.KeyValue keyValue =
                     MineDatabase.getInstance().keyValueDao()
-                            .query(SettingWorkerConst.KEY_DETECTION_LIST);
+                            .query(SettingWorkerConstant.KEY_DETECTION_LIST);
 
             if (keyValue != null && keyValue.getValue() != null && !keyValue.getValue().isEmpty()) {
                 String[] detectionList = keyValue.getValue().split(",|，");

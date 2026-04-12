@@ -76,7 +76,7 @@ class TallyChartRepository {
      * @param end      结束时间
      * @param callback 回调
      */
-    void queryDailyInCome(long start, long end, Callback<List<DailyData>, IError> callback) {
+    void queryDailyIncome(long start, long end, Callback<List<DailyData>, IError> callback) {
         MineExecutors.ioExecutor().execute(() -> {
             List<RecordGroup> incomeGroupList = TallyDatabase.getInstance().recordDao()
                     .queryIncomeDailyGroup(start, end);

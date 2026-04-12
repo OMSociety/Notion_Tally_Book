@@ -97,7 +97,7 @@ public class BackupFileViewModel extends BaseViewModel {
         if (enabled) {
             try {
                 List<WorkInfo> workInfos = WorkManager.getInstance()
-                        .getWorkInfosByTag(WorkerConst.UNIQUE_NAME_AUTO_BACKUP_WORKER)
+                        .getWorkInfosByTag(WorkerConstant.UNIQUE_NAME_AUTO_BACKUP_WORKER)
                         .get();
                 // 如果没有找到任务，则更新状态为关闭
                 if (workInfos.isEmpty()) {
@@ -133,7 +133,7 @@ public class BackupFileViewModel extends BaseViewModel {
         } else {
             // 禁用自动备份 - 取消所有相关任务
             WorkManager.getInstance()
-                    .cancelAllWorkByTag(WorkerConst.UNIQUE_NAME_AUTO_BACKUP_WORKER);
+                    .cancelAllWorkByTag(WorkerConstant.UNIQUE_NAME_AUTO_BACKUP_WORKER);
         }
     }
     /**
@@ -142,11 +142,11 @@ public class BackupFileViewModel extends BaseViewModel {
     private void schedulePeriodicBackup() {
         PeriodicWorkRequest periodicRequest = new PeriodicWorkRequest.Builder(
                 AutoBackupWorker.class, 24, TimeUnit.HOURS)
-                .addTag(WorkerConst.UNIQUE_NAME_AUTO_BACKUP_WORKER)
+                .addTag(WorkerConstant.UNIQUE_NAME_AUTO_BACKUP_WORKER)
                 .build();
 
         WorkManager.getInstance().enqueueUniquePeriodicWork(
-                WorkerConst.UNIQUE_NAME_AUTO_BACKUP_WORKER,
+                WorkerConstant.UNIQUE_NAME_AUTO_BACKUP_WORKER,
                 ExistingPeriodicWorkPolicy.KEEP,
                 periodicRequest);
     }
