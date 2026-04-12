@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-        google()
-        jcenter()
+        maven { url "https://maven.google.com" }
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.0'
@@ -9,9 +9,12 @@ buildscript {
 }
 
 def props = new Properties()
-props.load(new FileInputStream("${rootDir}/local.properties"))
-props.each { key, val ->
-    project.ext.set(key, val)
+def localPropertiesFile = file("${rootDir}/local.properties")
+if (localPropertiesFile.exists()) {
+    props.load(new FileInputStream(localPropertiesFile))
+    props.each { key, val ->
+        project.ext.set(key, val)
+    }
 }
 
 ext {
@@ -90,9 +93,8 @@ ext {
 
 allprojects {
     repositories {
-        maven { url "https://maven.aliyun.com/nexus/content/groups/public" }
-        google()
-        jcenter()
+        maven { url "https://maven.google.com" }
+        mavenCentral()
         maven { url "https://jitpack.io" }
     }
 }

@@ -37,6 +37,16 @@ public interface RecordDao {
     Record queryById(long id);
 
     /**
+     * 通过同步 ID 查询记录
+     */
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
+    @Query("select * " +
+            "from record " +
+            "left outer join category on record.record_category_unique_name=category.category_unique_name " +
+            "where record_sync_id = :syncId limit 1")
+    Record queryBySyncId(String syncId);
+
+    /**
      * 通过关键字查询
      *
      * @param keyWord 关键字
