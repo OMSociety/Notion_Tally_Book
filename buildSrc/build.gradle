@@ -3,7 +3,6 @@ apply plugin: 'groovy'
 repositories {
     maven { url "https://maven.google.com" }
     mavenCentral()
-    jcenter()
 }
 
 dependencies {

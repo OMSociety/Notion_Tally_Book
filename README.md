@@ -69,6 +69,15 @@
 - **云端**：Notion API
 - **AI**：OpenAI 兼容 API
 
+## 构建基线（稳定组合）
+
+- **JDK**：8（推荐 Temurin 8）
+- **Gradle**：5.1.1（`gradle/wrapper/gradle-wrapper.properties`）
+- **Android Gradle Plugin**：3.4.0（`build.gradle`）
+- **buildSrc AGP 依赖**：3.3.2（`buildSrc/build.gradle`）
+
+> 说明：当前构建依赖 Google Maven 仓库，网络环境需可访问 `dl.google.com` 才能完成依赖下载。
+
 ## 项目结构
 
 ```
@@ -100,6 +109,14 @@ app/src/main/java/com/coderpage/mine/
 - 请妥善保管您的 Notion API Token 和 AI API Key
 - 首次使用请先在设置中配置 Notion 和 AI
 - 同步前请确保 Notion 数据库字段已正确配置
+
+## 发布前端到端验证清单
+
+1. 本地新增一笔支出与一笔收入，确认首页/图表展示正常。
+2. 执行 Notion 同步并确认远端记录创建成功。
+3. 人工制造同一条记录的本地/远端差异，验证冲突处理策略结果。
+4. 执行 AI 配置测试连接，验证识别流程可用。
+5. 执行本地备份与导出，检查导出文件可读取。
 
 ## 许可证
 

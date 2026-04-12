@@ -91,11 +91,6 @@ public class OpenAiRecognizer implements AiRecognizer {
 
             requestBody.put("messages", messages);
 
-            // 发送请求
-            String jsonBody = gson.toJson(requestBody);
-            RequestBody body = RequestBody.create(
-                    MediaType.parse("application/json"), jsonBody);
-
             Request.Builder requestBuilder = new Request.Builder()
                     .url(config.getApiUrl() + "/chat/completions")
                     .addHeader("Authorization", "Bearer " + config.getApiKey())
@@ -110,10 +105,14 @@ public class OpenAiRecognizer implements AiRecognizer {
                 requestBody.put("system", SYSTEM_PROMPT);
             }
 
+            // 发送请求
+            String jsonBody = gson.toJson(requestBody);
+            RequestBody body = RequestBody.create(
+                    MediaType.parse("application/json"), jsonBody);
             Request request = requestBuilder.post(body).build();
 
             try (Response response = client.newCall(request).execute()) {
-                String responseBody = response.body().string();
+                String responseBody = response.body() != null ? response.body().string() : "";
 
                 if (!response.isSuccessful()) {
                     return RecognitionResult.error("请求失败: " + response.code() + " - " + responseBody);
@@ -159,7 +158,7 @@ public class OpenAiRecognizer implements AiRecognizer {
                     .build();
 
             try (Response response = client.newCall(request).execute()) {
-                String responseBody = response.body().string();
+                String responseBody = response.body() != null ? response.body().string() : "";
 
                 if (response.isSuccessful()) {
                     return RecognitionResult.success(true, "test", 0);

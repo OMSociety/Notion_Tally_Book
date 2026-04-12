@@ -32,6 +32,13 @@ public class ConflictResolver {
      * @return 解决后的记录（返回 null 表示需要用户手动选择）
      */
     public Record resolve(Record localRecord, Record remoteRecord) {
+        if (localRecord == null) {
+            return remoteRecord;
+        }
+        if (remoteRecord == null) {
+            return localRecord;
+        }
+
         switch (defaultStrategy) {
             case STRATEGY_KEEP_LOCAL:
                 return localRecord;
@@ -40,7 +47,7 @@ public class ConflictResolver {
                 return remoteRecord;
                 
             case STRATEGY_KEEP_NEWEST:
-                if (localRecord.lastModified > remoteRecord.lastModified) {
+                if (localRecord.lastModified >= remoteRecord.lastModified) {
                     return localRecord;
                 } else {
                     return remoteRecord;
@@ -59,6 +66,13 @@ public class ConflictResolver {
      * 只合并不同字段，相同字段保留最新的
      */
     private Record mergeRecords(Record local, Record remote) {
+        if (local == null) {
+            return remote;
+        }
+        if (remote == null) {
+            return local;
+        }
+
         Record merged = new Record();
         
         // 基础信息
@@ -82,13 +96,16 @@ public class ConflictResolver {
         }
         
         // 备注 - 合并两个备注
-        if (local.remark != null && !local.remark.isEmpty()) {
-            merged.remark = local.remark;
-            if (remote.remark != null && !remote.remark.isEmpty()) {
-                merged.remark = local.remark + " | " + remote.remark;
-            }
+        String localRemark = local.remark == null ? "" : local.remark.trim();
+        String remoteRemark = remote.remark == null ? "" : remote.remark.trim();
+        if (!localRemark.isEmpty() && !remoteRemark.isEmpty()) {
+            merged.remark = localRemark.equals(remoteRemark)
+                    ? localRemark
+                    : localRemark + " | " + remoteRemark;
+        } else if (!localRemark.isEmpty()) {
+            merged.remark = localRemark;
         } else {
-            merged.remark = remote.remark;
+            merged.remark = remoteRemark;
         }
         
         merged.lastModified = Math.max(local.lastModified, remote.lastModified);

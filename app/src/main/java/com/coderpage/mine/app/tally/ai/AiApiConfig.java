@@ -3,9 +3,6 @@ package com.coderpage.mine.app.tally.ai;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.coderpage.mine.persistence.database.MineDatabase;
-import com.coderpage.mine.persistence.entity.KeyValue;
-
 /**
  * AI API 配置管理
  * 
@@ -96,9 +93,13 @@ public class AiApiConfig {
     
     // 验证配置是否完整
     public boolean isValid() {
-        return apiUrl != null && !apiUrl.isEmpty() 
-            && apiKey != null && !apiKey.isEmpty()
-            && model != null && !model.isEmpty();
+        return !isBlank(apiUrl)
+            && !isBlank(apiKey)
+            && !isBlank(model);
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
     
     // 保存配置
