@@ -199,7 +199,8 @@ public class NotionSyncManager {
                 }
                 result.conflictCount++;
             } else if (local.notionPageId != null) {
-                // 只在本地有 - 上传
+                // 本地已有 notionPageId，但当前远端列表中不存在，先清理旧 id，交由 uploadRecord 执行重建并回填
+                local.notionPageId = null;
                 uploadRecord(local);
                 result.uploadedCount++;
             } else {
@@ -410,13 +411,17 @@ public class NotionSyncManager {
         pageData.put("parent", parent);
         pageData.put("properties", properties);
         
+        if (record.notionPageId != null && !record.notionPageId.isEmpty()) {
+            notionGateway.updatePage(record.notionPageId, gson.toJson(pageData));
+            updateLocalRecord(record);
+            return;
+        }
+
         String response = notionGateway.createPage(gson.toJson(pageData));
         JsonObject json = JsonParser.parseString(response).getAsJsonObject();
-        
+
         if (json.has("id")) {
             record.notionPageId = json.get("id").getAsString();
-            
-            // 更新本地记录
             updateLocalRecord(record);
         }
     }

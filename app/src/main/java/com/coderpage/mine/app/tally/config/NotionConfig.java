@@ -3,6 +3,8 @@ package com.coderpage.mine.app.tally.config;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.coderpage.mine.app.tally.security.SensitiveDataCipher;
+
 /**
  * Notion 同步配置
  * 
@@ -23,11 +25,12 @@ public class NotionConfig {
     public static final int SYNC_MODE_BIDIRECTIONAL = 2;
     
     private final SharedPreferences prefs;
+    private final Context appContext;
     private static NotionConfig instance;
     
     private NotionConfig(Context context) {
-        prefs = context.getApplicationContext()
-                .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        appContext = context.getApplicationContext();
+        prefs = appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
     
     public static synchronized NotionConfig getInstance(Context context) {
@@ -39,11 +42,14 @@ public class NotionConfig {
     
     // Integration Token
     public void setIntegrationToken(String token) {
-        prefs.edit().putString(KEY_INTEGRATION_TOKEN, token).apply();
+        prefs.edit()
+                .putString(KEY_INTEGRATION_TOKEN, SensitiveDataCipher.encrypt(appContext, token))
+                .apply();
     }
     
     public String getIntegrationToken() {
-        return prefs.getString(KEY_INTEGRATION_TOKEN, "");
+        return SensitiveDataCipher.decrypt(
+                appContext, prefs.getString(KEY_INTEGRATION_TOKEN, ""));
     }
     
     public boolean hasIntegrationToken() {

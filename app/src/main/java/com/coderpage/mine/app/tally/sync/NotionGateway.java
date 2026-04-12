@@ -25,6 +25,10 @@ public class NotionGateway {
         return apiClient.createPage(pageData);
     }
 
+    public String updatePage(String pageId, String pageData) throws IOException {
+        return apiClient.updatePage(pageId, pageData);
+    }
+
     public String getDatabaseSchema() throws IOException {
         return apiClient.getDatabaseSchema();
     }
