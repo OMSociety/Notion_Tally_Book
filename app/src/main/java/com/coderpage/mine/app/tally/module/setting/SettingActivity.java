@@ -46,7 +46,7 @@ public class SettingActivity extends BaseActivity {
     private LinearLayout lyAbout;
     private LinearLayout lyUpdate;
     private Toolbar mToolbar;
-    private AiApiConfig mAiConfig;
+    private AiApiConfig mAiConfig = new AiApiConfig();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,9 +140,6 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mAiConfig == null) {
-            mAiConfig = new AiApiConfig();
-        }
         mAiConfig.setApiUrl(etAiApiUrl.getText().toString().trim());
         mAiConfig.setApiKey(etAiApiKey.getText().toString().trim());
         mAiConfig.setModel(etAiModel.getText().toString().trim());
