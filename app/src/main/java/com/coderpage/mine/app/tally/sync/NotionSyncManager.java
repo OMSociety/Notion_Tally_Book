@@ -199,7 +199,7 @@ public class NotionSyncManager {
                 }
                 result.conflictCount++;
             } else if (local.notionPageId != null) {
-                // 远端不存在该页面，创建新页面并更新本地 syncId
+                // 本地已有 notionPageId，但当前远端列表中不存在，先清理旧 id，交由 uploadRecord 执行重建并回填
                 local.notionPageId = null;
                 uploadRecord(local);
                 result.uploadedCount++;

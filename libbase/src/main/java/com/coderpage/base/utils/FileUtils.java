@@ -125,6 +125,6 @@ public class FileUtils {
                 cursor.close();
             }
         }
-        return "";
+        return null;
     }
 }

@@ -1,17 +1,20 @@
 package com.coderpage.mine.app.tally.security;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.UUID;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -19,8 +22,13 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public final class SensitiveDataCipher {
 
+    private static final String TAG = "SensitiveDataCipher";
     private static final String PREFIX = "enc:";
-    private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
+    private static final String TRANSFORMATION = "AES/GCM/NoPadding";
+    private static final int GCM_TAG_LENGTH = 128;
+    private static final int GCM_IV_LENGTH = 12;
+    private static final String PREF_NAME = "security_meta";
+    private static final String KEY_DEVICE_SECRET = "device_secret";
 
     private SensitiveDataCipher() {
     }
@@ -34,17 +42,18 @@ public final class SensitiveDataCipher {
         }
         try {
             SecretKeySpec key = buildKey(context);
-            byte[] iv = new byte[16];
+            byte[] iv = new byte[GCM_IV_LENGTH];
             new SecureRandom().nextBytes(iv);
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
+            cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH, iv));
             byte[] encrypted = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
             byte[] payload = new byte[iv.length + encrypted.length];
             System.arraycopy(iv, 0, payload, 0, iv.length);
             System.arraycopy(encrypted, 0, payload, iv.length, encrypted.length);
             return PREFIX + Base64.encodeToString(payload, Base64.NO_WRAP);
         } catch (Exception e) {
-            return plaintext;
+            Log.e(TAG, "encrypt failed", e);
+            return "";
         }
     }
 
@@ -57,16 +66,18 @@ public final class SensitiveDataCipher {
         }
         try {
             byte[] payload = Base64.decode(storedValue.substring(PREFIX.length()), Base64.NO_WRAP);
-            if (payload.length <= 16) {
+            if (payload.length <= GCM_IV_LENGTH) {
+                Log.w(TAG, "decrypt failed: payload too short");
                 return "";
             }
-            byte[] iv = Arrays.copyOfRange(payload, 0, 16);
-            byte[] encrypted = Arrays.copyOfRange(payload, 16, payload.length);
+            byte[] iv = Arrays.copyOfRange(payload, 0, GCM_IV_LENGTH);
+            byte[] encrypted = Arrays.copyOfRange(payload, GCM_IV_LENGTH, payload.length);
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.DECRYPT_MODE, buildKey(context), new IvParameterSpec(iv));
+            cipher.init(Cipher.DECRYPT_MODE, buildKey(context), new GCMParameterSpec(GCM_TAG_LENGTH, iv));
             byte[] decrypted = cipher.doFinal(encrypted);
             return new String(decrypted, StandardCharsets.UTF_8);
         } catch (Exception e) {
+            Log.e(TAG, "decrypt failed", e);
             return "";
         }
     }
@@ -76,11 +87,16 @@ public final class SensitiveDataCipher {
         String androidId = Settings.Secure.getString(
                 context.getContentResolver(), Settings.Secure.ANDROID_ID);
         if (TextUtils.isEmpty(androidId)) {
-            androidId = "unknown_device";
+            SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+            androidId = prefs.getString(KEY_DEVICE_SECRET, "");
+            if (TextUtils.isEmpty(androidId)) {
+                androidId = UUID.randomUUID().toString();
+                prefs.edit().putString(KEY_DEVICE_SECRET, androidId).apply();
+            }
         }
         String seed = packageName + ":" + androidId;
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] keyBytes = Arrays.copyOf(digest.digest(seed.getBytes(StandardCharsets.UTF_8)), 16);
+        byte[] keyBytes = Arrays.copyOf(digest.digest(seed.getBytes(StandardCharsets.UTF_8)), 32);
         return new SecretKeySpec(keyBytes, "AES");
     }
 }
