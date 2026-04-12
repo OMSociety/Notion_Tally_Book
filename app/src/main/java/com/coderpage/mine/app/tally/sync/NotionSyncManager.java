@@ -6,8 +6,6 @@ import android.os.Looper;
 
 import com.coderpage.mine.app.tally.config.NotionConfig;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
-import com.coderpage.mine.app.tally.persistence.sql.dao.RecordDao;
-import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -35,12 +33,12 @@ public class NotionSyncManager {
     
     private final Context context;
     private final NotionConfig config;
-    private final NotionApiClient apiClient;
-    private final ConflictResolver conflictResolver;
+    private final NotionGateway notionGateway;
+    private final ConflictService conflictService;
+    private final SyncRepository syncRepository;
     private final ExecutorService executor;
     private final Handler mainHandler;
     private final Gson gson;
-    private final RecordDao recordDao;
     
     private SyncListener listener;
     private boolean isSyncing = false;
@@ -66,15 +64,15 @@ public class NotionSyncManager {
     public NotionSyncManager(Context context) {
         this.context = context.getApplicationContext();
         this.config = NotionConfig.getInstance(context);
-        this.apiClient = NotionApiClient.getInstance(config);
-        this.conflictResolver = new ConflictResolver();
+        this.notionGateway = new NotionGateway(NotionApiClient.getInstance(config));
+        this.conflictService = new ConflictService();
         this.executor = Executors.newSingleThreadExecutor();
         this.mainHandler = new Handler(Looper.getMainLooper());
         this.gson = new Gson();
         
         // 初始化数据库
         TallyDatabase database = TallyDatabase.getInstance();
-        this.recordDao = database.recordDao();
+        this.syncRepository = new SyncRepository(database.recordDao());
     }
     
     public void setSyncListener(SyncListener listener) {
@@ -104,7 +102,7 @@ public class NotionSyncManager {
             
             try {
                 // 验证 Notion 配置
-                if (!apiClient.validateConfig()) {
+                if (!notionGateway.validateConfig()) {
                     throw new IOException("Notion 配置无效，请检查 Token 和 Database ID");
                 }
                 
@@ -191,7 +189,7 @@ public class NotionSyncManager {
             if (local.notionPageId != null && remoteMap.containsKey(local.notionPageId)) {
                 // 双方都有 - 冲突处理
                 ConflictResolver.Record remote = remoteMap.get(local.notionPageId);
-                ConflictResolver.Record winner = conflictResolver.resolve(local, remote);
+                ConflictResolver.Record winner = conflictService.resolve(local, remote);
                 if (winner == local) {
                     uploadRecord(local);
                     result.uploadedCount++;
@@ -213,7 +211,7 @@ public class NotionSyncManager {
         
         // 6. 处理远程新增记录
         List<ConflictResolver.Record> remoteOnlyRecords =
-                SyncDiffHelper.findRemoteOnlyRecords(localRecords, remoteRecords);
+                conflictService.findRemoteOnlyRecords(localRecords, remoteRecords);
         for (ConflictResolver.Record remote : remoteOnlyRecords) {
             saveRemoteRecord(remote);
             result.downloadedCount++;
@@ -252,13 +250,7 @@ public class NotionSyncManager {
      * 获取本地记录
      */
     private List<ConflictResolver.Record> getLocalRecords() {
-        try {
-            List<com.coderpage.mine.app.tally.persistence.model.Record> modelRecords = recordDao.queryAll();
-            return RecordConverter.toSyncRecords(modelRecords);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
+        return syncRepository.getLocalRecords();
     }
     
     /**
@@ -269,7 +261,7 @@ public class NotionSyncManager {
         String cursor = null;
         
         do {
-            String response = apiClient.queryDatabase(cursor);
+            String response = notionGateway.queryDatabase(cursor);
             JsonObject json = JsonParser.parseString(response).getAsJsonObject();
             
             JsonArray results = json.getAsJsonArray("results");
@@ -418,7 +410,7 @@ public class NotionSyncManager {
         pageData.put("parent", parent);
         pageData.put("properties", properties);
         
-        String response = apiClient.createPage(gson.toJson(pageData));
+        String response = notionGateway.createPage(gson.toJson(pageData));
         JsonObject json = JsonParser.parseString(response).getAsJsonObject();
         
         if (json.has("id")) {
@@ -433,61 +425,14 @@ public class NotionSyncManager {
      * 更新本地记录
      */
     private void updateLocalRecord(ConflictResolver.Record record) {
-        try {
-            if (record.id == null || record.id.isEmpty()) {
-                return;
-            }
-            long id = Long.parseLong(record.id);
-            com.coderpage.mine.app.tally.persistence.model.Record model = recordDao.queryById(id);
-            if (model != null) {
-                model.setAmount(record.amount);
-                model.setTime(record.time);
-                model.setDesc(record.remark != null ? record.remark : "");
-                model.setType("expense".equals(record.type) ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
-                model.setCategoryUniqueName(record.category != null ? record.category : "");
-                if (record.notionPageId != null) {
-                    model.setSyncId("notion:" + record.notionPageId);
-                }
-                recordDao.update(model.createEntity());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        syncRepository.updateLocalRecord(record);
     }
     
     /**
      * 保存远程记录到本地
      */
     private void saveRemoteRecord(ConflictResolver.Record record) {
-        try {
-            // 检查是否已存在
-            List<com.coderpage.mine.app.tally.persistence.model.Record> existing = recordDao.queryAll();
-            for (com.coderpage.mine.app.tally.persistence.model.Record existingRecord : existing) {
-                if (record.notionPageId != null && 
-                    record.notionPageId.equals(existingRecord.getSyncId().replace("notion:", ""))) {
-                    // 已存在，更新
-                    existingRecord.setAmount(record.amount);
-                    existingRecord.setTime(record.time);
-                    existingRecord.setDesc(record.remark != null ? record.remark : "");
-                    existingRecord.setType("expense".equals(record.type) ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
-                    existingRecord.setCategoryUniqueName(record.category != null ? record.category : "");
-                    existingRecord.setSyncId("notion:" + record.notionPageId);
-                    recordDao.update(existingRecord.createEntity());
-                    return;
-                }
-            }
-            // 不存在，插入
-            com.coderpage.mine.app.tally.persistence.model.Record newRecord = new com.coderpage.mine.app.tally.persistence.model.Record();
-            newRecord.setAmount(record.amount);
-            newRecord.setTime(record.time);
-            newRecord.setDesc(record.remark != null ? record.remark : "");
-            newRecord.setType("expense".equals(record.type) ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
-            newRecord.setCategoryUniqueName(record.category != null ? record.category : "");
-            newRecord.setSyncId(record.notionPageId != null ? "notion:" + record.notionPageId : "");
-            recordDao.insert(newRecord.createEntity());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        syncRepository.saveRemoteRecord(record);
     }
     
     /**
@@ -495,7 +440,7 @@ public class NotionSyncManager {
      */
     public boolean validateDatabase() {
         try {
-            String schema = apiClient.getDatabaseSchema();
+            String schema = notionGateway.getDatabaseSchema();
             JsonObject json = JsonParser.parseString(schema).getAsJsonObject();
             
             // 检查必要的字段
