@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class SyncRepository {
 
+    private static final String NOTION_SYNC_PREFIX = "notion:";
+
     private final RecordDao recordDao;
 
     public SyncRepository(RecordDao recordDao) {
@@ -35,14 +37,7 @@ public class SyncRepository {
             long id = Long.parseLong(record.id);
             com.coderpage.mine.app.tally.persistence.model.Record model = recordDao.queryById(id);
             if (model != null) {
-                model.setAmount(record.amount);
-                model.setTime(record.time);
-                model.setDesc(record.remark != null ? record.remark : "");
-                model.setType("expense".equals(record.type) ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
-                model.setCategoryUniqueName(record.category != null ? record.category : "");
-                if (record.notionPageId != null) {
-                    model.setSyncId("notion:" + record.notionPageId);
-                }
+                applyRecordFields(model, record);
                 recordDao.update(model.createEntity());
             }
         } catch (Exception e) {
@@ -54,28 +49,37 @@ public class SyncRepository {
         try {
             if (record.notionPageId != null && !record.notionPageId.isEmpty()) {
                 com.coderpage.mine.app.tally.persistence.model.Record existingRecord =
-                        recordDao.queryBySyncId("notion:" + record.notionPageId);
+                        recordDao.queryBySyncId(makeNotionSyncId(record.notionPageId));
                 if (existingRecord != null) {
-                    existingRecord.setAmount(record.amount);
-                    existingRecord.setTime(record.time);
-                    existingRecord.setDesc(record.remark != null ? record.remark : "");
-                    existingRecord.setType("expense".equals(record.type) ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
-                    existingRecord.setCategoryUniqueName(record.category != null ? record.category : "");
-                    existingRecord.setSyncId("notion:" + record.notionPageId);
+                    applyRecordFields(existingRecord, record);
                     recordDao.update(existingRecord.createEntity());
                     return;
                 }
             }
             com.coderpage.mine.app.tally.persistence.model.Record newRecord = new com.coderpage.mine.app.tally.persistence.model.Record();
-            newRecord.setAmount(record.amount);
-            newRecord.setTime(record.time);
-            newRecord.setDesc(record.remark != null ? record.remark : "");
-            newRecord.setType("expense".equals(record.type) ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
-            newRecord.setCategoryUniqueName(record.category != null ? record.category : "");
-            newRecord.setSyncId(record.notionPageId != null ? "notion:" + record.notionPageId : "");
+            applyRecordFields(newRecord, record);
             recordDao.insert(newRecord.createEntity());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void applyRecordFields(com.coderpage.mine.app.tally.persistence.model.Record target,
+                                   ConflictResolver.Record source) {
+        target.setAmount(source.amount);
+        target.setTime(source.time);
+        target.setDesc(source.remark != null ? source.remark : "");
+        target.setType("expense".equals(source.type) ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
+        target.setCategoryUniqueName(source.category != null ? source.category : "");
+        if (source.notionPageId != null && !source.notionPageId.isEmpty()) {
+            target.setSyncId(makeNotionSyncId(source.notionPageId));
+        }
+    }
+
+    private String makeNotionSyncId(String notionPageId) {
+        if (notionPageId == null || notionPageId.isEmpty()) {
+            return "";
+        }
+        return NOTION_SYNC_PREFIX + notionPageId;
     }
 }
