@@ -213,7 +213,7 @@ public class NotionSyncManager {
         
         // 6. 处理远程新增记录
         List<ConflictResolver.Record> remoteOnlyRecords =
-                SyncDiffHelper.findRemoteOnlyRecords(localRecords, remoteRecords);
+                SyncDiffHelper.findRemoteOnlyRecords(localRecords, new ArrayList<>(remoteMap.values()));
         for (ConflictResolver.Record remote : remoteOnlyRecords) {
             saveRemoteRecord(remote);
             result.downloadedCount++;
