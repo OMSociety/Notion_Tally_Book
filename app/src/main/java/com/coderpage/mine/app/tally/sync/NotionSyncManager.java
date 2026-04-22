@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -325,10 +326,11 @@ public class NotionSyncManager {
             if (properties.has("时间")) {
                 JsonObject dateProp = properties.getAsJsonObject("时间");
                 if (dateProp.has("date") && dateProp.get("date") != null) {
-                    String dateStr = dateProp.getAsJsonObject("date").get("start").getAsString();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-                    sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-                    record.time = sdf.parse(dateStr).getTime();
+                    JsonObject date = dateProp.getAsJsonObject("date");
+                    if (date.has("start") && date.get("start") != null) {
+                        String dateStr = date.get("start").getAsString();
+                        record.time = parseNotionDateToMillis(dateStr);
+                    }
                 }
             }
             
@@ -350,6 +352,54 @@ public class NotionSyncManager {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private long parseNotionDateToMillis(String dateStr) throws java.text.ParseException {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            throw new java.text.ParseException("date string empty", 0);
+        }
+        String value = dateStr.trim();
+        String normalized = normalizeIsoTimezone(value);
+        String[] patterns = new String[]{
+                "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+                "yyyy-MM-dd'T'HH:mm:ssZ",
+                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                "yyyy-MM-dd'T'HH:mm:ss.SSS",
+                "yyyy-MM-dd'T'HH:mm:ss",
+                "yyyy-MM-dd"
+        };
+        for (String pattern : patterns) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.US);
+                sdf.setLenient(false);
+                boolean dateOnly = "yyyy-MM-dd".equals(pattern);
+                boolean hasZone = pattern.contains("Z") || pattern.contains("'Z'");
+                if (dateOnly) {
+                    sdf.setTimeZone(TimeZone.getDefault());
+                } else if (!hasZone) {
+                    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                }
+                Date parsed = sdf.parse(normalized);
+                if (parsed != null) {
+                    return parsed.getTime();
+                }
+            } catch (java.text.ParseException ignore) {
+            }
+        }
+        throw new java.text.ParseException("unsupported date format: " + value, 0);
+    }
+
+    private String normalizeIsoTimezone(String value) {
+        if (value.endsWith("Z")) {
+            return value.substring(0, value.length() - 1) + "+0000";
+        }
+        int tzSignIndex = Math.max(value.lastIndexOf('+'), value.lastIndexOf('-'));
+        int timeSeparatorIndex = value.lastIndexOf('T');
+        if (tzSignIndex > timeSeparatorIndex && value.length() - tzSignIndex == 6 && value.charAt(value.length() - 3) == ':') {
+            return value.substring(0, value.length() - 3) + value.substring(value.length() - 2);
+        }
+        return value;
     }
     
     /**

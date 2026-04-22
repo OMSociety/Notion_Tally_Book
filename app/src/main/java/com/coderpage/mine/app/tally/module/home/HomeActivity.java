@@ -81,12 +81,15 @@ public class HomeActivity extends BaseActivity {
      * 检查隐私政策是否已同意
      */
     private void checkPrivacyPolicy() {
-        SharedPreferences sp = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        boolean privacyAccepted = sp.getBoolean(KEY_PRIVACY_ACCEPTED, false);
-
-        if (!privacyAccepted) {
-            showPrivacyPolicyDialog(true);
+        if (isPrivacyAccepted()) {
+            return;
         }
+        showPrivacyPolicyDialog(true);
+    }
+
+    private boolean isPrivacyAccepted() {
+        SharedPreferences sp = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        return sp.getBoolean(KEY_PRIVACY_ACCEPTED, false);
     }
 
     /**
@@ -141,7 +144,9 @@ public class HomeActivity extends BaseActivity {
     public void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         UpdateUtils.checkPersistedNewVersionAndShowUpdateConfirmDialog(this);
-        handlePermission();
+        if (isPrivacyAccepted()) {
+            handlePermission();
+        }
     }
 
     private void handlePermission() {

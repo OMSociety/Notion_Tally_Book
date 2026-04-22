@@ -8,19 +8,25 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.coderpage.mine.R;
 import com.coderpage.mine.BuildConfig;
-import com.coderpage.mine.app.tally.ai.AiApiConfig;
+import com.coderpage.mine.R;
+import com.coderpage.mine.app.tally.ai.AiSettingActivity;
 import com.coderpage.mine.app.tally.common.router.TallyRouter;
+import com.coderpage.mine.app.tally.config.NotionConfig;
 import com.coderpage.mine.app.tally.module.about.AboutActivity;
 import com.coderpage.mine.app.tally.module.backup.BackupFileActivity;
+import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
+import com.coderpage.mine.app.tally.sync.NotionSyncManager;
 import com.coderpage.mine.ui.BaseActivity;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 设置页面 - 简化版
@@ -32,27 +38,37 @@ public class SettingActivity extends BaseActivity {
 
     private static final int REQUEST_PERMISSION = 100;
 
-    // AI 配置
-    private EditText etAiApiUrl;
-    private EditText etAiApiKey;
-    private EditText etAiModel;
-    
+    // Notion 配置
+    private EditText etNotionToken;
+    private EditText etNotionDatabaseId;
+
+    // 功能入口
+    private LinearLayout lyAiSetting;
+    private LinearLayout lyManualSync;
+    private LinearLayout lyNotionHelp;
+
     // 数据管理
     private LinearLayout lyImport;
     private LinearLayout lyExport;
     private LinearLayout lyClear;
-    
+
     // 其他
     private LinearLayout lyAbout;
     private LinearLayout lyUpdate;
     private Toolbar mToolbar;
-    private AiApiConfig mAiConfig = new AiApiConfig();
+    private TextView tvVersion;
+
+    private NotionConfig mNotionConfig;
+    private NotionSyncManager mNotionSyncManager;
+    private boolean mSyncing = false;
+    private final ExecutorService mDatabaseExecutor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
-        
+        mNotionConfig = NotionConfig.getInstance(this);
+
         initToolbar();
         initViews();
         loadSettings();
@@ -64,37 +80,93 @@ public class SettingActivity extends BaseActivity {
         setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("设置");
+            getSupportActionBar().setTitle(R.string.menu_tally_setting);
         }
         mToolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void initViews() {
-        etAiApiUrl = findViewById(R.id.etAiApiUrl);
-        etAiApiKey = findViewById(R.id.etAiApiKey);
-        etAiModel = findViewById(R.id.etAiModel);
+        etNotionToken = findViewById(R.id.etNotionToken);
+        etNotionDatabaseId = findViewById(R.id.etNotionDatabaseId);
+        lyAiSetting = findViewById(R.id.lyAiSetting);
+        lyManualSync = findViewById(R.id.lyManualSync);
+        lyNotionHelp = findViewById(R.id.lyNotionHelp);
         lyImport = findViewById(R.id.lyImport);
         lyExport = findViewById(R.id.lyExport);
         lyClear = findViewById(R.id.lyClear);
         lyAbout = findViewById(R.id.lyAbout);
         lyUpdate = findViewById(R.id.lyUpdate);
+        tvVersion = findViewById(R.id.tvVersion);
     }
 
     private void loadSettings() {
-        mAiConfig = AiApiConfig.load(this);
-        etAiApiUrl.setText(mAiConfig.getApiUrl());
-        etAiApiKey.setText(mAiConfig.getApiKey());
-        etAiModel.setText(mAiConfig.getModel());
+        etNotionToken.setText(mNotionConfig.getIntegrationToken());
+        etNotionDatabaseId.setText(mNotionConfig.getDatabaseId());
+        tvVersion.setText(getString(R.string.setting_version_format, BuildConfig.VERSION_NAME));
     }
 
     private void setupListeners() {
+        lyAiSetting.setOnClickListener(v -> startActivity(new Intent(this, AiSettingActivity.class)));
+        lyManualSync.setOnClickListener(v -> startManualSync());
+        lyNotionHelp.setOnClickListener(v -> startActivity(new Intent(this, NotionDatabaseHelpActivity.class)));
         lyImport.setOnClickListener(v -> checkPermissionAndImport());
         lyExport.setOnClickListener(v -> startActivity(new Intent(this, BackupFileActivity.class)));
         lyClear.setOnClickListener(v -> showClearDialog());
         lyAbout.setOnClickListener(v -> startActivity(new Intent(this, AboutActivity.class)));
         lyUpdate.setOnClickListener(v -> {
-            Toast.makeText(this, "当前已是最新版本 v" + BuildConfig.VERSION_NAME, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.setting_latest_version, BuildConfig.VERSION_NAME), Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void saveNotionConfig() {
+        String token = etNotionToken.getText() == null ? "" : etNotionToken.getText().toString().trim();
+        String databaseId = etNotionDatabaseId.getText() == null ? "" : etNotionDatabaseId.getText().toString().trim();
+        mNotionConfig.setIntegrationToken(token);
+        mNotionConfig.setDatabaseId(databaseId);
+    }
+
+    private void startManualSync() {
+        if (mSyncing) {
+            Toast.makeText(this, R.string.setting_sync_in_progress, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        saveNotionConfig();
+        if (!mNotionConfig.isConfigured()) {
+            Toast.makeText(this, R.string.setting_notion_config_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (mNotionSyncManager == null) {
+            mNotionSyncManager = new NotionSyncManager(this);
+        }
+
+        mSyncing = true;
+        mNotionSyncManager.setSyncListener(new NotionSyncManager.SyncListener() {
+            @Override
+            public void onSyncStart() {
+                Toast.makeText(SettingActivity.this, R.string.setting_sync_start, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSyncProgress(int current, int total, String message) {
+            }
+
+            @Override
+            public void onSyncComplete(NotionSyncManager.SyncResult result) {
+                mSyncing = false;
+                Toast.makeText(SettingActivity.this,
+                        getString(R.string.setting_sync_done, result.uploadedCount, result.downloadedCount, result.conflictCount),
+                        Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onSyncError(String error) {
+                mSyncing = false;
+                Toast.makeText(SettingActivity.this, getString(R.string.setting_sync_failed, error), Toast.LENGTH_LONG).show();
+            }
+        });
+        mNotionSyncManager.startSync();
     }
 
     private void checkPermissionAndImport() {
@@ -109,20 +181,21 @@ public class SettingActivity extends BaseActivity {
 
     private void showImportDialog() {
         new AlertDialog.Builder(this)
-            .setTitle("导入数据")
-            .setItems(new String[]{"JSON备份", "CSV文件"}, (dialog, which) -> {
+            .setTitle(R.string.setting_data_import)
+            .setItems(new String[]{getString(R.string.setting_import_json), getString(R.string.setting_import_csv_in_progress)}, (dialog, which) -> {
                 if (which == 0) {
                     startActivity(new Intent(this, BackupFileActivity.class));
                 } else {
-                    Toast.makeText(this, "CSV导入功能开发中", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.setting_csv_in_progress, Toast.LENGTH_SHORT).show();
                 }
             })
-            .setNegativeButton("取消", null)
+            .setNegativeButton(R.string.dialog_btn_cancel, null)
             .show();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             showImportDialog();
         }
@@ -130,19 +203,33 @@ public class SettingActivity extends BaseActivity {
 
     private void showClearDialog() {
         new AlertDialog.Builder(this)
-            .setTitle("清除数据")
-            .setMessage("确定要清除所有记账数据吗？此操作不可恢复。")
-            .setPositiveButton("确定", (dialog, which) -> Toast.makeText(this, "数据已清除", Toast.LENGTH_SHORT).show())
-            .setNegativeButton("取消", null)
+            .setTitle(R.string.setting_data_clear)
+            .setMessage(R.string.setting_clear_confirm)
+            .setPositiveButton(android.R.string.ok, (dialog, which) -> clearAllRecords())
+            .setNegativeButton(R.string.dialog_btn_cancel, null)
             .show();
+    }
+
+    private void clearAllRecords() {
+        mDatabaseExecutor.execute(() -> {
+            try {
+                TallyDatabase.getInstance().recordDao().deleteAll();
+                runOnUiThread(() -> Toast.makeText(SettingActivity.this, R.string.setting_clear_success, Toast.LENGTH_SHORT).show());
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(SettingActivity.this, R.string.setting_clear_failed, Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mAiConfig.setApiUrl(etAiApiUrl.getText().toString().trim());
-        mAiConfig.setApiKey(etAiApiKey.getText().toString().trim());
-        mAiConfig.setModel(etAiModel.getText().toString().trim());
-        mAiConfig.save(this);
+        saveNotionConfig();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDatabaseExecutor.shutdown();
     }
 }

@@ -103,6 +103,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
+            android:name=".app.tally.ai.AiSettingActivity"
+            android:label="@string/setting_group_ai"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Tally" />
+        <activity
+            android:name=".app.tally.module.setting.NotionDatabaseHelpActivity"
+            android:label="@string/setting_notion_help"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Tally" />
+        <activity
             android:name=".app.tally.module.detail.RecordDetailActivity"
             android:label="@string/tally_toolbar_title_detail"
             android:screenOrientation="portrait"
