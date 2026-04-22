@@ -61,13 +61,14 @@ public class SettingActivity extends BaseActivity {
     private NotionConfig mNotionConfig;
     private NotionSyncManager mNotionSyncManager;
     private boolean mSyncing = false;
-    private final ExecutorService mDatabaseExecutor = Executors.newSingleThreadExecutor();
+    private ExecutorService mDatabaseExecutor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         mNotionConfig = NotionConfig.getInstance(this);
+        mDatabaseExecutor = Executors.newSingleThreadExecutor();
 
         initToolbar();
         initViews();
@@ -211,6 +212,9 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void clearAllRecords() {
+        if (mDatabaseExecutor == null || mDatabaseExecutor.isShutdown()) {
+            mDatabaseExecutor = Executors.newSingleThreadExecutor();
+        }
         mDatabaseExecutor.execute(() -> {
             try {
                 TallyDatabase.getInstance().recordDao().deleteAll();
@@ -230,6 +234,8 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mDatabaseExecutor.shutdown();
+        if (mDatabaseExecutor != null && !mDatabaseExecutor.isShutdown()) {
+            mDatabaseExecutor.shutdown();
+        }
     }
 }

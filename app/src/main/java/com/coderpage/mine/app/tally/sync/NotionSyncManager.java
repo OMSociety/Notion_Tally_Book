@@ -373,11 +373,8 @@ public class NotionSyncManager {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.US);
                 sdf.setLenient(false);
-                boolean dateOnly = "yyyy-MM-dd".equals(pattern);
                 boolean hasZone = pattern.contains("Z") || pattern.contains("'Z'");
-                if (dateOnly) {
-                    sdf.setTimeZone(TimeZone.getDefault());
-                } else if (!hasZone) {
+                if (!hasZone) {
                     sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
                 }
                 Date parsed = sdf.parse(normalized);
