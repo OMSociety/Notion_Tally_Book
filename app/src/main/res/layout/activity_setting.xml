@@ -3,17 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:orientation="vertical">
 
-    <!-- Toolbar -->
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
-        app:titleTextColor="@color/appTextColorPrimary"
-        app:navigationIcon="?attr/homeAsUpIndicator"/>
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:titleTextColor="@color/appTextColorPrimary" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -26,245 +25,298 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- AI 设置 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AI 图片识别"
+                android:layout_marginBottom="8dp"
+                android:text="@string/setting_group_ai"
                 android:textColor="@color/colorAccent"
                 android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
+                android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@+id/lyAiSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
+                android:layout_marginBottom="16dp"
                 android:background="@drawable/bg_common_card_white"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="API URL"
-                    android:textSize="14sp"
-                    android:textColor="@color/appTextColorPrimary"
-                    android:layout_marginBottom="4dp"/>
-
-                <EditText
-                    android:id="@+id/etAiApiUrl"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_input"
-                    android:hint="输入 API 地址"
-                    android:inputType="textUri"
-                    android:paddingHorizontal="12dp"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/bg_common_card_white"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="API Key"
-                    android:textSize="14sp"
-                    android:textColor="@color/appTextColorPrimary"
-                    android:layout_marginBottom="4dp"/>
-
-                <EditText
-                    android:id="@+id/etAiApiKey"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_input"
-                    android:hint="输入 API Key"
-                    android:inputType="textPassword"
-                    android:paddingHorizontal="12dp"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/bg_common_card_white"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="模型"
-                    android:textSize="14sp"
-                    android:textColor="@color/appTextColorPrimary"
-                    android:layout_marginBottom="4dp"/>
-
-                <EditText
-                    android:id="@+id/etAiModel"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_input"
-                    android:hint="如: Qwen/Qwen2-VL-7B-Instruct"
-                    android:inputType="text"
-                    android:paddingHorizontal="12dp"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-
-            <!-- 数据管理 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="数据管理"
-                android:textColor="@color/colorAccent"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
-
-            <LinearLayout
-                android:id="@+id/lyImport"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="16dp"
                 android:minHeight="56dp"
-                android:background="@drawable/bg_common_card_white"
-                android:layout_marginBottom="8dp">
+                android:orientation="horizontal"
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="导入数据"
-                    android:textSize="16sp"
-                    android:textColor="@color/appTextColorPrimary"/>
+                    android:text="@string/setting_ai_open_page"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="16sp" />
 
                 <android.support.v7.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_icon_arrow_right_gray"/>
+                    app:srcCompat="@drawable/ic_icon_arrow_right_gray" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/setting_group_notion"
+                android:textColor="@color/colorAccent"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_common_card_white"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/setting_notion_token"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etNotionToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input"
+                    android:hint="@string/setting_notion_token_hint"
+                    android:inputType="textPassword"
+                    android:paddingHorizontal="12dp"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_common_card_white"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/setting_notion_database_id"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etNotionDatabaseId"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_input"
+                    android:hint="@string/setting_notion_database_id_hint"
+                    android:inputType="text"
+                    android:paddingHorizontal="12dp"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyManualSync"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_common_card_white"
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/setting_notion_sync_now"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="16sp" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_icon_arrow_right_gray" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyNotionHelp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_common_card_white"
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/setting_notion_help"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="16sp" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_icon_arrow_right_gray" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/setting_group_data"
+                android:textColor="@color/colorAccent"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/lyImport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_common_card_white"
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/setting_data_import"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="16sp" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_icon_arrow_right_gray" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/lyExport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:minHeight="56dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/bg_common_card_white"
-                android:layout_marginBottom="8dp">
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="导出数据"
-                    android:textSize="16sp"
-                    android:textColor="@color/appTextColorPrimary"/>
+                    android:text="@string/setting_data_export"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="16sp" />
 
                 <android.support.v7.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_icon_arrow_right_gray"/>
+                    app:srcCompat="@drawable/ic_icon_arrow_right_gray" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/lyClear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:minHeight="56dp"
+                android:layout_marginBottom="16dp"
                 android:background="@drawable/bg_common_card_white"
-                android:layout_marginBottom="16dp">
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="清除数据"
-                    android:textSize="16sp"
-                    android:textColor="@color/appTextColorPrimary"/>
+                    android:text="@string/setting_data_clear"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="16sp" />
 
                 <Button
                     android:id="@+id/btnClearData"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:text="清除"
                     android:minWidth="80dp"
-                    android:textSize="12sp"/>
+                    android:text="@string/setting_data_clear_action"
+                    android:textSize="12sp" />
             </LinearLayout>
 
-            <!-- 其他 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="其他"
+                android:layout_marginBottom="8dp"
+                android:text="@string/setting_group_other"
                 android:textColor="@color/colorAccent"
                 android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/lyAbout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:minHeight="56dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/bg_common_card_white"
-                android:layout_marginBottom="8dp">
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="关于"
-                    android:textSize="16sp"
-                    android:textColor="@color/appTextColorPrimary"/>
+                    android:text="@string/setting_about"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="16sp" />
 
                 <android.support.v7.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_icon_arrow_right_gray"/>
+                    app:srcCompat="@drawable/ic_icon_arrow_right_gray" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/lyUpdate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:background="@drawable/bg_common_card_white"
                 android:gravity="center_vertical"
-                android:padding="16dp"
                 android:minHeight="56dp"
-                android:background="@drawable/bg_common_card_white">
+                android:orientation="horizontal"
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="检查更新"
-                    android:textSize="16sp"
-                    android:textColor="@color/appTextColorPrimary"/>
+                    android:text="@string/setting_check_update"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="16sp" />
 
                 <TextView
+                    android:id="@+id/tvVersion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="v1.0.0"
-                    android:textSize="14sp"
-                    android:textColor="@color/appTextColorThird"/>
+                    android:textColor="@color/appTextColorThird"
+                    android:textSize="14sp" />
             </LinearLayout>
 
         </LinearLayout>
