@@ -391,8 +391,17 @@ public class NotionSyncManager {
         if (value.endsWith("Z")) {
             return value.substring(0, value.length() - 1) + "+0000";
         }
-        int tzSignIndex = Math.max(value.lastIndexOf('+'), value.lastIndexOf('-'));
         int timeSeparatorIndex = value.lastIndexOf('T');
+        int tzSignIndex = -1;
+        if (timeSeparatorIndex >= 0 && timeSeparatorIndex < value.length() - 1) {
+            for (int i = value.length() - 1; i > timeSeparatorIndex; i--) {
+                char c = value.charAt(i);
+                if (c == '+' || c == '-') {
+                    tzSignIndex = i;
+                    break;
+                }
+            }
+        }
         if (tzSignIndex > timeSeparatorIndex && value.length() - tzSignIndex == 6 && value.charAt(value.length() - 3) == ':') {
             return value.substring(0, value.length() - 3) + value.substring(value.length() - 2);
         }
