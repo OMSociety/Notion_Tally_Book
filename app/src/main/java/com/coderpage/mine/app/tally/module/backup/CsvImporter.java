@@ -33,6 +33,7 @@ import java.util.UUID;
 public class CsvImporter {
 
     private static final String TAG = "CsvImporter";
+    private static final String SYNC_ID_PREFIX = "csv:";
     private static final int TYPE_UNKNOWN = -1;
 
     /**
@@ -184,7 +185,7 @@ public class CsvImporter {
         record.setType(type);
         record.setCategoryUniqueName(isBlank(categoryUniqueName) ? "" : categoryUniqueName);
         record.setDesc(isBlank(descField) ? "" : descField.trim());
-        record.setSyncId("csv:" + UUID.randomUUID().toString());
+        record.setSyncId(SYNC_ID_PREFIX + UUID.randomUUID().toString());
         return record;
     }
 
@@ -471,6 +472,7 @@ public class CsvImporter {
             if (expenseByName.containsKey(key) && !incomeByName.containsKey(key)) {
                 return CategoryEntity.TYPE_EXPENSE;
             }
+            // 同名分类在收入和支出都存在时，返回未知，交由上层走默认类型兜底。
             return TYPE_UNKNOWN;
         }
 
