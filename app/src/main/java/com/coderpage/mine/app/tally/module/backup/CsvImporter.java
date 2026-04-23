@@ -161,6 +161,7 @@ public class CsvImporter {
         String categoryName = safeTrim(categoryField);
         int type = parseType(typeField);
         if (type == TYPE_UNKNOWN) {
+            // 类型兜底链路：负数金额 -> 支出；否则按分类名推断；仍无法判定则默认支出。
             if (amountWithSign < 0) {
                 type = RecordEntity.TYPE_EXPENSE;
             } else {
