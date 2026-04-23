@@ -3,6 +3,7 @@ package com.coderpage.mine.app.tally.module.setting;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.coderpage.base.utils.FileUtils;
 import com.coderpage.mine.BuildConfig;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.ai.AiSettingActivity;
@@ -21,10 +23,12 @@ import com.coderpage.mine.app.tally.common.router.TallyRouter;
 import com.coderpage.mine.app.tally.config.NotionConfig;
 import com.coderpage.mine.app.tally.module.about.AboutActivity;
 import com.coderpage.mine.app.tally.module.backup.BackupFileActivity;
+import com.coderpage.mine.app.tally.module.backup.CsvImporter;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.app.tally.sync.NotionSyncManager;
 import com.coderpage.mine.ui.BaseActivity;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,6 +41,7 @@ import java.util.concurrent.Executors;
 public class SettingActivity extends BaseActivity {
 
     private static final int REQUEST_PERMISSION = 100;
+    private static final int REQUEST_IMPORT_CSV = 101;
 
     // Notion 配置
     private EditText etNotionToken;
@@ -183,15 +188,29 @@ public class SettingActivity extends BaseActivity {
     private void showImportDialog() {
         new AlertDialog.Builder(this)
             .setTitle(R.string.setting_data_import)
-            .setItems(new String[]{getString(R.string.setting_import_json), getString(R.string.setting_import_csv_in_progress)}, (dialog, which) -> {
+            .setItems(new String[]{getString(R.string.setting_import_json), getString(R.string.setting_import_csv)}, (dialog, which) -> {
                 if (which == 0) {
                     startActivity(new Intent(this, BackupFileActivity.class));
                 } else {
-                    Toast.makeText(this, R.string.setting_csv_in_progress, Toast.LENGTH_SHORT).show();
+                    chooseCsvFileForImport();
                 }
             })
             .setNegativeButton(R.string.dialog_btn_cancel, null)
             .show();
+    }
+
+    private void chooseCsvFileForImport() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
+                "text/csv",
+                "text/comma-separated-values",
+                "application/csv",
+                "application/vnd.ms-excel",
+                "text/plain"
+        });
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.setting_import_csv)), REQUEST_IMPORT_CSV);
     }
 
     @Override
@@ -200,6 +219,49 @@ public class SettingActivity extends BaseActivity {
         if (requestCode == REQUEST_PERMISSION && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             showImportDialog();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK || data == null) {
+            return;
+        }
+        if (requestCode != REQUEST_IMPORT_CSV) {
+            return;
+        }
+        Uri uri = data.getData();
+        if (uri == null) {
+            Toast.makeText(this, R.string.tally_toast_illegal_path, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String path = FileUtils.getPath(this, uri);
+        if (path == null || path.trim().isEmpty()) {
+            Toast.makeText(this, R.string.tally_toast_illegal_path, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        importCsvFile(path);
+    }
+
+    private void importCsvFile(String path) {
+        File file = new File(path);
+        if (!file.exists() || !file.isFile()) {
+            Toast.makeText(this, R.string.tally_toast_illegal_path, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (mDatabaseExecutor == null || mDatabaseExecutor.isShutdown()) {
+            mDatabaseExecutor = Executors.newSingleThreadExecutor();
+        }
+        mDatabaseExecutor.execute(() -> {
+            CsvImporter.ImportResult importResult = CsvImporter.importFromCsv(this, file);
+            runOnUiThread(() -> {
+                if (importResult.success) {
+                    Toast.makeText(this, importResult.message, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, getString(R.string.setting_csv_import_failed, importResult.message), Toast.LENGTH_LONG).show();
+                }
+            });
+        });
     }
 
     private void showClearDialog() {
