@@ -28,7 +28,6 @@ import java.util.Locale;
 public class LogViewerActivity extends BaseActivity {
 
     private TextView mLogContent;
-    private TextView mLogInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +35,6 @@ public class LogViewerActivity extends BaseActivity {
         setContentView(R.layout.activity_log_viewer);
 
         mLogContent = findViewById(R.id.tvLogContent);
-        mLogInfo = findViewById(R.id.tvLogInfo);
 
         loadLogs();
     }
@@ -85,14 +83,9 @@ public class LogViewerActivity extends BaseActivity {
             }
 
             mLogContent.setText(logBuilder.toString());
-            mLogInfo.setText(String.format("日志文件: %s\n更新时间: %s\n日志行数: %d",
-                    latestLog.getName(),
-                    sdf.format(new Date(latestLog.lastModified())),
-                    logBuilder.toString().split("\n").length));
 
         } catch (IOException e) {
             mLogContent.setText("读取日志失败: " + e.getMessage());
-            mLogInfo.setText("错误信息");
             Toast.makeText(this, "读取日志失败", Toast.LENGTH_SHORT).show();
         }
     }
@@ -119,15 +112,12 @@ public class LogViewerActivity extends BaseActivity {
 
             if (logBuilder.length() > 0) {
                 mLogContent.setText(logBuilder.toString());
-                mLogInfo.setText("系统日志 (最近100条)\n" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
             } else {
                 mLogContent.setText("暂无日志记录\n\n应用运行日志将显示在这里。\n\n提示：使用应用过程中产生的日志会自动记录。");
-                mLogInfo.setText("暂无日志");
             }
 
         } catch (IOException e) {
             mLogContent.setText("暂无日志记录\n\n应用运行日志将显示在这里。\n\n提示：使用应用过程中产生的日志会自动记录。");
-            mLogInfo.setText("暂无日志");
         }
     }
 }
