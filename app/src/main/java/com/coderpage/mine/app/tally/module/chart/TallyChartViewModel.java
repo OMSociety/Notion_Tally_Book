@@ -2,12 +2,12 @@ package com.coderpage.mine.app.tally.module.chart;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.OnLifecycleEvent;
 import android.content.Intent;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
@@ -79,6 +79,11 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
     private List<CategoryData> mCategoryDailyIncomeList = new ArrayList<>();
     private List<CategoryData> mCategoryYearlyExpenseList = new ArrayList<>();
     private List<CategoryData> mCategoryYearlyIncomeList = new ArrayList<>();
+
+    private final Object mQueryLock = new Object();
+    private volatile int mRefreshGeneration = 0;
+    private volatile boolean mInitialized = false;
+    private Runnable mPendingRefresh;
 
     /** 月单位的收入列表 */
     private MutableLiveData<MonthlyDataList> mObservableMonthlyDataList = new MutableLiveData<>();
@@ -163,7 +168,7 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
                 mEndDate.setTimeInMillis(monthDateRange.second);
 
                 clearData();
-                refreshData();
+                ensureInitThen(() -> refreshData());
             }
         }, currentMonth).show();
     }
@@ -200,13 +205,13 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
     /** 显示为 支出账单 点击 */
     public void onSelectAsExpenseChartClick() {
         mDisplayExpenseChart.set(true);
-        refreshData();
+        ensureInitThen(() -> refreshData());
     }
 
     /** 显示为 收入账单 点击 */
     public void onSelectAsIncomeChartClick() {
         mDisplayExpenseChart.set(false);
-        refreshData();
+        ensureInitThen(() -> refreshData());
     }
 
     /** 切换 日账单、年账单点击 */
@@ -235,16 +240,16 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
     /** 显示为 年账单 点击 */
     private void onSelectAsYearChartClick() {
         mDisplayDailyChart.set(false);
-        refreshData();
+        ensureInitThen(() -> refreshData());
     }
 
     /** 显示为 日账单 点击 */
     private void onSelectAsDailyChartClick() {
         mDisplayDailyChart.set(true);
-        refreshData();
+        ensureInitThen(() -> refreshData());
     }
 
-    private void init() {
+    private void init(SimpleCallback<Void> onReady) {
         mRepository.queryFirstRecordTime(new Callback<Long, IError>() {
             @Override
             public void success(Long firstRecordTime) {
@@ -272,24 +277,40 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
                         }
                     }
                 }
+                if (onReady != null) {
+                    onReady.success(null);
+                }
             }
 
             @Override
             public void failure(IError iError) {
                 LogUtils.LOGE(TAG, "query first record time error:" + iError.toString());
+                if (onReady != null) {
+                    onReady.success(null);
+                }
             }
         });
     }
 
+    private void ensureInitThen(Runnable action) {
+        if (mInitialized) {
+            action.run();
+        } else {
+            mPendingRefresh = action;
+        }
+    }
+
     private void clearData() {
-        mDailyExpenseList.clear();
-        mDailyIncomeList.clear();
-        mMonthlyExpenseList.clear();
-        mMonthlyIncomeList.clear();
-        mCategoryDailyExpenseList.clear();
-        mCategoryDailyIncomeList.clear();
-        mCategoryYearlyExpenseList.clear();
-        mCategoryYearlyIncomeList.clear();
+        synchronized (mQueryLock) {
+            mDailyExpenseList.clear();
+            mDailyIncomeList.clear();
+            mMonthlyExpenseList.clear();
+            mMonthlyIncomeList.clear();
+            mCategoryDailyExpenseList.clear();
+            mCategoryDailyIncomeList.clear();
+            mCategoryYearlyExpenseList.clear();
+            mCategoryYearlyIncomeList.clear();
+        }
 
         mObservableMonthlyDataList.setValue(null);
         mObservableDailyExpenseList.setValue(null);
@@ -299,6 +320,9 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
     }
 
     private void refreshData() {
+        synchronized (mQueryLock) {
+            mRefreshGeneration++;
+        }
         boolean isDisplayAsDaily = mDisplayDailyChart.get();
         boolean isDisplayExpense = mDisplayExpenseChart.get();
 
@@ -366,6 +390,7 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
         long startTime = mStartDate.getTimeInMillis();
         long endTime = mEndDate.getTimeInMillis();
 
+        final int gen = mRefreshGeneration;
         int queryModuleCount = 4;
         AtomicInteger queryCount = new AtomicInteger(0);
 
@@ -378,19 +403,28 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
             mRepository.queryDailyExpense(startTime, endTime, new Callback<List<DailyData>, IError>() {
                 @Override
                 public void success(List<DailyData> dailyDataList) {
-                    dailyDataList = completeEmptyDailyData(startTime, endTime, dailyDataList);
-                    mDailyExpenseList.clear();
-                    mDailyExpenseList.addAll(dailyDataList);
-
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        dailyDataList = completeEmptyDailyData(startTime, endTime, dailyDataList);
+                        mDailyExpenseList.clear();
+                        mDailyExpenseList.addAll(dailyDataList);
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
 
                 @Override
                 public void failure(IError iError) {
-                    mDailyExpenseList.clear();
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mDailyExpenseList.clear();
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
@@ -406,18 +440,28 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
             mRepository.queryDailyIncome(startTime, endTime, new Callback<List<DailyData>, IError>() {
                 @Override
                 public void success(List<DailyData> dailyDataList) {
-                    dailyDataList = completeEmptyDailyData(startTime, endTime, dailyDataList);
-                    mDailyIncomeList.clear();
-                    mDailyIncomeList.addAll(dailyDataList);
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        dailyDataList = completeEmptyDailyData(startTime, endTime, dailyDataList);
+                        mDailyIncomeList.clear();
+                        mDailyIncomeList.addAll(dailyDataList);
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
 
                 @Override
                 public void failure(IError iError) {
-                    mDailyIncomeList.clear();
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mDailyIncomeList.clear();
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
@@ -433,19 +477,29 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
             mRepository.queryCategoryExpense(startTime, endTime, new Callback<List<CategoryData>, IError>() {
                 @Override
                 public void success(List<CategoryData> categoryData) {
-                    mCategoryDailyExpenseList.clear();
-                    if (categoryData != null) {
-                        mCategoryDailyExpenseList.addAll(categoryData);
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mCategoryDailyExpenseList.clear();
+                        if (categoryData != null) {
+                            mCategoryDailyExpenseList.addAll(categoryData);
+                        }
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
                     }
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
 
                 @Override
                 public void failure(IError iError) {
-                    mCategoryDailyExpenseList.clear();
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mCategoryDailyExpenseList.clear();
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
@@ -461,19 +515,29 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
             mRepository.queryCategoryIncome(startTime, endTime, new Callback<List<CategoryData>, IError>() {
                 @Override
                 public void success(List<CategoryData> categoryData) {
-                    mCategoryDailyIncomeList.clear();
-                    if (categoryData != null) {
-                        mCategoryDailyIncomeList.addAll(categoryData);
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mCategoryDailyIncomeList.clear();
+                        if (categoryData != null) {
+                            mCategoryDailyIncomeList.addAll(categoryData);
+                        }
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
                     }
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
 
                 @Override
                 public void failure(IError iError) {
-                    mCategoryDailyIncomeList.clear();
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mCategoryDailyIncomeList.clear();
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
@@ -489,6 +553,7 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
         long startTime = yearDateRange.first;
         long endTime = yearDateRange.second;
 
+        final int gen = mRefreshGeneration;
         int queryModuleCount = 4;
         AtomicInteger queryCount = new AtomicInteger(0);
 
@@ -501,11 +566,15 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
             mRepository.queryMonthlyExpense(startTime, endTime, new Callback<List<MonthlyData>, IError>() {
                 @Override
                 public void success(List<MonthlyData> list) {
-                    // 补全空数据
-                    list = completeEmptyMonthlyData(startTime, endTime, list);
-                    mMonthlyExpenseList.clear();
-                    mMonthlyExpenseList.addAll(list);
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        list = completeEmptyMonthlyData(startTime, endTime, list);
+                        mMonthlyExpenseList.clear();
+                        mMonthlyExpenseList.addAll(list);
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
@@ -528,11 +597,15 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
             mRepository.queryMonthlyIncome(startTime, endTime, new Callback<List<MonthlyData>, IError>() {
                 @Override
                 public void success(List<MonthlyData> list) {
-                    // 补全空数据
-                    list = completeEmptyMonthlyData(startTime, endTime, list);
-                    mMonthlyIncomeList.clear();
-                    mMonthlyIncomeList.addAll(list);
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        list = completeEmptyMonthlyData(startTime, endTime, list);
+                        mMonthlyIncomeList.clear();
+                        mMonthlyIncomeList.addAll(list);
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
@@ -555,19 +628,29 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
             mRepository.queryCategoryExpense(startTime, endTime, new Callback<List<CategoryData>, IError>() {
                 @Override
                 public void success(List<CategoryData> categoryData) {
-                    mCategoryYearlyExpenseList.clear();
-                    if (categoryData != null) {
-                        mCategoryYearlyExpenseList.addAll(categoryData);
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mCategoryYearlyExpenseList.clear();
+                        if (categoryData != null) {
+                            mCategoryYearlyExpenseList.addAll(categoryData);
+                        }
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
                     }
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
 
                 @Override
                 public void failure(IError iError) {
-                    mCategoryYearlyExpenseList.clear();
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mCategoryYearlyExpenseList.clear();
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
@@ -583,19 +666,29 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
             mRepository.queryCategoryIncome(startTime, endTime, new Callback<List<CategoryData>, IError>() {
                 @Override
                 public void success(List<CategoryData> categoryData) {
-                    mCategoryYearlyIncomeList.clear();
-                    if (categoryData != null) {
-                        mCategoryYearlyIncomeList.addAll(categoryData);
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mCategoryYearlyIncomeList.clear();
+                        if (categoryData != null) {
+                            mCategoryYearlyIncomeList.addAll(categoryData);
+                        }
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
                     }
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
 
                 @Override
                 public void failure(IError iError) {
-                    mCategoryYearlyIncomeList.clear();
-                    if (queryCount.incrementAndGet() == queryModuleCount) {
+                    boolean shouldFireCallback;
+                    synchronized (mQueryLock) {
+                        if (gen != mRefreshGeneration) return;
+                        mCategoryYearlyIncomeList.clear();
+                        shouldFireCallback = queryCount.incrementAndGet() == queryModuleCount;
+                    }
+                    if (shouldFireCallback) {
                         callback.success(null);
                     }
                 }
@@ -796,8 +889,14 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
         mStartDate.setTimeInMillis(currentMonthRange.first);
         mEndDate.setTimeInMillis(currentMonthRange.second);
 
-        // 初始化数据
-        init();
-        refreshData();
+        // 初始化数据，等待 init 完成后再刷新，避免竞争条件
+        init(v -> {
+            mInitialized = true;
+            if (mPendingRefresh != null) {
+                mPendingRefresh.run();
+                mPendingRefresh = null;
+            }
+            refreshData();
+        });
     }
 }

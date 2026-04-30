@@ -1,11 +1,11 @@
 package com.coderpage.mine.ui;
 
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.ColorRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 
 import com.coderpage.base.utils.FunctionUtils;
@@ -54,6 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void setToolbarAsBack(View.OnClickListener clickListener) {
         getToolbar();
+        if (mToolbar == null) return;
 
         mToolbar.setNavigationIcon(R.drawable.ic_back);
         mToolbar.setNavigationOnClickListener(clickListener);
@@ -61,6 +62,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void setToolbarAsClose(View.OnClickListener clickListener) {
         getToolbar();
+        if (mToolbar == null) return;
 
         mToolbar.setNavigationIcon(R.drawable.ic_close);
         mToolbar.setNavigationOnClickListener(clickListener);

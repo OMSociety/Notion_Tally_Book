@@ -2,7 +2,7 @@ package com.coderpage.base.utils;
 
 import android.app.Activity;
 import android.os.Build;
-import android.support.annotation.ColorRes;
+import androidx.annotation.ColorRes;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;

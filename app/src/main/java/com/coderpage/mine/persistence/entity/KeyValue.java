@@ -1,10 +1,10 @@
 package com.coderpage.mine.persistence.entity;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 /**
  * @author lc. 2019-03-30 08:50
@@ -14,7 +14,7 @@ import android.support.annotation.NonNull;
  */
 
 @Keep
-@Entity(tableName = "key_value", indices = {@Index("key")}, primaryKeys = {"key"})
+@Entity(tableName = "key_value", primaryKeys = {"key"})
 public class KeyValue {
 
     @NonNull

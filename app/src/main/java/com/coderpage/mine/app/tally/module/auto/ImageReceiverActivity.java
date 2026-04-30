@@ -1,7 +1,5 @@
 package com.coderpage.mine.app.tally.module.auto;
 
-import static java.lang.Math.abs;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,7 +11,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
@@ -62,11 +60,10 @@ public class ImageReceiverActivity extends AppCompatActivity {
                     processAndPrintImage(imageUri);
                 } catch (Exception e) {
                     Log.e(TAG, "处理图片时出错", e);
-                    throw new RuntimeException(e);
+                    Toast.makeText(this, "处理图片时出错: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         }
-        finish();
     }
 
     private void processAndPrintImage(Uri imageUri) throws Exception {
@@ -91,6 +88,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
 
         // 异步调用
         ExecutorService executor = Executors.newSingleThreadExecutor();
+        final ExecutorService finalExecutor = executor;
         executor.execute(() -> {
             try {
                 RecognitionResult result = recognizer.recognize(base64Image);
@@ -109,6 +107,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
                 String content = "错误: " + e.getMessage();
                 sendNotification(context, title, content);
             } finally {
+                finalExecutor.shutdown();
                 runOnUiThread(() -> finish());
             }
         });
@@ -117,23 +116,27 @@ public class ImageReceiverActivity extends AppCompatActivity {
     // 将Uri转换为Base64编码
     private String uriToBase64(Uri uri) {
         try {
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-
             // 先解码图片尺寸，不加载到内存中
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(inputStream, null, options);
-
-            inputStream.close();
-            inputStream = getContentResolver().openInputStream(uri);
+            try (InputStream is1 = getContentResolver().openInputStream(uri)) {
+                BitmapFactory.decodeStream(is1, null, options);
+            }
 
             // 设置缩放比例为3（缩小一半）
             options.inJustDecodeBounds = false;
             options.inSampleSize = 3;
 
             // 解码图片并缩放
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
-            inputStream.close();
+            Bitmap bitmap = null;
+            try (InputStream is2 = getContentResolver().openInputStream(uri)) {
+                bitmap = BitmapFactory.decodeStream(is2, null, options);
+            }
+
+            if (bitmap == null) {
+                Log.e(TAG, "图片解码失败");
+                return null;
+            }
 
             // 将Bitmap转换为Base64
             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
@@ -186,7 +189,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
         record.setType(type == RecordType.EXPENSE ? Record.TYPE_EXPENSE : Record.TYPE_INCOME);
 
         record.setSyncId(AndroidUtils.generateUUID());
-        record.setAmount(abs(result.amount));
+        record.setAmount(Math.abs(result.amount));
         record.setTime(System.currentTimeMillis());
         record.setDesc("AI 识别记账");
 
@@ -205,7 +208,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
                 String title = "AI 自动记账成功:";
                 String content = (type == RecordType.EXPENSE ? "支出" : "收入") + Math.abs(result.amount) + "元";
                 runOnUiThread(() -> {
-                    Toast.makeText(this, title + content, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MineApp.getAppContext(), title + content, Toast.LENGTH_LONG).show();
                 });
             } else {
                 Log.e(TAG, "记录保存失败: " + result1.error());

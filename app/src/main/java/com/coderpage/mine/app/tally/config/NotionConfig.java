@@ -42,14 +42,27 @@ public class NotionConfig {
     
     // Integration Token
     public void setIntegrationToken(String token) {
+        // 加密失败会抛出 RuntimeException，不会将明文写入存储
+        String encrypted = SensitiveDataCipher.encrypt(appContext, token);
         prefs.edit()
-                .putString(KEY_INTEGRATION_TOKEN, SensitiveDataCipher.encrypt(appContext, token))
+                .putString(KEY_INTEGRATION_TOKEN, encrypted)
                 .apply();
     }
     
     public String getIntegrationToken() {
-        return SensitiveDataCipher.decrypt(
-                appContext, prefs.getString(KEY_INTEGRATION_TOKEN, ""));
+        String stored = prefs.getString(KEY_INTEGRATION_TOKEN, "");
+        String decrypted = "";
+        try {
+            decrypted = SensitiveDataCipher.decrypt(appContext, stored);
+        } catch (SensitiveDataCipher.CipherException e) {
+            android.util.Log.e("NotionConfig", "Failed to decrypt integration token", e);
+        }
+        if (!stored.isEmpty() && stored.startsWith("enc:") && decrypted.isEmpty()) {
+            throw new SecurityException("Failed to decrypt integration token. " +
+                    "The token was encrypted but cannot be decrypted — " +
+                    "this typically happens after app reinstallation or data migration.");
+        }
+        return decrypted;
     }
     
     public boolean hasIntegrationToken() {

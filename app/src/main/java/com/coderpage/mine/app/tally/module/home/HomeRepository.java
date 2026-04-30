@@ -1,8 +1,10 @@
 package com.coderpage.mine.app.tally.module.home;
 
+import androidx.annotation.Nullable;
 import android.util.Pair;
 
 import com.coderpage.base.common.IError;
+import com.coderpage.base.common.NonThrowError;
 import com.coderpage.base.common.Result;
 import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.concurrency.MineExecutors;
@@ -15,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author lc. 2018-07-08 15:25
@@ -23,90 +26,71 @@ import java.util.Map;
 
 class HomeRepository {
 
-    /** 近3日账单数量 */
-    private int mRecent3DayRecordCount;
-    /** 今日消费总额 */
-    private double mTodayExpenseTotalAmount;
-    /** 今日收入总额 */
-    private double mTodayIncomeTotalAmount;
-    /** 本月消费总额 */
-    private double mCurrentMonthExpenseTotalAmount;
-    /** 本月收入总额 */
-    private double mCurrentMonthIncomeTotalAmount;
-    /** 本月各个分类消费数据 */
-    private List<Pair<String, Double>> mCategoryExpenseTotal = new ArrayList<>();
-    /** 近3日账单记录 */
-    private List<Record> mRecent3DayRecordList = new ArrayList<>();
-    /** 今日账单记录 */
-    private List<Record> mTodayRecordList = new ArrayList<>();
+    static class Snapshot {
+        final int recent3DayRecordCount;
+        final double todayExpenseTotalAmount;
+        final double todayIncomeTotalAmount;
+        final double currentMonthExpenseTotalAmount;
+        final double currentMonthIncomeTotalAmount;
+        final List<Pair<String, Double>> categoryExpenseTotal;
+        final List<Record> recent3DayRecordList;
+        final List<Record> todayRecordList;
 
-    public int getRecent3DayRecordCount() {
-        return mRecent3DayRecordCount;
+        Snapshot(int recent3DayRecordCount,
+                 double todayExpenseTotalAmount,
+                 double todayIncomeTotalAmount,
+                 double currentMonthExpenseTotalAmount,
+                 double currentMonthIncomeTotalAmount,
+                 List<Pair<String, Double>> categoryExpenseTotal,
+                 List<Record> recent3DayRecordList,
+                 List<Record> todayRecordList) {
+            this.recent3DayRecordCount = recent3DayRecordCount;
+            this.todayExpenseTotalAmount = todayExpenseTotalAmount;
+            this.todayIncomeTotalAmount = todayIncomeTotalAmount;
+            this.currentMonthExpenseTotalAmount = currentMonthExpenseTotalAmount;
+            this.currentMonthIncomeTotalAmount = currentMonthIncomeTotalAmount;
+            this.categoryExpenseTotal = Collections.unmodifiableList(categoryExpenseTotal);
+            this.recent3DayRecordList = Collections.unmodifiableList(recent3DayRecordList);
+            this.todayRecordList = Collections.unmodifiableList(todayRecordList);
+        }
     }
 
-    double getTodayExpenseTotalAmount() {
-        return mTodayExpenseTotalAmount;
-    }
+    private final AtomicReference<Snapshot> mLatestSnapshot = new AtomicReference<>();
+    private final Object mSnapshotLock = new Object();
 
-    double getTodayIncomeTotalAmount() {
-        return mTodayIncomeTotalAmount;
-    }
-
-    double getCurrentMonthExpenseTotalAmount() {
-        return mCurrentMonthExpenseTotalAmount;
-    }
-
-    double getCurrentMonthIncomeTotalAmount() {
-        return mCurrentMonthIncomeTotalAmount;
-    }
-
-    List<Pair<String, Double>> getCategoryExpenseTotal() {
-        return mCategoryExpenseTotal;
-    }
-
-    List<Record> getRecent3DayRecordList() {
-        return mRecent3DayRecordList;
-    }
-
-    List<Record> getTodayRecordList() {
-        return mTodayRecordList;
+    @Nullable
+    Snapshot getLatestSnapshot() {
+        synchronized (mSnapshotLock) {
+            return mLatestSnapshot.get();
+        }
     }
 
     /** 读取本月消费数据 */
-    void loadCurrentMonthExpenseData(SimpleCallback<Result<Boolean, IError>> callback) {
+    void loadCurrentMonthExpenseData(SimpleCallback<Result<Snapshot, IError>> callback) {
         MineExecutors.ioExecutor().execute(() -> {
-            // 近3日账单数量
-            int recent3DayRecordCount = 0;
-            // 今日开始时间&结束时间
+            try {
             long todayStartTime = DateUtils.todayStartUnixTime();
             long todayEndTime = DateUtils.todayEndUnixTime();
-            // 前天开始时间
             long day3AgoStartTime = todayStartTime - (1000 * 60 * 60 * 24 * 2);
-            // 本月开始时间&结束时间
             long monthStartTime = DateUtils.currentMonthStartUnixTime();
             long monthEndTime = System.currentTimeMillis();
-            // 月消费总额
+
+            int recent3DayRecordCount = 0;
             double monthExpenseTotalAmount = 0;
-            // 月收入总额
             double monthIncomeTotalAmount = 0;
-            // 今日消费金额
             double todayExpenseTotalAmount = 0;
-            // 今日收入金额
             double todayIncomeTotalAmount = 0;
 
-            // 近3日账单记录
             List<Record> recent3DayList = new ArrayList<>();
-            // 今日账单记录
             List<Record> todayRecordList = new ArrayList<>();
             Map<String, Double> getAmountByCategoryName = new HashMap<>();
-            // 本月消费记录列表
+
             List<Record> currentMonthList =
                     TallyDatabase.getInstance().recordDao().queryAll(monthStartTime, monthEndTime, Integer.MAX_VALUE, 0);
             for (Record record : currentMonthList) {
                 boolean isTodayRecord = record.getTime() >= todayStartTime && record.getTime() < todayEndTime;
                 boolean isRecent3DayRecord = record.getTime() >= day3AgoStartTime && record.getTime() < todayEndTime;
 
-                // 今日消费
                 if (isTodayRecord) {
                     if (record.getType() == Record.TYPE_EXPENSE) {
                         todayExpenseTotalAmount += record.getAmount();
@@ -117,13 +101,11 @@ class HomeRepository {
                     todayRecordList.add(record);
                 }
 
-                // 近3日账单数据
                 if (isRecent3DayRecord) {
                     recent3DayRecordCount++;
                     recent3DayList.add(record);
                 }
 
-                // 本月账单总额
                 if (record.getType() == Record.TYPE_EXPENSE) {
                     monthExpenseTotalAmount += record.getAmount();
                 }
@@ -131,7 +113,6 @@ class HomeRepository {
                     monthIncomeTotalAmount += record.getAmount();
                 }
 
-                // 统计分类消费记录
                 if (record.getType() == Record.TYPE_EXPENSE) {
                     Double categoryAmountTotal = getAmountByCategoryName.get(record.getCategoryName());
                     if (categoryAmountTotal == null) {
@@ -141,16 +122,6 @@ class HomeRepository {
                     getAmountByCategoryName.put(record.getCategoryName(), categoryAmountTotal);
                 }
             }
-
-            mRecent3DayRecordCount = recent3DayRecordCount;
-            mTodayExpenseTotalAmount = todayExpenseTotalAmount;
-            mTodayIncomeTotalAmount = todayIncomeTotalAmount;
-            mCurrentMonthExpenseTotalAmount = monthExpenseTotalAmount;
-            mCurrentMonthIncomeTotalAmount = monthIncomeTotalAmount;
-            mRecent3DayRecordList.clear();
-            mRecent3DayRecordList.addAll(recent3DayList);
-            mTodayRecordList.clear();
-            mTodayRecordList.addAll(todayRecordList);
 
             List<Pair<String, Double>> categoryExpenseTotal = new ArrayList<>(getAmountByCategoryName.size());
             for (Map.Entry<String, Double> entry : getAmountByCategoryName.entrySet()) {
@@ -164,12 +135,29 @@ class HomeRepository {
                 }
                 return v1 > v2 ? -1 : 1;
             });
-            mCategoryExpenseTotal.clear();
-            mCategoryExpenseTotal.addAll(categoryExpenseTotal);
 
-            Result<Boolean, IError> result = new Result<>();
-            result.setData(true);
+            Snapshot snapshot = new Snapshot(
+                    recent3DayRecordCount,
+                    todayExpenseTotalAmount,
+                    todayIncomeTotalAmount,
+                    monthExpenseTotalAmount,
+                    monthIncomeTotalAmount,
+                    categoryExpenseTotal,
+                    recent3DayList,
+                    todayRecordList);
+
+            synchronized (mSnapshotLock) {
+                mLatestSnapshot.set(snapshot);
+            }
+
+            Result<Snapshot, IError> result = new Result<>();
+            result.setData(snapshot);
             MineExecutors.executeOnUiThread(() -> callback.success(result));
+            } catch (Exception e) {
+                Result<Snapshot, IError> errorResult = new Result<>();
+                errorResult.setError(new NonThrowError(e.getMessage()));
+                MineExecutors.executeOnUiThread(() -> callback.success(errorResult));
+            }
         });
     }
 }

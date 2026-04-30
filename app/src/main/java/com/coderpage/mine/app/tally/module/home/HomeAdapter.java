@@ -1,11 +1,11 @@
 package com.coderpage.mine.app.tally.module.home;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -14,6 +14,7 @@ import com.coderpage.mine.app.tally.module.home.model.HomeDisplayData;
 import com.coderpage.mine.app.tally.module.records.RecordItemViewModel;
 import com.coderpage.mine.app.tally.persistence.model.Record;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ import java.util.List;
 
 class HomeAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
-    private Activity mActivity;
+    private WeakReference<Activity> mActivityRef;
     private HomeViewModel mViewModel;
     private HomeMonthInfoViewModel mMonthInfoViewModel;
     private RecordItemViewModel mRecordItemViewModel;
@@ -32,11 +33,21 @@ class HomeAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private List<HomeDisplayData> mDataList = new ArrayList<>();
 
     HomeAdapter(FragmentActivity activity, HomeViewModel viewModel, RecordItemViewModel recordItemViewModel) {
-        mActivity = activity;
+        mActivityRef = new WeakReference<>(activity);
         mViewModel = viewModel;
         mMonthInfoViewModel = ViewModelProviders.of(activity).get(HomeMonthInfoViewModel.class);
         mRecordItemViewModel = recordItemViewModel;
-        mInflater = LayoutInflater.from(mActivity);
+        mInflater = LayoutInflater.from(activity);
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        mActivityRef = null;
+        mViewModel = null;
+        mMonthInfoViewModel = null;
+        mRecordItemViewModel = null;
+        mInflater = null;
     }
 
     void setDataList(List<HomeDisplayData> dataList) {
@@ -59,6 +70,10 @@ class HomeAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 HomeDisplayData oldData = mDataList.get(oldItemPosition);
                 HomeDisplayData newData = dataList.get(newItemPosition);
 
+                if (oldData == null || newData == null) {
+                    return oldData == newData;
+                }
+
                 if (oldData.getType() != newData.getType()) {
                     return false;
                 }
@@ -69,6 +84,10 @@ class HomeAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                         return true;
 
                     case HomeDisplayData.TYPE_RECORD_ITEM:
+                        if (!(oldData.getInternal() instanceof Record)
+                                || !(newData.getInternal() instanceof Record)) {
+                            return false;
+                        }
                         Record oldRecord = (Record) oldData.getInternal();
                         Record newRecord = (Record) newData.getInternal();
                         return oldRecord.getId() == newRecord.getId();
@@ -101,22 +120,26 @@ class HomeAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Activity activity = mActivityRef != null ? mActivityRef.get() : null;
+        if (activity == null) {
+            throw new IllegalStateException("Activity has been garbage collected");
+        }
 
         switch (viewType) {
 
             // 月消费、月收入信息模块
             case HomeDisplayData.TYPE_MONTH_INFO:
-                return new ViewHolderMonthInfo(mActivity, mMonthInfoViewModel,
+                return new ViewHolderMonthInfo(activity, mMonthInfoViewModel,
                         DataBindingUtil.inflate(mInflater, R.layout.tally_module_home_item_month_info, parent, false));
 
             // 今日账单数据
             case HomeDisplayData.TYPE_RECENT_DAY_INFO:
-                return new ViewHolderTodayExpense(mActivity, mViewModel,
+                return new ViewHolderTodayExpense(activity, mViewModel,
                         DataBindingUtil.inflate(mInflater, R.layout.tally_module_home_item_today_expense, parent, false));
 
             // 消费记录&支出记录 ITEM
             case HomeDisplayData.TYPE_RECORD_ITEM:
-                return new ViewHolderRecordItem(mActivity, mRecordItemViewModel, DataBindingUtil.inflate(
+                return new ViewHolderRecordItem(activity, mRecordItemViewModel, DataBindingUtil.inflate(
                         mInflater, R.layout.tally_item_record_common, parent, false));
 
             // 底部 View
@@ -124,7 +147,7 @@ class HomeAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 return new ViewHolderBottom(mInflater.inflate(R.layout.tally_module_home_item_bottom, parent, false));
 
             default:
-                return null;
+                throw new IllegalArgumentException("Unknown viewType: " + viewType);
         }
     }
 

@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
 import com.coderpage.base.common.NonThrowError;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.utils.ArrayUtils;
 import com.coderpage.base.utils.CommonUtils;
 import com.coderpage.base.utils.LogUtils;
@@ -39,6 +40,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.math.BigDecimal;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -164,38 +166,24 @@ public class Backup {
                 return;
             }
 
-            FileInputStream fis;
-            try {
-                fis = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                LOGE(TAG, "File not found", e);
-                listener.failure(new NonThrowError(ErrorCode.ILLEGAL_ARGS, "File not found"));
-                return;
-            }
-
-            InputStreamReader inputStreamReader = null;
-            BufferedReader bufferedReader = null;
             String sourceString = null;
-            try {
-                inputStreamReader = new InputStreamReader(fis);
-                bufferedReader = new BufferedReader(inputStreamReader);
+            try (FileInputStream fis = new FileInputStream(file);
+                 InputStreamReader inputStreamReader = new InputStreamReader(fis);
+                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
                 String line;
                 StringBuilder sourceBuilder = new StringBuilder();
                 while ((line = bufferedReader.readLine()) != null) {
                     sourceBuilder.append(line);
                 }
                 sourceString = sourceBuilder.toString();
+            } catch (FileNotFoundException e) {
+                LOGE(TAG, "File not found", e);
+                listener.failure(new NonThrowError(ErrorCode.ILLEGAL_ARGS, "File not found"));
+                return;
             } catch (IOException e) {
                 LOGE(TAG, "IO Err", e);
                 listener.failure(new NonThrowError(ErrorCode.INTERNAL_ERR, "File io err"));
                 return;
-            } finally {
-                try {
-                    bufferedReader.close();
-                    inputStreamReader.close();
-                } catch (IOException e) {
-                    // no-op
-                }
             }
 
             listener.onProgressUpdate(RestoreProgress.CHECK_FILE_FORMAT);
@@ -229,6 +217,7 @@ public class Backup {
                 boolean restoreCategoryOk = restoreCategoryTable(metadata, categoryList);
                 if (!restoreCategoryOk) {
                     listener.failure(new NonThrowError(ErrorCode.SQL_ERR, "恢复分类数据失败"));
+                    return;
                 }
             }
 
@@ -238,6 +227,7 @@ public class Backup {
                 boolean restoreExpenseOk = restoreExpenseTable(metadata, expenseList);
                 if (!restoreExpenseOk) {
                     listener.failure(new NonThrowError(ErrorCode.SQL_ERR, "恢复消费数据失败"));
+                    return;
                 }
             }
 
@@ -317,7 +307,7 @@ public class Backup {
 
             RecordEntity entity = new RecordEntity();
             entity.setAccountId(backupExpense.getAccountId());
-            entity.setAmount(backupExpense.getAmount());
+            entity.setAmount(BigDecimal.valueOf(backupExpense.getAmount()));
             entity.setTime(backupExpense.getTime());
             entity.setCategoryUniqueName(backupExpense.getCategoryUniqueName());
             entity.setDesc(backupExpense.getDesc());
@@ -361,10 +351,14 @@ public class Backup {
             // 0.6.0 版本之前，不支持收入类型的记录，不支持修改分类名称
             // 可以通过"分类名称"来获取对应的 categoryUniqueName
             String categoryUniqueName = getCategoryUniqueNameByName.get(backupExpense.getCategory());
+            if (categoryUniqueName == null || categoryUniqueName.isEmpty()) {
+                categoryUniqueName = backupExpense.getCategory() != null
+                        ? backupExpense.getCategory() : "";
+            }
 
             RecordEntity entity = new RecordEntity();
             entity.setAccountId(backupExpense.getAccountId());
-            entity.setAmount(backupExpense.getAmount());
+            entity.setAmount(BigDecimal.valueOf(backupExpense.getAmount()));
             entity.setTime(backupExpense.getTime());
             entity.setCategoryUniqueName(categoryUniqueName);
             entity.setDesc(backupExpense.getDesc());
@@ -451,13 +445,29 @@ public class Backup {
      * @param formatId 格式ID
      */
     public void performExport(Long startDate, Long endDate, String folder, int formatId) {
+        performExport(startDate, endDate, folder, formatId, null);
+    }
+
+    /**
+     * 执行实际的数据导出操作
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @param folder 导出文件夹路径
+     * @param formatId 格式ID
+     * @param onComplete 导出完成回调（在后台线程调用）
+     */
+    public void performExport(Long startDate, Long endDate, String folder, int formatId,
+                              SimpleCallback<Void> onComplete) {
         TallyDatabase database = TallyDatabase.getInstance();
         AsyncTaskExecutor.execute(() -> {
 
             //查询数据
             List<Record> records = database.recordDao().queryAllBetweenTimeTimeDesc(startDate, endDate);
             if (records == null || records.size() == 0) {
-                exportTips(MineApp.getAppContext(), "导出失败: 没有查询到账单记录");
+                String err = "导出失败: 没有查询到账单记录";
+                exportTips(MineApp.getAppContext(), err);
+                if (onComplete != null) onComplete.failure(
+                        new NonThrowError(ErrorCode.ILLEGAL_ARGS, err));
                 return;
             }
 
@@ -472,18 +482,28 @@ public class Backup {
                     file.createNewFile();
                 }
             } catch (IOException e) {
-                //提示用户创建文件报错
                 e.printStackTrace();
+                if (onComplete != null) onComplete.failure(
+                        new NonThrowError(ErrorCode.UNKNOWN, "创建文件失败: " + e.getMessage()));
                 return;
             }
 
             //写出数据
+            boolean writeOk;
             if (formatId == R.id.rbCsv) {
-                writeCsvFile(file, records);
+                writeOk = writeCsvFile(file, records);
             } else {
-                writeExcelFile(file, records);
+                writeOk = writeExcelFile(file, records);
+            }
+            if (!writeOk) {
+                String err = "导出失败: 文件写入错误";
+                exportTips(MineApp.getAppContext(), err);
+                if (onComplete != null) onComplete.failure(
+                        new NonThrowError(ErrorCode.UNKNOWN, err));
+                return;
             }
             exportTips(MineApp.getAppContext(), "导出成功");
+            if (onComplete != null) onComplete.success(null);
         });
     }
 
@@ -491,10 +511,10 @@ public class Backup {
      * 将记录写入CSV文件
      * @param file 目标文件
      * @param records 记录列表
+     * @return 写入是否成功
      */
-    private void writeCsvFile(File file, List<Record> records) {
-        try {
-            java.io.FileWriter fileWriter = new java.io.FileWriter(file);
+    private boolean writeCsvFile(File file, List<Record> records) {
+        try (java.io.FileWriter fileWriter = new java.io.FileWriter(file)) {
             // UTF-8 BOM，确保 Excel 正确识别中文
             fileWriter.append("\uFEFF");
             // 写入CSV头部
@@ -509,13 +529,13 @@ public class Backup {
                 // 获取类型文本
                 String type = record.getType() == Record.TYPE_EXPENSE ? "支出" : "收入";
 
-                // 写入一行数据
+                // 写入一行数据（对分类和备注做 CSV 注入防护）
                 fileWriter.append("\"")
                         .append(time)
                         .append("\"")
                         .append(",")
                         .append("\"")
-                        .append(record.getCategoryName() != null ? record.getCategoryName() : "")
+                        .append(sanitizeCsvField(record.getCategoryName()))
                         .append("\"")
                         .append(",")
                         .append("\"")
@@ -527,24 +547,40 @@ public class Backup {
                         .append("\"")
                         .append(",")
                         .append("\"")
-                        .append(record.getDesc() != null ? record.getDesc() : "")
+                        .append(sanitizeCsvField(record.getDesc()))
                         .append("\"")
                         .append("\n");
             }
 
             fileWriter.flush();
-            fileWriter.close();
+            return true;
         } catch (IOException e) {
             if (file.exists()) {
                 file.delete();
             }
+            return false;
         }
     }
 
-    private void writeExcelFile(File file, List<Record> records) {
-        try {
-            // 创建工作簿
-            Workbook workbook = new HSSFWorkbook();
+    /**
+     * 防止 CSV 注入：如果字段以 =、+、-、@ 开头（可能被 Excel 解释为公式），
+     * 在前面加单引号强制作为文本处理。
+     */
+    private static String sanitizeCsvField(String value) {
+        if (value == null || value.isEmpty()) {
+            return "";
+        }
+        // 转义双引号，防止 CSV 字段逃逸
+        String escaped = value.replace("\"", "\"\"");
+        char first = escaped.charAt(0);
+        if (first == '=' || first == '+' || first == '-' || first == '@') {
+            return "'" + escaped;
+        }
+        return escaped;
+    }
+
+    private boolean writeExcelFile(File file, List<Record> records) {
+        try (Workbook workbook = new HSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("账单明细");
 
             // 创建标题行（不使用CellStyle避免AWT依赖）
@@ -586,14 +622,15 @@ public class Backup {
             }
 
             // 写入文件
-            java.io.FileOutputStream fileOut = new java.io.FileOutputStream(file);
-            workbook.write(fileOut);
-            fileOut.close();
-            workbook.close();
+            try (java.io.FileOutputStream fileOut = new java.io.FileOutputStream(file)) {
+                workbook.write(fileOut);
+            }
+            return true;
         } catch (Exception e) {
             if (file.exists()) {
                 file.delete();
             }
+            return false;
         }
     }
     private void exportTips(Context context, String msg){

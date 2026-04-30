@@ -2,17 +2,15 @@ package com.coderpage.mine.app.tally.module.home;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.OnLifecycleEvent;
 import android.databinding.ObservableField;
-import android.support.v4.app.FragmentActivity;
-import android.util.Pair;
-
+import androidx.fragment.app.FragmentActivity;
 import com.coderpage.mine.app.tally.eventbus.EventRecordAdd;
 import com.coderpage.mine.app.tally.eventbus.EventRecordDelete;
 import com.coderpage.mine.app.tally.eventbus.EventRecordUpdate;
@@ -96,33 +94,27 @@ public class HomeViewModel extends AndroidViewModel implements LifecycleObserver
         if (mRefreshing.getValue() != null && mRefreshing.getValue()) {
             return;
         }
+        mRefreshing.setValue(true);
         mRepository.loadCurrentMonthExpenseData(result -> {
             mRefreshing.setValue(false);
             if (result.isOk()) {
-                int recent3DayRecordCount = mRepository.getRecent3DayRecordCount();
-                double monthExpenseTotalAmount = mRepository.getCurrentMonthExpenseTotalAmount();
-                double monthIncomeTotalAmount = mRepository.getCurrentMonthIncomeTotalAmount();
-                double todayExpenseTotalAmount = mRepository.getTodayExpenseTotalAmount();
-                double todayIncomeTotalAmount = mRepository.getTodayIncomeTotalAmount();
-
-                List<Pair<String, Double>> categoryExpenseTotal = mRepository.getCategoryExpenseTotal();
-                List<Record> todayRecordList = mRepository.getTodayRecordList();
+                HomeRepository.Snapshot snapshot = result.getData();
 
                 HomeMonthModel monthModel = new HomeMonthModel();
-                monthModel.setMonthExpenseAmount(monthExpenseTotalAmount);
-                monthModel.setMonthIncomeAmount(monthIncomeTotalAmount);
-                monthModel.setMonthCategoryExpenseData(categoryExpenseTotal);
+                monthModel.setMonthExpenseAmount(snapshot.currentMonthExpenseTotalAmount);
+                monthModel.setMonthIncomeAmount(snapshot.currentMonthIncomeTotalAmount);
+                monthModel.setMonthCategoryExpenseData(snapshot.categoryExpenseTotal);
 
                 HomeTodayDayRecordsModel todayRecordsModel = new HomeTodayDayRecordsModel();
-                todayRecordsModel.setToadyExpenseAmount(todayExpenseTotalAmount);
-                todayRecordsModel.setTodayIncomeAmount(todayIncomeTotalAmount);
-                todayRecordsModel.setRecent3DayRecordsCount(recent3DayRecordCount);
+                todayRecordsModel.setToadyExpenseAmount(snapshot.todayExpenseTotalAmount);
+                todayRecordsModel.setTodayIncomeAmount(snapshot.todayIncomeTotalAmount);
+                todayRecordsModel.setRecent3DayRecordsCount(snapshot.recent3DayRecordCount);
 
                 List<HomeDisplayData> dataList = new ArrayList<>();
                 dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_MONTH_INFO, monthModel));
                 dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_RECENT_DAY_INFO, todayRecordsModel));
 
-                for (Record record : todayRecordList) {
+                for (Record record : snapshot.todayRecordList) {
                     dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_RECORD_ITEM, record));
                 }
                 mDataList.setValue(dataList);

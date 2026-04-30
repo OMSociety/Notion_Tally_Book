@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.update;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.coderpage.base.utils.LogUtils;
@@ -105,10 +105,9 @@ public class GiteeSourceFetcher implements SourceFetcher {
         GiteeApi api = apiRetrofit.create(GiteeApi.class);
 
         // 获取最新版本信息
+        retrofit2.Response<GiteeRelease> response = null;
         try {
-            retrofit2.Response<GiteeRelease> response = api
-                    .fetchLatestRelease(GITEE_OWNER, GITEE_REPO)
-                    .execute();
+            response = api.fetchLatestRelease(GITEE_OWNER, GITEE_REPO).execute();
             if (!response.isSuccessful()) {
                 result.setErr(new Error(response.code(), response.message()));
                 return result;
@@ -121,10 +120,13 @@ public class GiteeSourceFetcher implements SourceFetcher {
             }
 
             GiteeReleaseAsset targetAsset = null;
-            for (GiteeReleaseAsset asset : body.getAssets()) {
-                if (asset.getName().endsWith(".apk")) {
-                    targetAsset = asset;
-                    break;
+            List<GiteeReleaseAsset> assets = body.getAssets();
+            if (assets != null) {
+                for (GiteeReleaseAsset asset : assets) {
+                    if (asset.getName() != null && asset.getName().endsWith(".apk")) {
+                        targetAsset = asset;
+                        break;
+                    }
                 }
             }
 
@@ -138,17 +140,7 @@ public class GiteeSourceFetcher implements SourceFetcher {
             apkModel.setVersionName(body.getName());
             // 尝试从标签名中提取版本号
             String tag = body.getTag_name();
-            try {
-                // 假设标签格式为 "v1.0.0" 或 "1.0.0"
-                if (tag.startsWith("v")) {
-                    apkModel.setVersionCode(Integer.parseInt(tag.substring(1).replace(".", "")));
-                } else {
-                    apkModel.setVersionCode(Integer.parseInt(tag.replace(".", "")));
-                }
-            } catch (NumberFormatException e) {
-                // 如果无法解析版本号，默认设为0
-                apkModel.setVersionCode(0);
-            }
+            apkModel.setVersionCode(parseVersionCode(tag));
             apkModel.setChangeLog(body.getBody());
             apkModel.setDownloadUrl(targetAsset.getBrowser_download_url());
             apkModel.setFileSize(targetAsset.getSize());
@@ -159,6 +151,25 @@ public class GiteeSourceFetcher implements SourceFetcher {
             e.printStackTrace();
             result.setErr(new Error(ErrorCode.UNKNOWN, e.getMessage()));
             return result;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+    }
+
+    private int parseVersionCode(String tagName) {
+        if (tagName == null) return 0;
+        try {
+            String version = tagName.startsWith("v") ? tagName.substring(1) : tagName;
+            String[] parts = version.split("\\.");
+            int code = 0;
+            for (int i = 0; i < Math.min(parts.length, 3); i++) {
+                code = code * 100 + Integer.parseInt(parts[i]);
+            }
+            return code;
+        } catch (Exception e) {
+            return 0;
         }
     }
 

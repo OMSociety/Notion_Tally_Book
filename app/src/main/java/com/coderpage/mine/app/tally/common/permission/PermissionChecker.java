@@ -174,14 +174,16 @@ public class PermissionChecker {
         Cursor cursor = activity.getContentResolver().query(Uri.parse("content://sms/"), null, null,
                 null, null);
         if (cursor != null) {
-            if (needCheckByRunDangerousCode()) {
-                if (isNumberIndexInfoIsNull(cursor, cursor.getColumnIndex(Telephony.Sms.DATE))) {
-                    cursor.close();
-                    return false;
+            try {
+                if (needCheckByRunDangerousCode()) {
+                    if (isNumberIndexInfoIsNull(cursor, cursor.getColumnIndex(Telephony.Sms.DATE))) {
+                        return false;
+                    }
                 }
+                return true;
+            } finally {
+                cursor.close();
             }
-            cursor.close();
-            return true;
         } else {
             return false;
         }
@@ -293,14 +295,16 @@ public class PermissionChecker {
                         ("content://call_log/calls"), null, null,
                 null, null);
         if (cursor != null) {
-            if (needCheckByRunDangerousCode()) {
-                if (isNumberIndexInfoIsNull(cursor, cursor.getColumnIndex(CallLog.Calls.NUMBER))) {
-                    cursor.close();
-                    return false;
+            try {
+                if (needCheckByRunDangerousCode()) {
+                    if (isNumberIndexInfoIsNull(cursor, cursor.getColumnIndex(CallLog.Calls.NUMBER))) {
+                        return false;
+                    }
                 }
+                return true;
+            } finally {
+                cursor.close();
             }
-            cursor.close();
-            return true;
         } else {
             return false;
         }
@@ -333,13 +337,16 @@ public class PermissionChecker {
             Cursor cursor = resolver.query(uri, new String[]{ContactsContract.Contacts.Data._ID},
                     "display_name=?", new String[]{TAG}, null);
             if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    int id = cursor.getInt(0);
-                    resolver.delete(uri, "display_name=?", new String[]{TAG});
-                    uri = Uri.parse("content://com.android.contacts/data");
-                    resolver.delete(uri, "raw_contact_id=?", new String[]{id + ""});
+                try {
+                    if (cursor.moveToFirst()) {
+                        int id = cursor.getInt(0);
+                        resolver.delete(uri, "display_name=?", new String[]{TAG});
+                        uri = Uri.parse("content://com.android.contacts/data");
+                        resolver.delete(uri, "raw_contact_id=?", new String[]{id + ""});
+                    }
+                } finally {
+                    cursor.close();
                 }
-                cursor.close();
             }
             return true;
         } else {
@@ -356,15 +363,17 @@ public class PermissionChecker {
         Cursor cursor = activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone
                 .CONTENT_URI, null, null, null, null);
         if (cursor != null) {
-            if (needCheckByRunDangerousCode()) {
-                if (isNumberIndexInfoIsNull(cursor, cursor.getColumnIndex(ContactsContract.CommonDataKinds
-                        .Phone.NUMBER))) {
-                    cursor.close();
-                    return false;
+            try {
+                if (needCheckByRunDangerousCode()) {
+                    if (isNumberIndexInfoIsNull(cursor, cursor.getColumnIndex(ContactsContract.CommonDataKinds
+                            .Phone.NUMBER))) {
+                        return false;
+                    }
                 }
+                return true;
+            } finally {
+                cursor.close();
             }
-            cursor.close();
-            return true;
         } else {
             return false;
         }

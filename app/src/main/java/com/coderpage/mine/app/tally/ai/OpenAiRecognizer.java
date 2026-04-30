@@ -57,6 +57,9 @@ public class OpenAiRecognizer implements AiRecognizer {
 
     @Override
     public RecognitionResult recognize(String base64Image) {
+        if (!config.getApiUrl().toLowerCase().startsWith("https://")) {
+            return RecognitionResult.error("API 地址必须使用 HTTPS 协议");
+        }
         try {
             // 构建请求体
             Map<String, Object> requestBody = new HashMap<>();
@@ -72,13 +75,26 @@ public class OpenAiRecognizer implements AiRecognizer {
 
             List<Map<String, Object>> content = new ArrayList<>();
 
-            // 图片
-            Map<String, Object> imageContent = new HashMap<>();
-            Map<String, Object> imageUrl = new HashMap<>();
-            imageUrl.put("url", "data:image/png;base64," + base64Image);
-            imageContent.put("type", "image_url");
-            imageContent.put("image_url", imageUrl);
-            content.add(imageContent);
+            boolean isAnthropic = AiApiConfig.PROVIDER_ANTHROPIC.equals(config.getProvider());
+
+            // 图片 - Anthropic 和 OpenAI 格式不同
+            if (isAnthropic) {
+                Map<String, Object> imageContent = new HashMap<>();
+                imageContent.put("type", "image");
+                Map<String, Object> source = new HashMap<>();
+                source.put("type", "base64");
+                source.put("media_type", "image/png");
+                source.put("data", base64Image);
+                imageContent.put("source", source);
+                content.add(imageContent);
+            } else {
+                Map<String, Object> imageContent = new HashMap<>();
+                Map<String, Object> imageUrl = new HashMap<>();
+                imageUrl.put("url", "data:image/png;base64," + base64Image);
+                imageContent.put("type", "image_url");
+                imageContent.put("image_url", imageUrl);
+                content.add(imageContent);
+            }
 
             // 文本
             Map<String, Object> textContent = new HashMap<>();
@@ -97,12 +113,15 @@ public class OpenAiRecognizer implements AiRecognizer {
                     .addHeader("Content-Type", "application/json");
 
             // 根据提供商添加额外的 headers
-            if (AiApiConfig.PROVIDER_ANTHROPIC.equals(config.getProvider())) {
+            if (isAnthropic) {
                 requestBuilder.addHeader("anthropic-version", "2023-06-01");
                 requestBuilder.addHeader("x-api-key", config.getApiKey());
                 // Anthropic 使用不同的端点
                 requestBuilder.url(config.getApiUrl() + "/messages");
                 requestBody.put("system", SYSTEM_PROMPT);
+                // Anthropic 不需要 Authorization header
+                requestBuilder = requestBuilder
+                        .removeHeader("Authorization");
             }
 
             // 发送请求
@@ -132,7 +151,9 @@ public class OpenAiRecognizer implements AiRecognizer {
 
     @Override
     public RecognitionResult testConnection() {
-        // 使用简单的测试提示
+        if (!config.getApiUrl().toLowerCase().startsWith("https://")) {
+            return RecognitionResult.error("API 地址必须使用 HTTPS 协议");
+        }
         try {
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("model", config.getModel());
@@ -146,24 +167,61 @@ public class OpenAiRecognizer implements AiRecognizer {
 
             requestBody.put("messages", messages);
 
+            boolean isAnthropic = AiApiConfig.PROVIDER_ANTHROPIC.equals(config.getProvider());
+
             String jsonBody = gson.toJson(requestBody);
             RequestBody body = RequestBody.create(
                     MediaType.parse("application/json"), jsonBody);
 
-            Request request = new Request.Builder()
+            Request.Builder requestBuilder = new Request.Builder()
                     .url(config.getApiUrl() + "/chat/completions")
                     .addHeader("Authorization", "Bearer " + config.getApiKey())
                     .addHeader("Content-Type", "application/json")
-                    .post(body)
-                    .build();
+                    .post(body);
+
+            if (isAnthropic) {
+                requestBuilder.addHeader("anthropic-version", "2023-06-01");
+                requestBuilder.addHeader("x-api-key", config.getApiKey());
+                requestBuilder.url(config.getApiUrl() + "/messages");
+                requestBody.put("system", "You are a helpful assistant.");
+                // 重建 body
+                jsonBody = gson.toJson(requestBody);
+                body = RequestBody.create(MediaType.parse("application/json"), jsonBody);
+                requestBuilder = requestBuilder.post(body);
+                requestBuilder = requestBuilder.removeHeader("Authorization");
+            }
+
+            Request request = requestBuilder.build();
 
             try (Response response = client.newCall(request).execute()) {
                 String responseBody = response.body() != null ? response.body().string() : "";
 
-                if (response.isSuccessful()) {
-                    return RecognitionResult.success(true, "test", 0);
-                } else {
+                if (!response.isSuccessful()) {
                     return RecognitionResult.error("连接失败: " + response.code() + " - " + responseBody);
+                }
+
+                // 校验响应体，确保 API 真正可用
+                if (responseBody.isEmpty()) {
+                    return RecognitionResult.success(true, "test", 0);
+                }
+
+                try {
+                    JsonObject json = JsonParser.parseString(responseBody).getAsJsonObject();
+                    // Anthropic 格式: {"type": "message", "content": [...]}
+                    if (json.has("type") && "message".equals(json.get("type").getAsString())) {
+                        return RecognitionResult.success(true, "test", 0);
+                    }
+                    // OpenAI 格式: {"choices": [...]}
+                    if (json.has("choices")) {
+                        return RecognitionResult.success(true, "test", 0);
+                    }
+                    // 响应体既不是 Anthropic 也不是 OpenAI 格式
+                    return RecognitionResult.error("未知的响应格式: " +
+                            (responseBody.length() > 200 ? responseBody.substring(0, 200) + "..." : responseBody));
+                } catch (Exception parseEx) {
+                    // 响应体不是合法 JSON，但仍返回了成功状态码
+                    Log.w(TAG, "响应体解析失败，但 HTTP 状态码成功", parseEx);
+                    return RecognitionResult.success(true, "test", 0);
                 }
             }
 
@@ -183,7 +241,20 @@ public class OpenAiRecognizer implements AiRecognizer {
 
             // 提取响应内容
             String content = "";
-            if (json.has("choices")) {
+
+            // Anthropic 格式: {"content": [{"type": "text", "text": "..."}]}
+            if (json.has("content") && json.get("content").isJsonArray()) {
+                JsonArray contentArray = json.getAsJsonArray("content");
+                for (int i = 0; i < contentArray.size(); i++) {
+                    JsonObject block = contentArray.get(i).getAsJsonObject();
+                    if ("text".equals(block.get("type").getAsString())) {
+                        content = block.get("text").getAsString();
+                        break;
+                    }
+                }
+            }
+            // OpenAI 格式: {"choices": [{"message": {"content": "..."}}]}
+            else if (json.has("choices")) {
                 JsonArray choices = json.getAsJsonArray("choices");
                 if (choices.size() > 0) {
                     JsonObject choice = choices.get(0).getAsJsonObject();

@@ -40,23 +40,32 @@ class FileDownloader {
                 .build();
 
         Result<File, Error> result;
+        okhttp3.Response response = null;
         try {
-            okhttp3.Response response = okHttpClient.newCall(request).execute();
+            response = okHttpClient.newCall(request).execute();
             if (response.isSuccessful()) {
                 DownloadCache downloadCache = new DownloadCache(mContext);
-                File apkFile = downloadCache.saveFile(fileName, response.body().source());
-                if (apkFile != null) {
-                    result = new Result<>(apkFile, null);
+                okhttp3.ResponseBody body = response.body();
+                if (body == null) {
+                    result = new Result<>(null, new Error(-1, "response body is null"));
                 } else {
-                    result = new Result<>(null,
-                            new Error(-1, "save file failed"));
+                    File apkFile = downloadCache.saveFile(fileName, body.source());
+                    if (apkFile != null) {
+                        result = new Result<>(apkFile, null);
+                    } else {
+                        result = new Result<>(null,
+                                new Error(-1, "save file failed"));
+                    }
                 }
-
             } else {
                 result = new Result<>(null, new Error(response.code(), response.message()));
             }
         } catch (IOException e) {
             result = new Result<>(null, new Error(-1, e.getMessage()));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
 
         return result;

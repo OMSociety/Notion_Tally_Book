@@ -1,10 +1,10 @@
 package com.coderpage.mine.app.tally.module.edit.record;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +47,14 @@ public class RecordEditFragment extends Fragment {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.tally_module_edit_fragment, container, false);
         getLifecycle().addObserver(mViewModel);
 
-        mRecordType = (RecordType) getArguments().getSerializable(EXTRA_RECORD_TYPE);
+        Bundle args = getArguments();
+        mRecordType = RecordType.EXPENSE;
+        if (args != null) {
+            RecordType type = (RecordType) args.getSerializable(EXTRA_RECORD_TYPE);
+            if (type != null) {
+                mRecordType = type;
+            }
+        }
         initView();
         subscribeUi();
         return mBinding.getRoot();

@@ -2,13 +2,13 @@ package com.coderpage.mine.app.tally.module.edit.record;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.OnLifecycleEvent;
 import android.content.DialogInterface;
 import android.databinding.ObservableField;
 import android.os.Bundle;
@@ -380,10 +380,13 @@ public class RecordViewModel extends AndroidViewModel implements LifecycleObserv
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     public void onCreate(LifecycleOwner owner) {
+        if (!(owner instanceof RecordEditFragment)) return;
         RecordEditFragment fragment = (RecordEditFragment) owner;
         Bundle arguments = fragment.getArguments();
+        if (arguments == null) return;
         long recordId = arguments.getLong(RecordEditFragment.EXTRA_RECORD_ID, -1);
-        mType = (RecordType) arguments.getSerializable(RecordEditFragment.EXTRA_RECORD_TYPE);
+        RecordType serializableType = (RecordType) arguments.getSerializable(RecordEditFragment.EXTRA_RECORD_TYPE);
+        mType = serializableType != null ? serializableType : RecordType.EXPENSE;
         mCategorySettingItem.getInternal().setType(mType == RecordType.EXPENSE
                 ? CategoryModel.TYPE_EXPENSE : CategoryModel.TYPE_INCOME);
         setRecordId(recordId);

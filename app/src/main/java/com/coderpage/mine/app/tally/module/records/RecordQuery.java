@@ -2,7 +2,7 @@ package com.coderpage.mine.app.tally.module.records;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import com.coderpage.base.utils.ArrayUtils;
 import com.coderpage.mine.app.tally.persistence.model.Record;

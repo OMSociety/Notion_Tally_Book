@@ -1,18 +1,19 @@
 package com.coderpage.mine.app.tally.persistence.sql.dao;
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.RoomWarnings;
-import android.arch.persistence.room.Update;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.RoomWarnings;
+import androidx.room.Update;
 
 import com.coderpage.mine.app.tally.persistence.model.Record;
 import com.coderpage.mine.app.tally.persistence.model.RecordCategoryGroup;
 import com.coderpage.mine.app.tally.persistence.model.RecordGroup;
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -58,7 +59,7 @@ public interface RecordDao {
     @Query("select * " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
-            "where category_name like :keyWord or record_desc like :keyWord order by record_time desc limit :limit offset :offset")
+            "where category_name like :keyWord ESCAPE '\\' or record_desc like :keyWord ESCAPE '\\' order by record_time desc limit :limit offset :offset")
     List<Record> queryByKeyWord(String keyWord, long limit, long offset);
 
     /**
@@ -91,9 +92,17 @@ public interface RecordDao {
     @Query("select * " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
-            "where record_type == :type and record_time >= :startTime and record_time <= :endTime and category_unique_name in (:categoryNameArray) " +
+            "where record_type == :type and record_time >= :startTime and record_time <= :endTime " +
+            "and (:categoryNameArray is null or category_unique_name in (:categoryNameArray)) " +
             "order by record_time desc limit :limit offset :offset")
-    List<Record> query(int type, long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
+    List<Record> queryInternal(int type, long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
+
+    default List<Record> query(int type, long startTime, long endTime, long limit, long offset, String[] categoryNameArray) {
+        if (categoryNameArray != null && categoryNameArray.length == 0) {
+            return Collections.emptyList();
+        }
+        return queryInternal(type, startTime, endTime, limit, offset, categoryNameArray);
+    }
 
     /**
      * 查询所有类型记录
@@ -123,9 +132,17 @@ public interface RecordDao {
     @Query("select * " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
-            "where record_time >= :startTime and record_time <= :endTime and category_unique_name in (:categoryNameArray) " +
+            "where record_time >= :startTime and record_time <= :endTime " +
+            "and (:categoryNameArray is null or category_unique_name in (:categoryNameArray)) " +
             "order by record_time desc limit :limit offset :offset")
-    List<Record> queryAll(long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
+    List<Record> queryAllInternal(long startTime, long endTime, long limit, long offset, String[] categoryNameArray);
+
+    default List<Record> queryAll(long startTime, long endTime, long limit, long offset, String[] categoryNameArray) {
+        if (categoryNameArray != null && categoryNameArray.length == 0) {
+            return Collections.emptyList();
+        }
+        return queryAllInternal(startTime, endTime, limit, offset, categoryNameArray);
+    }
 
     /**
      * 插入记录
@@ -209,11 +226,11 @@ public interface RecordDao {
      * @param end   结束时间
      * @return 查询到的月支出数据
      */
-    @Query("select count(*),sum(record_amount),record_time " +
+    @Query("select count(*),sum(record_amount),min(record_time) AS record_time " +
             "from record " +
             "where record_time >= :start and record_time<= :end and record_type = 0 " +
             "group by strftime('%Y-%m', datetime(record_time/1000, 'unixepoch', 'localtime')) " +
-            "order by record_time ASC")
+            "order by min(record_time) ASC")
     List<RecordGroup> queryExpenseMonthGroup(long start, long end);
 
     /**
@@ -223,11 +240,11 @@ public interface RecordDao {
      * @param end   结束时间
      * @return 查询到的月收入数据
      */
-    @Query("select count(*),sum(record_amount),record_time " +
+    @Query("select count(*),sum(record_amount),min(record_time) AS record_time " +
             "from record " +
             "where record_time >= :start and record_time<= :end and record_type = 1 " +
             "group by strftime('%Y-%m', datetime(record_time/1000, 'unixepoch', 'localtime')) " +
-            "order by record_time ASC")
+            "order by min(record_time) ASC")
     List<RecordGroup> queryIncomeMonthGroup(long start, long end);
 
     /**
@@ -237,11 +254,11 @@ public interface RecordDao {
      * @param end   结束时间
      * @return 查询到的日支出数据
      */
-    @Query("select count(*),sum(record_amount),record_time " +
+    @Query("select count(*),sum(record_amount),min(record_time) AS record_time " +
             "from record " +
             "where record_time >= :start and record_time<= :end and record_type = 0 " +
             "group by strftime('%Y-%m-%d', datetime(record_time/1000, 'unixepoch', 'localtime')) " +
-            "order by record_time ASC")
+            "order by min(record_time) ASC")
     List<RecordGroup> queryExpenseDailyGroup(long start, long end);
 
     /**
@@ -251,11 +268,11 @@ public interface RecordDao {
      * @param end   结束时间
      * @return 查询到的日收入数据
      */
-    @Query("select count(*),sum(record_amount),record_time " +
+    @Query("select count(*),sum(record_amount),min(record_time) AS record_time " +
             "from record " +
             "where record_time >= :start and record_time<= :end and record_type = 1 " +
             "group by strftime('%Y-%m-%d', datetime(record_time/1000, 'unixepoch', 'localtime')) " +
-            "order by record_time ASC")
+            "order by min(record_time) ASC")
     List<RecordGroup> queryIncomeDailyGroup(long start, long end);
 
     /**
@@ -266,7 +283,7 @@ public interface RecordDao {
      * @return 查询到的分类支出数据
      */
     @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
-    @Query("select category.category_type,category.category_id,count(*),sum(record_amount),record_time,category_unique_name,category_name,category_icon " +
+    @Query("select category.category_type,category.category_id,count(*),sum(record_amount),min(record_time),category_unique_name,category_name,category_icon " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :start and record_time<= :end and record_type = 0 " +
@@ -282,7 +299,7 @@ public interface RecordDao {
      * @return 查询到的分类收入数据
      */
     @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
-    @Query("select category.category_type,category.category_id,count(*),sum(record_amount),record_time,category_unique_name,category_name,category_icon " +
+    @Query("select category.category_type,category.category_id,count(*),sum(record_amount),min(record_time),category_unique_name,category_name,category_icon " +
             "from record " +
             "left outer join category on record.record_category_unique_name=category.category_unique_name " +
             "where record_time >= :start and record_time<= :end and record_type = 1 " +
@@ -296,7 +313,9 @@ public interface RecordDao {
      * @return 第一笔记录
      */
     @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
-    @Query("select * from record order by record_time ASC limit 1")
+    @Query("select * from record " +
+            "left outer join category on record.record_category_unique_name=category.category_unique_name " +
+            "order by record_time ASC limit 1")
     Record queryFirst();
 
     /***

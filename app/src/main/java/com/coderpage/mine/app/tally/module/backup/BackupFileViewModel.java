@@ -4,8 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
 import android.app.DatePickerDialog;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,9 +14,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
-import android.support.annotation.NonNull;
-import android.support.v4.provider.DocumentFile;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.core.provider.DocumentFile;
+import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -93,26 +93,27 @@ public class BackupFileViewModel extends BaseViewModel {
         SharedPreferences prefs = getApplication().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         boolean enabled = prefs.getBoolean(KEY_AUTO_BACKUP_ENABLED, false); // 默认关闭
 
-        // 检查是否真正存在任务
-        if (enabled) {
-            try {
-                List<WorkInfo> workInfos = WorkManager.getInstance()
-                        .getWorkInfosByTag(WorkerConstant.UNIQUE_NAME_AUTO_BACKUP_WORKER)
-                        .get();
-                // 如果没有找到任务，则更新状态为关闭
-                if (workInfos.isEmpty()) {
-                    enabled = false;
-                    // 同时更新 SharedPreferences 中的状态
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean(KEY_AUTO_BACKUP_ENABLED, false);
-                    editor.apply();
-                }
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
+        // 先用 SharedPreferences 的值初始化 UI，避免主线程阻塞
         mAutoBackupEnabled.setValue(enabled);
+
+        // 后台校验 WorkManager 中是否真正存在任务
+        if (enabled) {
+            AsyncTaskExecutor.execute(() -> {
+                try {
+                    List<WorkInfo> workInfos = WorkManager.getInstance()
+                            .getWorkInfosByTag(WorkerConstant.UNIQUE_NAME_AUTO_BACKUP_WORKER)
+                            .get();
+                    if (workInfos.isEmpty()) {
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean(KEY_AUTO_BACKUP_ENABLED, false);
+                        editor.apply();
+                        mAutoBackupEnabled.postValue(false);
+                    }
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
     /**
      * 切换自动备份状态
@@ -564,8 +565,10 @@ public class BackupFileViewModel extends BaseViewModel {
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
                     // 获取用户选择的参数
-                    Long selectedStartDate = (Long) tvStartDate.getTag();
-                    Long selectedEndDate = (Long) tvEndDate.getTag();
+                    Object startTag = tvStartDate.getTag();
+                    Object endTag = tvEndDate.getTag();
+                    Long selectedStartDate = startTag instanceof Long ? (Long) startTag : null;
+                    Long selectedEndDate = endTag instanceof Long ? (Long) endTag : null;
                     String selectedFolder = (String) tvFolder.getTag();
                     int selectedFormat = rgFormat.getCheckedRadioButtonId();
 
@@ -631,13 +634,18 @@ public class BackupFileViewModel extends BaseViewModel {
                 // 显示导出进度
                 mProcessMessage.postValue("正在导出数据...");
 
-                // 执行实际的导出操作
+                // 执行实际的导出操作，在完成回调中隐藏加载指示器
                 Backup backup = new Backup();
-                backup.performExport(startDate, endDate, folder, formatId);
+                backup.performExport(startDate, endDate, folder, formatId, new SimpleCallback<Void>() {
+                    @Override
+                    public void success(Void aVoid) {
+                        mProcessMessage.postValue(null);
+                    }
 
-                // 导出完成后提示用户
-                runOnUiThread(() -> {
-                    mProcessMessage.postValue(null);
+                    @Override
+                    public void failure(IError iError) {
+                        mProcessMessage.postValue(null);
+                    }
                 });
             }
 
@@ -726,10 +734,11 @@ public class BackupFileViewModel extends BaseViewModel {
     // 生命周期
     ///////////////////////////////////////////////////////////////////////////
     protected void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
             if (requestCode == 1) {
                 // Get the Uri of the selected file
                 Uri uri = data.getData();
+                if (uri == null) return;
                 String path = FileUtils.getPath(activity, uri);
                 onBackupFileSelectedFromFileSystem(activity, path);
             } else if (requestCode == 2) {

@@ -61,7 +61,7 @@ public class TimeUtils {
     public static int getDaysTotalOfMonth(int year, int month) {
         if (month == 2) {
             // 闰年
-            boolean leapYear = year % 4 == 0;
+            boolean leapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
             if (leapYear) {
                 return 29;
             } else {

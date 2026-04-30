@@ -1,7 +1,7 @@
 package com.coderpage.framework;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -138,13 +138,9 @@ public class PresenterImpl<
                 }
             });
         } else {
-            if (mUpdatableViews == null) {
-                return;
-            }
-            throw new RuntimeException(
-                    "Invalid user action " + (action != null ? action.getId() : null) +
-                            ". Have you called setValidUserActions on your presenter, with all " +
-                            "the UserActionEnum you want to support?");
+            LOGI(TAG, "Invalid user action " + (action != null ? action.getId() : null) +
+                    ". Have you called setValidUserActions on your presenter, with all " +
+                    "the UserActionEnum you want to support?");
         }
     }
 

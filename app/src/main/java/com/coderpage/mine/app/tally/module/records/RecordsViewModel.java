@@ -2,16 +2,16 @@ package com.coderpage.mine.app.tally.module.records;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.OnLifecycleEvent;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -88,7 +88,7 @@ public class RecordsViewModel extends BaseViewModel implements LifecycleObserver
                     return;
                 }
                 // 更新显示的列表数据
-                mRecordList.postValue(formatRecordList(dataList));
+                mRecordList.setValue(formatRecordList(dataList));
             }
         };
     }
@@ -124,18 +124,10 @@ public class RecordsViewModel extends BaseViewModel implements LifecycleObserver
         }
         // 在应用新查询条件前，清空当前显示的数据列表
         // 这样可以确保旧数据不会继续显示在页面上
-        if (mRecordList.getValue() != null) {
-            mRecordList.getValue().clear();
-            mRecordList.postValue(mRecordList.getValue());
-        }
+        mRecordList.setValue(new ArrayList<>());
 
         mQuery = query;
-        boolean refreshUseLoadMode = mRecordList.getValue() == null || mRecordList.getValue().isEmpty();
-        if (refreshUseLoadMode) {
-            mLoadDelegate.load();
-        } else {
-            mLoadDelegate.refresh();
-        }
+        mLoadDelegate.refresh();
 
         // 格式化 Toolbar Title
         // 全部记录不显示区间信息
@@ -201,11 +193,10 @@ public class RecordsViewModel extends BaseViewModel implements LifecycleObserver
      * @return 格式化后的数据列表
      */
     private List<Object> formatRecordList(List<Record> source) {
-        List<Object> currentDisplayList = mRecordList.getValue() == null ? new ArrayList<>() : mRecordList.getValue();
+        List<Object> currentDisplayList = new ArrayList<>();
         if (source == null || source.isEmpty()) {
             return currentDisplayList;
         }
-        currentDisplayList.clear();
 
         WrappedInt yearTemp = new WrappedInt(-1);
         WrappedInt monthTemp = new WrappedInt(-1);

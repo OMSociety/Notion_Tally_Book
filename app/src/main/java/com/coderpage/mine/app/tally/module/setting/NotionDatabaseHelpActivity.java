@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.setting;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.coderpage.mine.app.tally.common.router.TallyRouter;

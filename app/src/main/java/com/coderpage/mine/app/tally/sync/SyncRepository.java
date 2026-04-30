@@ -3,6 +3,8 @@ package com.coderpage.mine.app.tally.sync;
 import com.coderpage.mine.app.tally.persistence.sql.dao.RecordDao;
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import java.util.List;
  */
 public class SyncRepository {
 
+    private static final String TAG = "SyncRepository";
     private static final String NOTION_SYNC_PREFIX = "notion:";
 
     private final RecordDao recordDao;
@@ -24,7 +27,7 @@ public class SyncRepository {
             List<com.coderpage.mine.app.tally.persistence.model.Record> modelRecords = recordDao.queryAll();
             return RecordConverter.toSyncRecords(modelRecords);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "getLocalRecords failed", e);
             return new ArrayList<>();
         }
     }
@@ -40,8 +43,11 @@ public class SyncRepository {
                 applyRecordFields(model, record);
                 recordDao.update(model.createEntity());
             }
+        } catch (NumberFormatException e) {
+            Log.w(TAG, "updateLocalRecord: invalid id format: " + record.id, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "updateLocalRecord failed for id=" + record.id, e);
+            throw new RuntimeException("Failed to update local record: " + record.id, e);
         }
     }
 
@@ -60,7 +66,8 @@ public class SyncRepository {
             applyRecordFields(newRecord, record);
             recordDao.insert(newRecord.createEntity());
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "saveRemoteRecord failed for notionPageId=" + record.notionPageId, e);
+            throw new RuntimeException("Failed to save remote record: " + record.notionPageId, e);
         }
     }
 
@@ -69,9 +76,11 @@ public class SyncRepository {
         target.setAmount(source.amount);
         target.setTime(source.time);
         target.setDesc(source.remark != null ? source.remark : "");
-        target.setType("expense".equals(source.type) ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
+        boolean isExpense = "expense".equals(source.type) || "支出".equals(source.type);
+        target.setType(isExpense ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
         target.setCategoryUniqueName(source.category != null ? source.category : "");
-        if (source.notionPageId != null && !source.notionPageId.isEmpty()) {
+        if (source.notionPageId != null && !source.notionPageId.isEmpty()
+                && (target.getSyncId() == null || target.getSyncId().isEmpty())) {
             target.setSyncId(makeNotionSyncId(source.notionPageId));
         }
     }

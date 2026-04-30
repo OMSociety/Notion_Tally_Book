@@ -1,13 +1,14 @@
 package com.coderpage.mine.app.tally.module.search;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.os.Handler;
-import android.support.annotation.Nullable;
+import android.os.Looper;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.coderpage.base.common.Callback;
@@ -50,7 +51,7 @@ public class SearchViewModel extends BaseViewModel {
 
     public SearchViewModel(Application application) {
         super(application);
-        mHandler = new Handler();
+        mHandler = new Handler(Looper.getMainLooper());
         mRepository = new SearchRepository();
         mLoadDelegate = new BaseLoadDelegate<Record>(15) {
             @Override
@@ -139,8 +140,8 @@ public class SearchViewModel extends BaseViewModel {
 
     /** 移除搜索记录 ITEM */
     public void onRemoveHistoryItemClick(String history) {
-        List<String> searchHistoryList = mSearchHistoryList.getValue();
-        searchHistoryList = searchHistoryList == null ? new ArrayList<>() : searchHistoryList;
+        List<String> currentValue = mSearchHistoryList.getValue();
+        List<String> searchHistoryList = currentValue == null ? new ArrayList<>() : new ArrayList<>(currentValue);
         ArrayUtils.remove(searchHistoryList, item -> CommonUtils.isEqual(item, history));
         // 缓存到本地
         mRepository.saveSearchHistory(searchHistoryList,
@@ -182,8 +183,8 @@ public class SearchViewModel extends BaseViewModel {
         if (TextUtils.isEmpty(keyWord)) {
             return;
         }
-        List<String> searchHistoryList = mSearchHistoryList.getValue();
-        searchHistoryList = searchHistoryList == null ? new ArrayList<>() : searchHistoryList;
+        List<String> currentValue = mSearchHistoryList.getValue();
+        List<String> searchHistoryList = currentValue == null ? new ArrayList<>() : new ArrayList<>(currentValue);
         // 移除之前的，添加到第一个位置
         ArrayUtils.remove(searchHistoryList, item -> CommonUtils.isEqual(item, keyWord));
         // 添加到列表中
@@ -191,11 +192,17 @@ public class SearchViewModel extends BaseViewModel {
         // 历史记录不得超过 10
         int maxCacheSize = 10;
         if (searchHistoryList.size() > maxCacheSize) {
-            searchHistoryList = searchHistoryList.subList(0, maxCacheSize);
+            searchHistoryList = new ArrayList<>(searchHistoryList.subList(0, maxCacheSize));
         }
         // 缓存到本地
         mRepository.saveSearchHistory(searchHistoryList,
                 // 缓存成功，刷新列表
                 v -> loadSearchHistory());
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mHandler.removeCallbacks(mSearchPendingTask);
     }
 }

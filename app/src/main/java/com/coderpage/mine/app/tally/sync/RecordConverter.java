@@ -46,14 +46,21 @@ public class RecordConverter {
     }
 
     /**
-     * ConflictResolver.Record 转换为 Record
+     * ConflictResolver.Record 转换为 Record（新建）
      */
     public static Record toRecord(ConflictResolver.Record record) {
+        return toRecord(record, new Record());
+    }
+
+    /**
+     * ConflictResolver.Record 转换为 Record，保留已有 Record 的 syncId
+     */
+    public static Record toRecord(ConflictResolver.Record record, Record existing) {
         if (record == null) {
             return null;
         }
 
-        Record model = new Record();
+        Record model = existing;
 
         // ID
         if (record.id != null && !record.id.isEmpty()) {
@@ -78,11 +85,10 @@ public class RecordConverter {
         // 分类
         model.setCategoryUniqueName(record.category != null ? record.category : "");
 
-        // notionPageId 存储在 syncId 中
-        if (record.notionPageId != null && !record.notionPageId.isEmpty()) {
+        // notionPageId 存储在 syncId 中（仅在无现有 syncId 且有 notionPageId 时写入，避免覆盖本地 syncId）
+        if (record.notionPageId != null && !record.notionPageId.isEmpty()
+                && (model.getSyncId() == null || model.getSyncId().isEmpty())) {
             model.setSyncId("notion:" + record.notionPageId);
-        } else {
-            model.setSyncId(record.id != null ? record.id : "");
         }
 
         return model;

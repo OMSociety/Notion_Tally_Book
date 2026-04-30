@@ -3,6 +3,7 @@ package com.coderpage.mine.app.tally.sync;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.coderpage.mine.app.tally.config.NotionConfig;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Notion 同步管理器
@@ -39,11 +41,11 @@ public class NotionSyncManager {
     private final SyncRepository syncRepository;
     private final ExecutorService executor;
     private final Handler mainHandler;
-    private final Gson gson;
+    private static final Gson gson = new Gson();
     
-    private SyncListener listener;
-    private boolean isSyncing = false;
-    private String currentSyncType = "manual";
+    private volatile SyncListener listener;
+    private final AtomicBoolean isSyncing = new AtomicBoolean(false);
+    private volatile String currentSyncType = "manual";
     
     public interface SyncListener {
         void onSyncStart();
@@ -69,7 +71,6 @@ public class NotionSyncManager {
         this.conflictService = new ConflictService();
         this.executor = Executors.newSingleThreadExecutor();
         this.mainHandler = new Handler(Looper.getMainLooper());
-        this.gson = new Gson();
         
         // 初始化数据库
         TallyDatabase database = TallyDatabase.getInstance();
@@ -84,17 +85,16 @@ public class NotionSyncManager {
      * 开始同步
      */
     public void startSync() {
-        if (isSyncing) {
+        if (!isSyncing.compareAndSet(false, true)) {
             notifyError("同步已在进行中");
             return;
         }
-        
+
         if (!config.isConfigured()) {
+            isSyncing.set(false);
             notifyError("请先配置 Notion Integration Token 和 Database ID");
             return;
         }
-        
-        isSyncing = true;
         notifyStart();
         
         executor.execute(() -> {
@@ -125,21 +125,20 @@ public class NotionSyncManager {
                 config.setLastSyncTime(System.currentTimeMillis());
                 
                 mainHandler.post(() -> {
-                    isSyncing = false;
+                    isSyncing.set(false);
                     if (listener != null) {
                         listener.onSyncComplete(result);
-
                     }
                 });
-                
+
             } catch (Exception e) {
-                result.errors.add(e.getMessage());
+                String errorMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+                result.errors.add(errorMsg);
                 result.errorCount++;
                 mainHandler.post(() -> {
-                    isSyncing = false;
+                    isSyncing.set(false);
                     if (listener != null) {
-                        listener.onSyncError(e.getMessage());
-
+                        listener.onSyncError(errorMsg);
                     }
                 });
             }
@@ -345,11 +344,22 @@ public class NotionSyncManager {
                 }
             }
             
-            record.lastModified = record.time;
-            
+            // Use Notion's last_edited_time from the page object for accurate conflict resolution
+            if (page.has("last_edited_time") && page.get("last_edited_time") != null) {
+                try {
+                    String lastEditedStr = page.get("last_edited_time").getAsString();
+                    record.lastModified = parseNotionDateToMillis(lastEditedStr);
+                } catch (Exception e) {
+                    Log.w(TAG, "Failed to parse last_edited_time, falling back to record.time", e);
+                    record.lastModified = record.time;
+                }
+            } else {
+                record.lastModified = record.time;
+            }
+
             return record;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "parseNotionPageToRecord failed", e);
             return null;
         }
     }
@@ -513,6 +523,7 @@ public class NotionSyncManager {
             
             return hasAmount && hasType && hasCategory && hasTime;
         } catch (Exception e) {
+            Log.e(TAG, "validateDatabase failed", e);
             return false;
         }
     }
@@ -535,14 +546,14 @@ public class NotionSyncManager {
     
     private void notifyError(String error) {
         mainHandler.post(() -> {
-            isSyncing = false;
+            isSyncing.set(false);
             if (listener != null) {
                 listener.onSyncError(error);
             }
         });
     }
-    
+
     public boolean isSyncing() {
-        return isSyncing;
+        return isSyncing.get();
     }
 }

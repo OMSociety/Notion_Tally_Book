@@ -1,6 +1,7 @@
 package com.coderpage.mine.app.tally.ai;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,6 +25,7 @@ import com.coderpage.mine.ui.BaseActivity;
 @Route(path = TallyRouter.AI_SETTING)
 public class AiSettingActivity extends BaseActivity {
 
+    private static final String TAG = "AiSettingActivity";
     private ActivityAiSettingBinding mBinding;
     private AiSettingViewModel mViewModel;
     private ArrayAdapter<AiApiConfig.ProviderTemplate> mAdapter;
@@ -56,9 +58,14 @@ public class AiSettingActivity extends BaseActivity {
         // 保存按钮
         Button btnSave = findViewById(R.id.btnSave);
         btnSave.setOnClickListener(v -> {
-            mViewModel.saveConfig();
-            Toast.makeText(this, "配置已保存", Toast.LENGTH_SHORT).show();
-            finish();
+            try {
+                mViewModel.saveConfig();
+                Toast.makeText(this, "配置已保存", Toast.LENGTH_SHORT).show();
+                finish();
+            } catch (RuntimeException e) {
+                Log.e(TAG, "保存配置失败", e);
+                Toast.makeText(this, "保存失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
         });
 
         // 测试按钮

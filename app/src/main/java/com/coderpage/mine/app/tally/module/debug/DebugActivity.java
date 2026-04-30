@@ -1,10 +1,10 @@
 package com.coderpage.mine.app.tally.module.debug;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.coderpage.mine.R;
 import com.coderpage.mine.module.debug.DebugActivityBinding;

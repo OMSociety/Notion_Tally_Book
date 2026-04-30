@@ -11,9 +11,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.FileProvider;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -95,7 +95,9 @@ public class DownloadService extends IntentService {
                 mDownloadUrl,
                 mDownFilename,
                 (bytesRead, contentLength, done) -> {
-                    mProgress = Float.valueOf(((float) bytesRead / contentLength) * 100).intValue();
+                    if (contentLength > 0) {
+                        mProgress = Float.valueOf(((float) bytesRead / contentLength) * 100).intValue();
+                    }
                 });
         // 下载完成 关闭通知
         mNotificationManager.cancel(NOTIFY_ID_DOWNLOAD_APK);

@@ -39,22 +39,26 @@ class BackupCache {
     private static final String BACKUP_FILE_NAME = "backup";
     private static final String AUTOMATIC_BACKUP_FILE_NAME = "automatic_backup";
 
+    private static final ThreadLocal<SimpleDateFormat> BACKUP_DATE_FORMAT =
+            ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()));
+
     private static String DATA_ROOT_PATH = null;
 
     private Context mContext;
-    private File backupFolder; // 备份文件夹
-    private String backupFolderPath = DATA_ROOT_PATH + File.separator + BACKUP_FOLDER_NAME;
-    private SimpleDateFormat backupFileDateFormat =
-            new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    private volatile File backupFolder; // 备份文件夹
+    private volatile String backupFolderPath;
 
     BackupCache(Context context) {
         mContext = context;
         DATA_ROOT_PATH = context.getCacheDir().getPath();
+        File cacheRoot = Cache.getCacheFolder(context);
+        backupFolderPath = cacheRoot.getPath() + File.separator + BACKUP_FOLDER_NAME;
+        backupFolder = new File(backupFolderPath);
         initBackupFolder();
     }
 
     private synchronized boolean initBackupFolder() {
-        if (backupFolder != null && backupFolder.exists()) {
+        if (backupFolder.exists()) {
             return true;
         }
 
@@ -63,11 +67,6 @@ class BackupCache {
             return false;
         }
 
-        backupFolderPath = cacheRoot.getPath() + File.separator + BACKUP_FOLDER_NAME;
-        backupFolder = new File(backupFolderPath);
-        if (backupFolder.exists()) {
-            return true;
-        }
         boolean mkDirOk = backupFolder.mkdir();
         if (!mkDirOk) {
             LOGE(TAG, "create backup cache folder failed");
@@ -83,7 +82,7 @@ class BackupCache {
      *
      * @return 备份文件，如果备份成功返回文件对象，否则返回 null
      */
-    File backup2JsonFile(BackupModel backupModel, Callback<Void, IError> callback) {
+    synchronized File backup2JsonFile(BackupModel backupModel, Callback<Void, IError> callback) {
         String fileName = formatBackupJsonFileName();
         File file = new File(backupFolderPath, fileName);
         if (!createFileIfNotExists(file)) {
@@ -92,14 +91,14 @@ class BackupCache {
             return null;
         }
 
-        try {
-            FileWriter fileWriter = new FileWriter(file);
+        try (FileWriter fileWriter = new FileWriter(file)) {
             JSON.writeJSONStringTo(
                     backupModel,
                     fileWriter,
                     SerializerFeature.WriteNullListAsEmpty,
                     SerializerFeature.WriteNullStringAsEmpty,
                     SerializerFeature.WriteNullNumberAsZero);
+            fileWriter.flush();
             LOGI(TAG, "备份 JSON 文件成功 " + file.getAbsolutePath());
             callback.success(null);
         } catch (IOException e) {
@@ -113,7 +112,7 @@ class BackupCache {
 
     private String formatBackupJsonFileName() {
         Calendar calendar = Calendar.getInstance();
-        String dateFormatted = backupFileDateFormat.format(calendar.getTime());
+        String dateFormatted = BACKUP_DATE_FORMAT.get().format(calendar.getTime());
         return BACKUP_FILE_NAME + "_" + dateFormatted + ".json";
     }
 
@@ -147,13 +146,14 @@ class BackupCache {
     /**
      * 删除所有备份文件
      */
-    public boolean deleteAllBackupFile() {
+    public synchronized boolean deleteAllBackupFile() {
         File backupFileFolder = new File(backupFolderPath);
         if (!backupFileFolder.exists()) {
             return true;
         }
         if (backupFileFolder.isDirectory()) {
             String[] backupFileNames = backupFileFolder.list();
+            if (backupFileNames == null) return true;
             for (String fileName : backupFileNames) {
                 new File(backupFileFolder, fileName).delete();
             }
@@ -161,7 +161,8 @@ class BackupCache {
         return true;
     }
 
-    List<File> listBackupFiles() {
+    synchronized List<File> listBackupFiles() {
+        initBackupFolder();
         File imageFolder = new File(backupFolderPath);
         if (!imageFolder.exists()) {
             return new ArrayList<>();
@@ -178,7 +179,7 @@ class BackupCache {
      * @param listener    回调监听器
      * @return 备份文件
      */
-    public File backup2JsonFileSync(BackupModel backupModel, Backup.BackupProgressListener listener) {
+    public synchronized File backup2JsonFileSync(BackupModel backupModel, Backup.BackupProgressListener listener) {
         try {
             File file = new File(backupFolderPath, AUTOMATIC_BACKUP_FILE_NAME +".json");
             if (!createFileIfNotExists(file)) {
@@ -187,13 +188,15 @@ class BackupCache {
                 return null;
             }
 
-            FileWriter fileWriter = new FileWriter(file);
-            JSON.writeJSONStringTo(
-                    backupModel,
-                    fileWriter,
-                    SerializerFeature.WriteNullListAsEmpty,
-                    SerializerFeature.WriteNullStringAsEmpty,
-                    SerializerFeature.WriteNullNumberAsZero);
+            try (FileWriter fileWriter = new FileWriter(file)) {
+                JSON.writeJSONStringTo(
+                        backupModel,
+                        fileWriter,
+                        SerializerFeature.WriteNullListAsEmpty,
+                        SerializerFeature.WriteNullStringAsEmpty,
+                        SerializerFeature.WriteNullNumberAsZero);
+                fileWriter.flush();
+            }
             LOGI(TAG, "备份 JSON 文件成功 " + file.getAbsolutePath());
             listener.success(null);
             return file;

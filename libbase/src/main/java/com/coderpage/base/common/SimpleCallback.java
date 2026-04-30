@@ -6,4 +6,5 @@ package com.coderpage.base.common;
 
 public interface SimpleCallback<T> {
     void success(T t);
+    void failure(IError error);
 }

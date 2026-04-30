@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.update;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -36,7 +36,7 @@ import static com.coderpage.base.utils.LogUtils.makeLogTag;
 class LatestVersionFetcher implements SourceFetcher {
     private static final String TAG = makeLogTag(LatestVersionFetcher.class);
 
-    private static final String VERSION_BASE_URL = "http://app.coderpage.com";
+    private static final String VERSION_BASE_URL = "https://app.coderpage.com";
 
     @Override
     public Result<ApkModel, Error> fetchApkModel() {
@@ -63,11 +63,12 @@ class LatestVersionFetcher implements SourceFetcher {
         UpdateApi api = apiRetrofit.create(UpdateApi.class);
 
         // 获取最新版本信息
+        Response<LatestVersionResponse> response = null;
         try {
             JSONObject reqBody = new JSONObject();
             reqBody.put("packageName", MineApp.getAppContext().getPackageName());
             reqBody.put("channelName", BuildConfig.FLAVOR);
-            Response<LatestVersionResponse> response = api
+            response = api
                     .fetchLatestVersion(reqBody)
                     .execute();
             if (!response.isSuccessful()) {
@@ -85,6 +86,10 @@ class LatestVersionFetcher implements SourceFetcher {
             e.printStackTrace();
             result.setErr(new Error(ErrorCode.UNKNOWN, e.getMessage()));
             return result;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 

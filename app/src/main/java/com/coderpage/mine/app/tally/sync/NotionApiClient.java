@@ -1,5 +1,7 @@
 package com.coderpage.mine.app.tally.sync;
 
+import android.util.Log;
+
 import com.coderpage.mine.app.tally.config.NotionConfig;
 
 import java.io.IOException;
@@ -25,9 +27,10 @@ public class NotionApiClient {
     
     private final OkHttpClient client;
     private final NotionConfig config;
-    
+    private final com.google.gson.Gson gson = new com.google.gson.Gson();
+
     private static NotionApiClient instance;
-    
+
     private NotionApiClient(NotionConfig config) {
         this.config = config;
         this.client = new OkHttpClient.Builder()
@@ -36,9 +39,9 @@ public class NotionApiClient {
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .build();
     }
-    
+
     public static synchronized NotionApiClient getInstance(NotionConfig config) {
-        if (instance == null) {
+        if (instance == null || instance.config != config) {
             instance = new NotionApiClient(config);
         }
         return instance;
@@ -53,7 +56,7 @@ public class NotionApiClient {
             body.put("start_cursor", cursor);
         }
         
-        String jsonBody = new com.google.gson.Gson().toJson(body);
+        String jsonBody = gson.toJson(body);
         RequestBody requestBody = RequestBody.create(
                 MediaType.parse("application/json"), jsonBody);
         
@@ -71,7 +74,7 @@ public class NotionApiClient {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
             }
-            return response.body().string();
+            return response.body() != null ? response.body().string() : "";
         }
     }
     
@@ -94,7 +97,7 @@ public class NotionApiClient {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
             }
-            return response.body().string();
+            return response.body() != null ? response.body().string() : "";
         }
     }
     
@@ -117,7 +120,7 @@ public class NotionApiClient {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
             }
-            return response.body().string();
+            return response.body() != null ? response.body().string() : "";
         }
     }
     
@@ -130,6 +133,7 @@ public class NotionApiClient {
             queryDatabase(null);
             return true;
         } catch (Exception e) {
+            Log.e("NotionApiClient", "validateConfig failed", e);
             return false;
         }
     }
@@ -149,7 +153,7 @@ public class NotionApiClient {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
             }
-            return response.body().string();
+            return response.body() != null ? response.body().string() : "";
         }
     }
 }

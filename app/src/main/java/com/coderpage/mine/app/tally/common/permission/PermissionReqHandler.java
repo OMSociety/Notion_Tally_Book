@@ -3,9 +3,9 @@ package com.coderpage.mine.app.tally.common.permission;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.coderpage.base.utils.ArrayUtils;
 
@@ -29,6 +29,9 @@ public class PermissionReqHandler {
     private WeakReference<Activity> mActivityRef;
 
     private String[] mPermissionArray;
+    /** 已重试次数，防止无限循环 */
+    private int mRetryCount;
+    private static final int MAX_RETRY_COUNT = 3;
 
     public PermissionReqHandler(Activity activity) {
         mActivityRef = new WeakReference<>(activity);
@@ -42,6 +45,11 @@ public class PermissionReqHandler {
      * @param listener        请求权限的监听器
      */
     public void requestPermission(boolean forceReq, String[] permissionArray, Listener listener) {
+        requestPermission(forceReq, permissionArray, listener, true);
+    }
+
+    private void requestPermission(boolean forceReq, String[] permissionArray, Listener listener,
+                                   boolean resetRetryCount) {
         Activity activity = mActivityRef.get();
         if (activity == null || activity.isFinishing()) {
             return;
@@ -49,6 +57,9 @@ public class PermissionReqHandler {
         mIsForceReq = forceReq;
         mPermissionArray = permissionArray;
         mListener = listener;
+        if (resetRetryCount) {
+            mRetryCount = 0;
+        }
         // 获取当前未授权的权限列表
         String[] notGrantedPermissionArray = getNotGrantedPermissionArray(activity, permissionArray);
         // 全部已经授权，返回成功
@@ -141,11 +152,12 @@ public class PermissionReqHandler {
             }
         }
 
-        // 用户拒绝，再次请求
-        if (!notGrantedPermissionList.isEmpty()) {
+        // 用户拒绝，再次请求（最多重试一次，避免无限循环）
+        if (!notGrantedPermissionList.isEmpty() && mRetryCount < MAX_RETRY_COUNT) {
+            mRetryCount++;
             String[] permissionArray = new String[notGrantedPermissionList.size()];
             ArrayUtils.forEach(notGrantedPermissionList, (count, index, item) -> permissionArray[index] = item);
-            requestPermission(mIsForceReq, permissionArray, mListener);
+            requestPermission(mIsForceReq, permissionArray, mListener, false);
             return;
         }
 

@@ -2,14 +2,14 @@ package com.coderpage.mine.app.tally.module.detail;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.OnLifecycleEvent;
 import android.content.Intent;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 
 import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
@@ -73,12 +73,16 @@ public class RecordDetailViewModel extends BaseViewModel implements LifecycleObs
                     if (mType == TYPE_EXPENSE) {
                         mRepository.deleteExpense(mRecordId, result -> {
                             activity.finish();
-                            EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                            if (mRecord instanceof Record) {
+                                EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                            }
                         });
                     } else {
                         mRepository.deleteIncome(mRecordId, result -> {
                             activity.finish();
-                            EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                            if (mRecord instanceof Record) {
+                                EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                            }
                         });
                     }
                 }).show();
@@ -122,11 +126,11 @@ public class RecordDetailViewModel extends BaseViewModel implements LifecycleObs
                     RecordData recordData = new RecordData();
                     recordData.setType(TYPE_INCOME);
                     recordData.setRecordId(income.getId());
-                    recordData.setAmount(TallyUtils.formatDisplayMoney(income.getAmount()));
+                    recordData.setAmount("¥" + TallyUtils.formatDisplayMoney(income.getAmount()));
                     recordData.setCategoryIcon(income.getCategoryIcon());
                     recordData.setCategoryName(income.getCategoryName());
                     recordData.setDesc(income.getDesc());
-                    recordData.setTime("¥" + TallyUtils.formatDisplayTime(income.getTime()));
+                    recordData.setTime(TallyUtils.formatDisplayTime(income.getTime()));
                     mRecordData.setValue(recordData);
                 }
 
@@ -154,7 +158,7 @@ public class RecordDetailViewModel extends BaseViewModel implements LifecycleObs
         EventBus.getDefault().unregister(this);
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventRecordUpdate(EventRecordUpdate event) {
         mDataModified = true;
         if (event.getRecord() != null && event.getRecord().getId() == mRecordId) {

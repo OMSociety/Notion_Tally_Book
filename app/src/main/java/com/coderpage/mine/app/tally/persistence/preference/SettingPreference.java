@@ -38,7 +38,7 @@ public class SettingPreference {
     }
 
     private static SharedPreferences getPreference(Context context) {
-        return context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        return context.getApplicationContext().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
     }
 
 }

@@ -1,14 +1,14 @@
 package com.coderpage.mine.app.tally.persistence.sql;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.coderpage.base.utils.LogUtils;
 import com.coderpage.mine.MineApp;
@@ -40,7 +40,7 @@ public abstract class TallyDatabase extends RoomDatabase {
     /** db version of app version 0.6.0 */
     private static final int VERSION_0_6_0 = 60;
 
-    private static TallyDatabase sInstance = null;
+    private static volatile TallyDatabase sInstance = null;
 
     /**
      * 记录操作
@@ -65,7 +65,6 @@ public abstract class TallyDatabase extends RoomDatabase {
                             TallyDatabase.class, DATABASE_NAME)
                             .addMigrations(MIGRATION_010_040, MIGRATION_040_060)
                             .addCallback(mTallDatabaseCallback)
-                            .allowMainThreadQueries()
                             .build();
                 }
             }
@@ -111,7 +110,7 @@ public abstract class TallyDatabase extends RoomDatabase {
             db.beginTransaction();
             // 插入分类
             for (CategoryItem categoryItem : categoryList) {
-                ContentValues values = new ContentValues(4);
+                ContentValues values = new ContentValues(6);
                 values.put("category_unique_name", categoryItem.uniqueName);
                 values.put("category_name", categoryItem.name);
                 values.put("category_icon", categoryItem.icon);

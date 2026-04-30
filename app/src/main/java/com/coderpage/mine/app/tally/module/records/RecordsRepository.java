@@ -10,6 +10,9 @@ import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.app.tally.persistence.sql.dao.RecordDao;
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import java.util.List;
 
 /**
@@ -18,6 +21,8 @@ import java.util.List;
  */
 
 class RecordsRepository {
+
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     /**
      * 查询记录
@@ -29,27 +34,30 @@ class RecordsRepository {
      */
     void queryRecords(int page, int pageSize, RecordQuery query, Callback<List<Record>, IError> callback) {
         MineExecutors.ioExecutor().execute(() -> {
+            try {
+                int type = query.getType();
+                long startTime = query.getStartTime();
+                long endTime = query.getEndTime();
+                long limit = pageSize;
+                long offset = ((page - 1) * pageSize);
+                String[] categoryArray = query.getCategoryUniqueNameArray();
 
-            int type = query.getType();
-            long startTime = query.getStartTime();
-            long endTime = query.getEndTime();
-            long limit = pageSize;
-            long offset = ((page - 1) * pageSize);
-            String[] categoryArray = query.getCategoryUniqueNameArray();
+                List<Record> recordList;
+                RecordDao recordDao = TallyDatabase.getInstance().recordDao();
 
-            List<Record> recordList;
-            RecordDao recordDao = TallyDatabase.getInstance().recordDao();
-
-            if (type == RecordQuery.TYPE_ALL) {
-                recordList = categoryArray != null ?
-                        recordDao.queryAll(startTime, endTime, limit, offset, categoryArray) :
-                        recordDao.queryAll(startTime, endTime, limit, offset);
-            } else {
-                recordList = categoryArray != null ?
-                        recordDao.query(type, startTime, endTime, limit, offset, categoryArray) :
-                        recordDao.query(type, startTime, endTime, limit, offset);
+                if (type == RecordQuery.TYPE_ALL) {
+                    recordList = categoryArray != null && categoryArray.length > 0 ?
+                            recordDao.queryAll(startTime, endTime, limit, offset, categoryArray) :
+                            recordDao.queryAll(startTime, endTime, limit, offset);
+                } else {
+                    recordList = categoryArray != null && categoryArray.length > 0 ?
+                            recordDao.query(type, startTime, endTime, limit, offset, categoryArray) :
+                            recordDao.query(type, startTime, endTime, limit, offset);
+                }
+                mainHandler.post(() -> callback.success(recordList));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.failure(new NonThrowError(ErrorCode.SQL_ERR, "SQL ERR")));
             }
-            callback.success(recordList);
         });
     }
 

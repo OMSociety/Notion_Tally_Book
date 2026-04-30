@@ -2,11 +2,11 @@ package com.coderpage.mine.app.tally.module.setting;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Intent;
 import android.databinding.ObservableField;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.coderpage.base.common.Callback;
@@ -144,20 +144,20 @@ public class SettingViewModel extends BaseViewModel {
     /**
      * 开始同步
      */
-    public void startSync(Activity activity) {
+    public synchronized void startSync(Activity activity) {
         if (isSyncing.get() != null && isSyncing.get()) {
             return;
         }
-        
+
         NotionConfig config = NotionConfig.getInstance(getApplication());
         if (!config.isConfigured()) {
             return;
         }
-        
+
         if (syncManager == null) {
             syncManager = new NotionSyncManager(getApplication());
         }
-        
+
         isSyncing.set(true);
         
         syncManager.setSyncListener(new NotionSyncManager.SyncListener() {
@@ -261,14 +261,16 @@ public class SettingViewModel extends BaseViewModel {
                 TallyDatabase.getInstance().recordDao().deleteAll();
                 // 成功回调
                 if (callback != null) {
-                    callback.success(true);
+                    android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+                    mainHandler.post(() -> callback.success(true));
                 }
 
             } catch (Exception e) {
                 Log.e(TAG, "清除所有账单记录失败", e);
                 // 失败回调
                 if (callback != null) {
-                    callback.failure(new IError() {
+                    android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+                    mainHandler.post(() -> callback.failure(new IError() {
                         @Override
                         public String msg() {
                             return "清除所有账单记录失败: " + e.getMessage();
@@ -278,7 +280,7 @@ public class SettingViewModel extends BaseViewModel {
                         public int code() {
                             return -1;
                         }
-                    });
+                    }));
                 }
             }
         });

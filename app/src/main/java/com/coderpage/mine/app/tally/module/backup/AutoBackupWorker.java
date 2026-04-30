@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.backup;// AutoBackupWorker.java
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,19 +34,12 @@ public class AutoBackupWorker extends Worker {
 
                         @Override
                         public void success(Void aVoid) {
-                            // 备份成功
-                            ((android.app.Activity) getApplicationContext()).runOnUiThread(() -> {
-                                Toast.makeText(getApplicationContext(), "备份成功", Toast.LENGTH_SHORT).show();
-                            });
+                            Log.i("AutoBackupWorker", "Backup completed successfully");
                         }
 
                         @Override
                         public void failure(IError iError) {
-                            // 记录错误日志
                             Log.e("AutoBackupWorker", "Backup failed: " + iError.msg());
-                            ((android.app.Activity) getApplicationContext()).runOnUiThread(() -> {
-                                Toast.makeText(getApplicationContext(), "备份失败: " + iError.msg(), Toast.LENGTH_SHORT).show();
-                            });
                         }
                     });
 

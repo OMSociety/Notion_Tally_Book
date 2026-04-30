@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'com.coderpage.mine'
     compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
         applicationId rootProject.applicationId
@@ -8,7 +9,7 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.appVersionCode
         versionName rootProject.appVersionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary true
         multiDexEnabled true
 
@@ -18,8 +19,10 @@ android {
             }
         }
     }
-    packagingOptions {
-        pickFirst 'META-INF/okio.kotlin_module'
+    packaging {
+        resources {
+            pickFirsts += ['META-INF/okio.kotlin_module']
+        }
     }
 
     signingConfigs {
@@ -44,14 +47,15 @@ android {
             buildConfigField 'String', 'TALKING_DATA_APP_ID', "\"$rootProject.talkingDataId\""
         }
     }
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding true
+        buildConfig true
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
-    lintOptions {
+    lint {
         checkReleaseBuilds true
         abortOnError false
     }
@@ -105,7 +109,6 @@ dependencies {
     api rootProject.appCompat
     api rootProject.recyclerview
     api rootProject.design
-    api rootProject.percentLayout
     api rootProject.cardView
     api rootProject.materialCalendarview
     api rootProject.mpAndroidChart

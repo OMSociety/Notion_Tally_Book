@@ -9,10 +9,10 @@ public class DefaultWorkExecutor extends ThreadPoolExecutor {
     private static final int CPU_SIZE = Runtime.getRuntime().availableProcessors();
     private static final int CORE_SIZE;
     private static final int MAX_SIZE;
-    private static final long KEEP_ALIVE_TIME = 1L;
+    private static final long KEEP_ALIVE_TIME = 60L;
 
     public DefaultWorkExecutor() {
-        this(CORE_SIZE, MAX_SIZE, KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        this(CORE_SIZE, MAX_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     }
 
     static {

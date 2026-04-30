@@ -2,15 +2,15 @@ package com.coderpage.mine.app.tally.module.records;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -116,6 +116,15 @@ public class RecordsActivity extends BaseActivity {
 
         mAdapter = new RecordsAdapter(self());
         LinearLayoutManager layoutManager = new LinearLayoutManager(self(), LinearLayoutManager.VERTICAL, false);
+        // 设置新 adapter 前，清除旧 adapter 上可能残留的 observer，防止泄漏
+        RecyclerView.Adapter oldAdapter = mRecyclerView.getAdapter();
+        if (oldAdapter != null) {
+            try {
+                oldAdapter.unregisterAdapterDataObserver(mAdapterDataObserver);
+            } catch (Exception ignored) {
+                // observer 未注册时会抛异常，忽略即可
+            }
+        }
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(layoutManager);
 
@@ -153,11 +162,6 @@ public class RecordsActivity extends BaseActivity {
                 return;
             }
             setToolbarTitle(subTitle);
-        });
-        // 添加对当前查询条件的观察，用于控制清除按钮的显示
-        // 这里我们使用一个技巧，通过 ViewModel 的 getToolbarTitle() 观察来触发检查
-        // 因为每次查询条件改变时 toolbar title 都会更新
-        mViewModel.getToolbarTitle().observe(this, subTitle -> {
             updateClearButtonVisibility();
         });
     }

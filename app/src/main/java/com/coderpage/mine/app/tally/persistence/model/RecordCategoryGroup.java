@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.persistence.model;
 
-import android.arch.persistence.room.ColumnInfo;
+import androidx.room.ColumnInfo;
 
 /**
  * @author lc.

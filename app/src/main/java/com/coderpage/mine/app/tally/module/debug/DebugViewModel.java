@@ -3,7 +3,7 @@ package com.coderpage.mine.app.tally.module.debug;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.coderpage.base.cache.Cache;
 import com.coderpage.base.utils.LogUtils;
@@ -59,28 +59,23 @@ public class DebugViewModel extends BaseViewModel {
     private void copyDatabaseFileToSdcard() {
         MineExecutors.ioExecutor().execute(() -> {
             File oldfile = getApplication().getDatabasePath("sql_tally");
-            try {
-                int bytesum = 0;
-                int byteread = 0;
-
-                String newPath = Cache.getCacheFolder(getApplication()).getAbsolutePath() + "/记账本.db";
-                if (oldfile.exists()) {
-                    InputStream inStream = new FileInputStream(oldfile);
-                    FileOutputStream fs = new FileOutputStream(newPath);
-                    byte[] buffer = new byte[1444];
-                    int length;
-                    while ((byteread = inStream.read(buffer)) != -1) {
-                        bytesum += byteread;
-                        System.out.println(bytesum);
-                        fs.write(buffer, 0, byteread);
-                    }
-                    inStream.close();
+            String newPath = Cache.getCacheFolder(getApplication()).getAbsolutePath() + "/记账本.db";
+            if (!oldfile.exists()) {
+                showToastShort("导出失败: 数据库文件不存在");
+                return;
+            }
+            try (InputStream inStream = new FileInputStream(oldfile);
+                 FileOutputStream fs = new FileOutputStream(newPath)) {
+                byte[] buffer = new byte[1444];
+                int byteread;
+                while ((byteread = inStream.read(buffer)) != -1) {
+                    fs.write(buffer, 0, byteread);
                 }
+                showToastShort("导出成功");
             } catch (Exception e) {
                 e.printStackTrace();
                 showToastLong("导出异常:" + e.getMessage());
             }
-            showToastShort("导出成功");
         });
     }
 

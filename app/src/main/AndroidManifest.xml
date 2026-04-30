@@ -35,6 +35,7 @@
 
         <activity
             android:name=".app.tally.module.home.HomeActivity"
+            android:exported="true"
             android:label="@string/tally_toolbar_title_main"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally">
@@ -48,7 +49,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.coderpage.mine.app.tally.module.auto.ImageReceiverActivity">
+        <activity android:name="com.coderpage.mine.app.tally.module.auto.ImageReceiverActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -64,80 +66,96 @@
         </receiver>
         <activity
             android:name=".app.tally.ui.dialog.DocumentActivity"
+            android:exported="false"
             android:label="@string/user_agreement"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.edit.RecordEditActivity"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".app.tally.module.edit.category.CategoryManagerActivity"
+            android:exported="false"
             android:label=""
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".app.tally.module.edit.category.CategorySortActivity"
+            android:exported="false"
             android:label="@string/menu_tally_sort_category"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.edit.category.CategoryEditActivity"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".app.tally.module.about.AboutActivity"
+            android:exported="false"
             android:label="@string/tally_toolbar_title_about"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.records.RecordsActivity"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.setting.SettingActivity"
+            android:exported="false"
             android:label="@string/tally_toolbar_title_setting"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.ai.AiSettingActivity"
+            android:exported="false"
             android:label="@string/setting_group_ai"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.setting.NotionDatabaseHelpActivity"
+            android:exported="false"
             android:label="@string/setting_notion_help"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.detail.RecordDetailActivity"
+            android:exported="false"
             android:label="@string/tally_toolbar_title_detail"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.chart.TallyChartActivity"
+            android:exported="false"
             android:label="@string/tally_toolbar_title_chart"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.backup.BackupFileActivity"
+            android:exported="false"
             android:label="@string/tally_toolbar_title_backup_file"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.backup.BackupFileManagerActivity"
+            android:exported="false"
             android:label="@string/tally_toolbar_title_backup_file_manager"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.debug.DebugActivity"
+            android:exported="false"
             android:label="@string/tally_toolbar_title_debug"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
-        <activity android:name=".app.tally.module.search.SearchActivity">
+        <activity android:name=".app.tally.module.search.SearchActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -153,6 +171,7 @@
 
         <service
             android:name="com.talkingdata.sdk.TDAntiCheatingService"
+            android:exported="false"
             android:process="com.talkingdata.sdk.TDAntiCheatingService">
             <intent-filter>
                 <action android:name="com.talkingdata.sdk.TDAntiCheatingService" />
@@ -160,7 +179,7 @@
         </service>
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true">

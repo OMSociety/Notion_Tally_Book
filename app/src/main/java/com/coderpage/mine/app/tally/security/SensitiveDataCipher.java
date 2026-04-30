@@ -8,13 +8,14 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.UUID;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -29,6 +30,8 @@ public final class SensitiveDataCipher {
     private static final int GCM_IV_LENGTH = 12;
     private static final String PREF_NAME = "security_meta";
     private static final String KEY_DEVICE_SECRET = "device_secret";
+    private static final int PBKDF2_ITERATIONS = 10000;
+    private static final int PBKDF2_KEY_LENGTH = 256;
 
     private SensitiveDataCipher() {
     }
@@ -53,11 +56,11 @@ public final class SensitiveDataCipher {
             return PREFIX + Base64.encodeToString(payload, Base64.NO_WRAP);
         } catch (Exception e) {
             Log.e(TAG, "encrypt failed", e);
-            return "";
+            throw new RuntimeException("Encryption failed", e);
         }
     }
 
-    public static String decrypt(Context context, String storedValue) {
+    public static String decrypt(Context context, String storedValue) throws CipherException {
         if (storedValue == null || storedValue.isEmpty()) {
             return "";
         }
@@ -67,8 +70,7 @@ public final class SensitiveDataCipher {
         try {
             byte[] payload = Base64.decode(storedValue.substring(PREFIX.length()), Base64.NO_WRAP);
             if (payload.length <= GCM_IV_LENGTH) {
-                Log.w(TAG, "decrypt failed: payload too short");
-                return "";
+                throw new CipherException("decrypt failed: payload too short");
             }
             byte[] iv = Arrays.copyOfRange(payload, 0, GCM_IV_LENGTH);
             byte[] encrypted = Arrays.copyOfRange(payload, GCM_IV_LENGTH, payload.length);
@@ -76,9 +78,21 @@ public final class SensitiveDataCipher {
             cipher.init(Cipher.DECRYPT_MODE, buildKey(context), new GCMParameterSpec(GCM_TAG_LENGTH, iv));
             byte[] decrypted = cipher.doFinal(encrypted);
             return new String(decrypted, StandardCharsets.UTF_8);
+        } catch (CipherException e) {
+            throw e;
         } catch (Exception e) {
             Log.e(TAG, "decrypt failed", e);
-            return "";
+            throw new CipherException("decrypt failed", e);
+        }
+    }
+
+    public static final class CipherException extends Exception {
+        CipherException(String message) {
+            super(message);
+        }
+
+        CipherException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 
@@ -94,9 +108,11 @@ public final class SensitiveDataCipher {
                 prefs.edit().putString(KEY_DEVICE_SECRET, androidId).apply();
             }
         }
-        String seed = packageName + ":" + androidId;
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] keyBytes = Arrays.copyOf(digest.digest(seed.getBytes(StandardCharsets.UTF_8)), 32);
+        char[] password = (packageName + ":" + androidId).toCharArray();
+        byte[] salt = packageName.getBytes(StandardCharsets.UTF_8);
+        PBEKeySpec spec = new PBEKeySpec(password, salt, PBKDF2_ITERATIONS, PBKDF2_KEY_LENGTH);
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        byte[] keyBytes = factory.generateSecret(spec).getEncoded();
         return new SecretKeySpec(keyBytes, "AES");
     }
 }

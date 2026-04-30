@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.utils;
 
 import android.content.Context;
-import android.support.v7.widget.ListPopupWindow;
+import androidx.appcompat.widget.ListPopupWindow;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

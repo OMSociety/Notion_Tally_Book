@@ -1,16 +1,22 @@
 package com.coderpage.mine.app.tally.persistence.sql.entity;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+import androidx.annotation.NonNull;
+
+import com.coderpage.mine.app.tally.persistence.sql.Converters;
+
+import java.math.BigDecimal;
 
 /**
  * @author lc.
  * @since 0.6.0
  */
 @Entity(tableName = "record", indices = {@Index(value = {"record_sync_id"}, unique = true)})
+@TypeConverters(Converters.class)
 public class RecordEntity {
 
     /** 记录类型: 支出 */
@@ -33,7 +39,7 @@ public class RecordEntity {
 
     /** 金额 */
     @ColumnInfo(name = "record_amount")
-    private double amount;
+    private BigDecimal amount;
 
     /** 分类唯一名称，不可变 */
     @ColumnInfo(name = "record_category_unique_name")
@@ -85,11 +91,11 @@ public class RecordEntity {
         this.time = time;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

@@ -1,10 +1,10 @@
 package com.coderpage.mine.app.tally.persistence.sql.entity;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+import androidx.annotation.NonNull;
 
 /**
  * @author lc. 2018-05-20 14:27
@@ -25,7 +25,7 @@ public class CategoryEntity {
     /** 分类唯一名称 不可修改 */
     @NonNull
     @ColumnInfo(name = "category_unique_name")
-    private String uniqueName;
+    private String uniqueName = "";
 
     /** 分类名称 */
     @ColumnInfo(name = "category_name")

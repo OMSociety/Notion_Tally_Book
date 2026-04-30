@@ -100,10 +100,10 @@ public class CsvImporter {
                 }
             }
             
-            // 保存到数据库
+            // 保存到数据库（整体事务，失败时全部回滚）
             if (!records.isEmpty()) {
                 RecordEntity[] insertArray = records.toArray(new RecordEntity[0]);
-                database.recordDao().insert(insertArray);
+                database.runInTransaction(() -> database.recordDao().insert(insertArray));
             }
             
             result.success = true;
@@ -359,7 +359,7 @@ public class CsvImporter {
         
         for (String format : formats) {
             try {
-                SimpleDateFormat sdf = new SimpleDateFormat(format);
+                SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
                 return sdf.parse(str).getTime();
             } catch (ParseException e) {
                 // 尝试下一个格式

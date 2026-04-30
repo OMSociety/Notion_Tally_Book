@@ -1,10 +1,10 @@
 package com.coderpage.mine.app.tally.ui.dialog;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -75,9 +75,8 @@ public class DocumentActivity extends AppCompatActivity {
 
         setTitle(title);
 
-        try {
-            InputStream inputStream = getAssets().open(fileName);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        try (InputStream inputStream = getAssets().open(fileName);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             StringBuilder content = new StringBuilder();
             String line;
 
@@ -86,8 +85,6 @@ public class DocumentActivity extends AppCompatActivity {
             }
 
             mDocumentContent.setText(content.toString());
-            reader.close();
-            inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
             mDocumentContent.setText("无法加载文档内容");

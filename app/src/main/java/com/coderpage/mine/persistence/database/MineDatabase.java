@@ -1,11 +1,10 @@
 package com.coderpage.mine.persistence.database;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import com.coderpage.mine.MineApp;
-import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.persistence.dao.KeyValueDao;
 import com.coderpage.mine.persistence.entity.KeyValue;
 
@@ -22,7 +21,7 @@ public abstract class MineDatabase extends RoomDatabase {
     /** db version of app version 0.6.0 */
     private static final int VERSION_0_6_0 = 60;
 
-    private static MineDatabase sInstance = null;
+    private static volatile MineDatabase sInstance = null;
 
     /**
      * key-value 数据表操作
@@ -33,12 +32,11 @@ public abstract class MineDatabase extends RoomDatabase {
 
     public static MineDatabase getInstance() {
         if (sInstance == null) {
-            synchronized (TallyDatabase.class) {
+            synchronized (MineDatabase.class) {
                 if (sInstance == null) {
                     sInstance = Room.databaseBuilder(
                             MineApp.getAppContext(),
                             MineDatabase.class, DATABASE_NAME)
-                            .allowMainThreadQueries()
                             .build();
                 }
             }

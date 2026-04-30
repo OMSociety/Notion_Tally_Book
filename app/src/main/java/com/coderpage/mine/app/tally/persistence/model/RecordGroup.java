@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.persistence.model;
 
-import android.arch.persistence.room.ColumnInfo;
+import androidx.room.ColumnInfo;
 
 /**
  * @author lc.
@@ -19,7 +19,7 @@ public class RecordGroup {
 
     /** 总金额 */
     @ColumnInfo(name = "sum(record_amount)")
-    private float amount;
+    private double amount;
 
     public long getCount() {
         return count;
@@ -37,11 +37,11 @@ public class RecordGroup {
         this.time = time;
     }
 
-    public float getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(float amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 }

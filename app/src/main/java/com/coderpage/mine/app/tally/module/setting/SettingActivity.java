@@ -6,9 +6,9 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -60,7 +60,6 @@ public class SettingActivity extends BaseActivity {
     // 其他
     private LinearLayout lyAbout;
     private LinearLayout lyUpdate;
-    private Toolbar mToolbar;
     private TextView tvVersion;
 
     private NotionConfig mNotionConfig;

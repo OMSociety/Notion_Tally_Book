@@ -1,8 +1,10 @@
 package com.coderpage.mine.app.tally.persistence.model;
 
-import android.arch.persistence.room.ColumnInfo;
+import androidx.room.ColumnInfo;
 
 import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
+
+import java.math.BigDecimal;
 
 /**
  * @author lc.
@@ -44,7 +46,7 @@ public class Record {
 
     /** 金额 */
     @ColumnInfo(name = "record_amount")
-    private double amount;
+    private BigDecimal amount = BigDecimal.ZERO;
 
     /** 备注 */
     @ColumnInfo(name = "record_desc")
@@ -67,8 +69,8 @@ public class Record {
         entity.setId(getId());
         entity.setAccountId(getAccountId());
         entity.setAmount(getAmount());
-        entity.setDesc(getDesc());
-        entity.setSyncId(getSyncId());
+        entity.setDesc(getDesc() != null ? getDesc() : "");
+        entity.setSyncId(getSyncId() != null ? getSyncId() : "");
         entity.setSyncStatus(getSyncStatus());
         entity.setTime(getTime());
         entity.setCategoryUniqueName(getCategoryUniqueName());
@@ -124,12 +126,12 @@ public class Record {
         this.categoryIcon = categoryIcon;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = Math.round(amount * 100.0) / 100.0;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount == null ? BigDecimal.ZERO : amount.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     public String getDesc() {

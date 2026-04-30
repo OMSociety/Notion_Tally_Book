@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.update;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.coderpage.lib.update.ApkModel;
@@ -60,11 +60,10 @@ public class GitHubSourceFetcher implements SourceFetcher {
         
         GitHubApi api = apiRetrofit.create(GitHubApi.class);
 
+        Response<GitHubRelease> response = null;
         try {
-            Response<GitHubRelease> response = api
-                    .fetchLatestRelease(GITHUB_OWNER, GITHUB_REPO)
-                    .execute();
-            
+            response = api.fetchLatestRelease(GITHUB_OWNER, GITHUB_REPO).execute();
+
             if (!response.isSuccessful()) {
                 result.setErr(new Error(response.code(), response.message()));
                 return result;
@@ -78,10 +77,13 @@ public class GitHubSourceFetcher implements SourceFetcher {
 
             // 查找 APK 文件
             GitHubReleaseAsset targetAsset = null;
-            for (GitHubReleaseAsset asset : body.getAssets()) {
-                if (asset.getName() != null && asset.getName().endsWith(".apk")) {
-                    targetAsset = asset;
-                    break;
+            List<GitHubReleaseAsset> assets = body.getAssets();
+            if (assets != null) {
+                for (GitHubReleaseAsset asset : assets) {
+                    if (asset.getName() != null && asset.getName().endsWith(".apk")) {
+                        targetAsset = asset;
+                        break;
+                    }
                 }
             }
 
@@ -104,6 +106,10 @@ public class GitHubSourceFetcher implements SourceFetcher {
             e.printStackTrace();
             result.setErr(new Error(-1, e.getMessage()));
             return result;
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
 
@@ -111,11 +117,10 @@ public class GitHubSourceFetcher implements SourceFetcher {
         if (tagName == null) return 0;
         try {
             String version = tagName.startsWith("v") ? tagName.substring(1) : tagName;
-            // 将版本号如 "1.0.0" 转换为 100
             String[] parts = version.split("\\.");
             int code = 0;
             for (int i = 0; i < Math.min(parts.length, 3); i++) {
-                code += Integer.parseInt(parts[i]) * (100 / Math.pow(10, i));
+                code = code * 100 + Integer.parseInt(parts[i]);
             }
             return code;
         } catch (Exception e) {

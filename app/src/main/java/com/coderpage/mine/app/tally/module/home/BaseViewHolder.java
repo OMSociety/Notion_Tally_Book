@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.module.home;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 import com.coderpage.mine.app.tally.module.home.model.HomeDisplayData;

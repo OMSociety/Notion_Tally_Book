@@ -3,12 +3,12 @@ package com.coderpage.mine.app.tally.module.backup;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.OnLifecycleEvent;
 import android.content.DialogInterface;
 
 import com.coderpage.base.utils.ArrayUtils;
@@ -154,8 +154,11 @@ public class BackupFileManagerViewModel extends BaseViewModel implements Lifecyc
         boolean deleted = file.delete();
         if (deleted) {
             List<BackupFileManagerItem> currentList = mBackupFileList.getValue();
-            ArrayUtils.remove(currentList, item1 -> item1 == item);
-            mBackupFileList.setValue(currentList);
+            if (currentList != null) {
+                List<BackupFileManagerItem> newList = new ArrayList<>(currentList);
+                ArrayUtils.remove(newList, item1 -> item1 == item);
+                mBackupFileList.setValue(newList);
+            }
         }
     }
 

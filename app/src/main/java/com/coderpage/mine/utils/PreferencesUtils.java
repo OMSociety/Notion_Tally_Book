@@ -48,7 +48,7 @@ public class PreferencesUtils {
     public static List<String> getSearchHistory(Context context) {
         String source = getPreferences(context).getString(PRE_SEARCH_HISTORY_KEYWORDS, "");
         if (TextUtils.isEmpty(source)) return new ArrayList<>(0);
-        return Arrays.asList(source.split(","));
+        return new ArrayList<>(Arrays.asList(source.split(",")));
     }
 
     /**

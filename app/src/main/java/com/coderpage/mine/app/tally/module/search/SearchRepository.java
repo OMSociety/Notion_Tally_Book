@@ -1,6 +1,7 @@
 package com.coderpage.mine.app.tally.module.search;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -37,8 +38,9 @@ class SearchRepository {
             long limit = pageSize;
             long offset = ((page - 1) * pageSize);
 
+            String escapedKeyWord = keyWord.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
             List<Record> recordList = TallyDatabase.getInstance().recordDao()
-                    .queryByKeyWord("%" + keyWord + "%", limit, offset);
+                    .queryByKeyWord("%" + escapedKeyWord + "%", limit, offset);
             callback.success(recordList);
         });
     }
@@ -61,6 +63,7 @@ class SearchRepository {
                 List<String> list = JSONArray.parseArray(keyValue.getValue(), String.class);
                 MineExecutors.executeOnUiThread(() -> callback.success(list));
             } catch (Exception e) {
+                Log.e("SearchRepository", "loadSearchHistory failed", e);
                 MineExecutors.executeOnUiThread(() -> callback.success(new ArrayList<>()));
             }
         });

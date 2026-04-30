@@ -1,8 +1,6 @@
 // 文件路径: app/src/main/java/com/coderpage/mine/app/tally/module/auto/SmsReceiver.java
 package com.coderpage.mine.app.tally.module.auto;
 
-import static java.lang.Math.abs;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -29,6 +27,8 @@ import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.persistence.database.MineDatabase;
 import com.coderpage.mine.utils.AndroidUtils;
 
+import com.coderpage.concurrency.MineExecutors;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
@@ -43,48 +43,60 @@ public class SmsReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        mDataBase = TallyDatabase.getInstance();
+        final PendingResult pendingResult = goAsync();
+        MineExecutors.ioExecutor().execute(() -> {
+            try {
+                mDataBase = TallyDatabase.getInstance();
 
-        // 检查是否启用了短信识别功能
-        if (!isSmsRecognitionEnabled(context)) {
-            Log.d(TAG, "短信识别功能未开启");
-            return;
-        }
+                // 检查是否启用了短信识别功能
+                if (!isSmsRecognitionEnabled(context)) {
+                    Log.d(TAG, "短信识别功能未开启");
+                    return;
+                }
 
-        // 获取短信内容
-        Bundle bundle = intent.getExtras();
-        if (bundle == null) {
-            return;
-        }
+                // 获取短信内容
+                Bundle bundle = intent.getExtras();
+                if (bundle == null) {
+                    return;
+                }
 
-        Object[] pdus = (Object[]) bundle.get("pdus");
-        if (pdus == null || pdus.length == 0) {
-            return;
-        }
+                Object[] pdus = (Object[]) bundle.get("pdus");
+                if (pdus == null || pdus.length == 0) {
+                    return;
+                }
 
+                // 解析短信
+                for (Object pdu : pdus) {
+                    SmsMessage smsMessage;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        String format = intent.getStringExtra("format");
+                        smsMessage = SmsMessage.createFromPdu((byte[]) pdu, format != null ? format : "3gpp");
+                    } else {
+                        smsMessage = SmsMessage.createFromPdu((byte[]) pdu);
+                    }
+                    if (smsMessage != null) {
+                        String sender = smsMessage.getDisplayOriginatingAddress();
+                        String messageBody = smsMessage.getMessageBody();
 
-        // 解析短信
-        for (Object pdu : pdus) {
-            SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) pdu);
-            if (smsMessage != null) {
-                String sender = smsMessage.getDisplayOriginatingAddress();
-                String messageBody = smsMessage.getMessageBody();
+                        Log.d(TAG, "发件人: " + sender + ", 内容: " + messageBody);
 
-                Log.d(TAG, "发件人: " + sender + ", 内容: " + messageBody);
-
-                // 检查是否在检测名单中
-                if (isInDetectionList(context, sender)) {
-                    // 提示正在处理
-                    UIUtils.showToastShort(context, "短信记账处理中...");
-                    // 解析金额
-                    AiIdentifyAmount amount = extractAmount(messageBody);
-                    if (amount != null) {
-                        // 保存记录
-                        saveRecordDirectly(amount);
+                        // 检查是否在检测名单中
+                        if (isInDetectionList(context, sender)) {
+                            // 提示正在处理
+                            UIUtils.showToastShort(context, "短信记账处理中...");
+                            // 解析金额
+                            AiIdentifyAmount amount = extractAmount(messageBody);
+                            if (amount != null) {
+                                // 保存记录
+                                saveRecordDirectly(amount);
+                            }
+                        }
                     }
                 }
+            } finally {
+                pendingResult.finish();
             }
-        }
+        });
     }
 
     /**
@@ -239,7 +251,7 @@ public class SmsReceiver extends BroadcastReceiver {
     private void saveRecordDirectly(AiIdentifyAmount amount) {
         Context context = MineApp.getAppContext();
         //如果不是账单，则返回
-        if (amount.getBill() == false) return;
+        if (!Boolean.TRUE.equals(amount.getBill())) return;
 
         //如果识别不出来是支出或者是收入, 不记录
         String expenseOrIncome = amount.getExpenseOrIncome();
@@ -275,7 +287,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
         // 创建新的记录
         record.setSyncId(AndroidUtils.generateUUID());
-        record.setAmount(abs(amount.getMoney()));
+        record.setAmount(Math.abs(amount.getMoney()));
         record.setTime(System.currentTimeMillis());
         record.setDesc("短信识别记录");
 

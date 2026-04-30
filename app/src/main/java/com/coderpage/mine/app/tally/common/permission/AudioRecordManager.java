@@ -18,7 +18,7 @@ public class AudioRecordManager {
     private AudioRecord mRecorder;
     private DataOutputStream dos;
     private Thread recordThread;
-    private boolean isStart = false;
+    private volatile boolean isStart = false;
     private int bufferSize;
     /**
      * record thread
@@ -27,6 +27,9 @@ public class AudioRecordManager {
         @Override
         public void run() {
             try {
+                if (mRecorder == null || mRecorder.getState() != AudioRecord.STATE_INITIALIZED) {
+                    return;
+                }
                 android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
                 int bytesRecord;
                 byte[] tempBuffer = new byte[bufferSize];
@@ -56,8 +59,15 @@ public class AudioRecordManager {
     public AudioRecordManager() {
         bufferSize = AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat
                 .ENCODING_PCM_16BIT);
+        if (bufferSize == AudioRecord.ERROR_BAD_VALUE || bufferSize == AudioRecord.ERROR) {
+            bufferSize = 4096;
+        }
         mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 8000, AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT, bufferSize * 2);
+        if (mRecorder.getState() != AudioRecord.STATE_INITIALIZED) {
+            mRecorder.release();
+            mRecorder = null;
+        }
     }
 
     public boolean getSuccess() {
@@ -130,12 +140,40 @@ public class AudioRecordManager {
                 mRecorder.release();
             }
         }
-        if (dos != null) {
-            dos.flush();
-            dos.close();
-        }
+        closeOutputStream();
         length = file.length();
         deleteFile();
+    }
+
+    /**
+     * release resources if stopRecord was never called
+     */
+    public void release() {
+        destroyThread();
+        if (mRecorder != null) {
+            try {
+                if (mRecorder.getState() == AudioRecord.STATE_INITIALIZED) {
+                    mRecorder.stop();
+                }
+                mRecorder.release();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            mRecorder = null;
+        }
+        closeOutputStream();
+    }
+
+    private void closeOutputStream() {
+        if (dos != null) {
+            try {
+                dos.flush();
+                dos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            dos = null;
+        }
     }
 
     private void deleteFile() {
