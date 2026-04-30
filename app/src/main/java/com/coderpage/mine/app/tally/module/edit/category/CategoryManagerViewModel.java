@@ -10,6 +10,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
 import android.view.View;
 
+import com.coderpage.base.common.IError;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.utils.ResUtils;
 import com.coderpage.framework.BaseViewModel;
 import com.coderpage.framework.ViewReliedTask;
@@ -101,10 +103,26 @@ public class CategoryManagerViewModel extends BaseViewModel implements Lifecycle
 
     private void refreshData() {
         if (mType == CategoryModel.TYPE_EXPENSE) {
-            mRepository.loadAllExpenseCategory(mCategoryList::postValue);
+            mRepository.loadAllExpenseCategory(new SimpleCallback<List<CategoryModel>>() {
+                @Override
+                public void success(List<CategoryModel> categoryModels) {
+                    mCategoryList.postValue(categoryModels);
+                }
+
+                @Override
+                public void failure(IError error) { }
+            });
         }
         if (mType == CategoryModel.TYPE_INCOME) {
-            mRepository.loadAllIncomeCategory(mCategoryList::postValue);
+            mRepository.loadAllIncomeCategory(new SimpleCallback<List<CategoryModel>>() {
+                @Override
+                public void success(List<CategoryModel> categoryModels) {
+                    mCategoryList.postValue(categoryModels);
+                }
+
+                @Override
+                public void failure(IError error) { }
+            });
         }
     }
 

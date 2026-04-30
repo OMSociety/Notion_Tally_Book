@@ -25,6 +25,9 @@ import com.coderpage.mine.app.tally.ai.AiRecognizerFactory;
 import com.coderpage.mine.app.tally.ai.RecognitionResult;
 import com.coderpage.mine.app.tally.common.RecordType;
 import com.coderpage.mine.app.tally.eventbus.EventRecordAdd;
+import com.coderpage.base.common.IError;
+import com.coderpage.base.common.Result;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.mine.app.tally.module.edit.record.RecordRepository;
 import com.coderpage.mine.app.tally.module.home.HomeActivity;
 import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
@@ -189,7 +192,7 @@ public class ImageReceiverActivity extends AppCompatActivity {
         record.setType(type == RecordType.EXPENSE ? Record.TYPE_EXPENSE : Record.TYPE_INCOME);
 
         record.setSyncId(AndroidUtils.generateUUID());
-        record.setAmount(Math.abs(result.amount));
+        record.setAmount(java.math.BigDecimal.valueOf(Math.abs(result.amount)));
         record.setTime(System.currentTimeMillis());
         record.setDesc("AI 识别记账");
 
@@ -199,20 +202,26 @@ public class ImageReceiverActivity extends AppCompatActivity {
 
         // 保存记录到数据库
         RecordRepository repository = new RecordRepository();
-        repository.saveRecord(record, result1 -> {
-            if (result1.isOk()) {
-                record.setId(result1.data());
-                EventBus.getDefault().post(new EventRecordAdd(record));
-                Log.d(TAG, "记录保存成功: " + record.getId());
+        repository.saveRecord(record, new SimpleCallback<Result<Long, IError>>() {
+            @Override
+            public void success(Result<Long, IError> result1) {
+                if (result1.isOk()) {
+                    record.setId(result1.data());
+                    EventBus.getDefault().post(new EventRecordAdd(record));
+                    Log.d(TAG, "记录保存成功: " + record.getId());
 
-                String title = "AI 自动记账成功:";
-                String content = (type == RecordType.EXPENSE ? "支出" : "收入") + Math.abs(result.amount) + "元";
-                runOnUiThread(() -> {
-                    Toast.makeText(MineApp.getAppContext(), title + content, Toast.LENGTH_LONG).show();
-                });
-            } else {
-                Log.e(TAG, "记录保存失败: " + result1.error());
+                    String title = "AI 自动记账成功:";
+                    String content = (type == RecordType.EXPENSE ? "支出" : "收入") + Math.abs(result.amount) + "元";
+                    runOnUiThread(() -> {
+                        Toast.makeText(MineApp.getAppContext(), title + content, Toast.LENGTH_LONG).show();
+                    });
+                } else {
+                    Log.e(TAG, "记录保存失败: " + result1.error());
+                }
             }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 

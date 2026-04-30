@@ -3,6 +3,7 @@ package com.coderpage.mine.app.tally.module.records;
 import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
 import com.coderpage.base.common.NonThrowError;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.error.ErrorCode;
 import com.coderpage.concurrency.MineExecutors;
 import com.coderpage.mine.app.tally.persistence.model.Record;
@@ -56,7 +57,7 @@ class RecordsRepository {
                 }
                 mainHandler.post(() -> callback.success(recordList));
             } catch (Exception e) {
-                mainHandler.post(() -> callback.failure(new NonThrowError(ErrorCode.SQL_ERR, "SQL ERR")));
+                mainHandler.post(() -> ((SimpleCallback<List<Record>>) callback).failure(new NonThrowError(ErrorCode.SQL_ERR, "SQL ERR")));
             }
         });
     }
@@ -70,7 +71,7 @@ class RecordsRepository {
                 TallyDatabase.getInstance().recordDao().delete(entity);
                 MineExecutors.executeOnUiThread(() -> callback.success(null));
             } catch (Exception e) {
-                MineExecutors.executeOnUiThread(() -> callback.failure(new NonThrowError(ErrorCode.SQL_ERR, "SQL ERR")));
+                MineExecutors.executeOnUiThread(() -> ((SimpleCallback<Void>) callback).failure(new NonThrowError(ErrorCode.SQL_ERR, "SQL ERR")));
             }
         });
     }

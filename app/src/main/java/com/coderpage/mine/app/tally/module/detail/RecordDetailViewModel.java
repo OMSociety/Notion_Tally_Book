@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.framework.BaseViewModel;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.utils.TallyUtils;
@@ -71,18 +72,30 @@ public class RecordDetailViewModel extends BaseViewModel implements LifecycleObs
                 .setNegativeButton(R.string.dialog_btn_cancel, null)
                 .setPositiveButton(R.string.dialog_btn_delete, (dialog, which) -> {
                     if (mType == TYPE_EXPENSE) {
-                        mRepository.deleteExpense(mRecordId, result -> {
-                            activity.finish();
-                            if (mRecord instanceof Record) {
-                                EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                        mRepository.deleteExpense(mRecordId, new SimpleCallback<Boolean>() {
+                            @Override
+                            public void success(Boolean result) {
+                                activity.finish();
+                                if (mRecord instanceof Record) {
+                                    EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                                }
                             }
+
+                            @Override
+                            public void failure(IError error) { }
                         });
                     } else {
-                        mRepository.deleteIncome(mRecordId, result -> {
-                            activity.finish();
-                            if (mRecord instanceof Record) {
-                                EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                        mRepository.deleteIncome(mRecordId, new SimpleCallback<Boolean>() {
+                            @Override
+                            public void success(Boolean result) {
+                                activity.finish();
+                                if (mRecord instanceof Record) {
+                                    EventBus.getDefault().post(new EventRecordDelete((Record) mRecord));
+                                }
                             }
+
+                            @Override
+                            public void failure(IError error) { }
                         });
                     }
                 }).show();
@@ -105,7 +118,7 @@ public class RecordDetailViewModel extends BaseViewModel implements LifecycleObs
                     RecordData recordData = new RecordData();
                     recordData.setType(TYPE_EXPENSE);
                     recordData.setRecordId(expense.getId());
-                    recordData.setAmount("¥" + TallyUtils.formatDisplayMoney(expense.getAmount()));
+                    recordData.setAmount("¥" + TallyUtils.formatDisplayMoney(expense.getAmount().doubleValue()));
                     recordData.setCategoryIcon(expense.getCategoryIcon());
                     recordData.setCategoryName(expense.getCategoryName());
                     recordData.setDesc(expense.getDesc());
@@ -126,7 +139,7 @@ public class RecordDetailViewModel extends BaseViewModel implements LifecycleObs
                     RecordData recordData = new RecordData();
                     recordData.setType(TYPE_INCOME);
                     recordData.setRecordId(income.getId());
-                    recordData.setAmount("¥" + TallyUtils.formatDisplayMoney(income.getAmount()));
+                    recordData.setAmount("¥" + TallyUtils.formatDisplayMoney(income.getAmount().doubleValue()));
                     recordData.setCategoryIcon(income.getCategoryIcon());
                     recordData.setCategoryName(income.getCategoryName());
                     recordData.setDesc(income.getDesc());

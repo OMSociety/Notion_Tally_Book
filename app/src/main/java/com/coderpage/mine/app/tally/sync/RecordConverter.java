@@ -23,7 +23,7 @@ public class RecordConverter {
 
         ConflictResolver.Record record = new ConflictResolver.Record();
         record.id = String.valueOf(model.getId());
-        record.amount = model.getAmount();
+        record.amount = model.getAmount() != null ? model.getAmount().doubleValue() : 0.0;
         record.time = model.getTime();
         record.remark = model.getDesc();
         record.lastModified = model.getTime();
@@ -71,7 +71,7 @@ public class RecordConverter {
             }
         }
 
-        model.setAmount(record.amount);
+        model.setAmount(java.math.BigDecimal.valueOf(record.amount));
         model.setTime(record.time);
         model.setDesc(record.remark != null ? record.remark : "");
 

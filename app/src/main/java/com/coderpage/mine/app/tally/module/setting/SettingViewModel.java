@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.utils.LogUtils;
 import com.coderpage.framework.BaseViewModel;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
@@ -270,7 +271,7 @@ public class SettingViewModel extends BaseViewModel {
                 // 失败回调
                 if (callback != null) {
                     android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
-                    mainHandler.post(() -> callback.failure(new IError() {
+                    mainHandler.post(() -> ((SimpleCallback<Boolean>) callback).failure(new IError() {
                         @Override
                         public String msg() {
                             return "清除所有账单记录失败: " + e.getMessage();

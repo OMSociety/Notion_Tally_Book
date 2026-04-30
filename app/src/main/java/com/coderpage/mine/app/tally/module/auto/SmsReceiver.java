@@ -18,6 +18,9 @@ import com.coderpage.mine.MineApp;
 import com.coderpage.mine.R;
 import com.coderpage.mine.app.tally.common.RecordType;
 import com.coderpage.mine.app.tally.eventbus.EventRecordAdd;
+import com.coderpage.base.common.IError;
+import com.coderpage.base.common.Result;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.mine.app.tally.module.edit.record.RecordRepository;
 import com.coderpage.mine.app.tally.module.home.HomeActivity;
 import com.coderpage.mine.app.tally.module.setting.SettingWorkerConstant;
@@ -287,7 +290,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
         // 创建新的记录
         record.setSyncId(AndroidUtils.generateUUID());
-        record.setAmount(Math.abs(amount.getMoney()));
+        record.setAmount(java.math.BigDecimal.valueOf(Math.abs(amount.getMoney())));
         record.setTime(System.currentTimeMillis());
         record.setDesc("短信识别记录");
 
@@ -298,20 +301,28 @@ public class SmsReceiver extends BroadcastReceiver {
 
         // 保存记录到数据库
         RecordRepository repository = new RecordRepository();
-        repository.saveRecord(record, result -> {
-            if (result.isOk()) {
-                record.setId(result.data());
-                EventBus.getDefault().post(new EventRecordAdd(record));
-                Log.d(TAG, "记录保存成功: " + record.getId());
-                // 添加成功提示
-                UIUtils.showToastShort(context, "短信记账成功: " +
-                        (type == RecordType.EXPENSE ? "支出" : "收入") +
-                        Math.abs(amount.getMoney()) + "元");
+        repository.saveRecord(record, new SimpleCallback<Result<Long, IError>>() {
+            @Override
+            public void success(Result<Long, IError> result) {
+                if (result.isOk()) {
+                    record.setId(result.data());
+                    EventBus.getDefault().post(new EventRecordAdd(record));
+                    Log.d(TAG, "记录保存成功: " + record.getId());
+                    // 添加成功提示
+                    UIUtils.showToastShort(context, "短信记账成功: " +
+                            (type == RecordType.EXPENSE ? "支出" : "收入") +
+                            Math.abs(amount.getMoney()) + "元");
 
-                // 发送通知到通知中心
-                sendNotification(context, type, amount);
-            } else {
-                Log.e(TAG, "记录保存失败: " + result.error());
+                    // 发送通知到通知中心
+                    sendNotification(context, type, amount);
+                } else {
+                    Log.e(TAG, "记录保存失败: " + result.error());
+                }
+            }
+
+            @Override
+            public void failure(IError error) {
+                Log.e(TAG, "记录保存失败: " + error.msg());
             }
         });
     }

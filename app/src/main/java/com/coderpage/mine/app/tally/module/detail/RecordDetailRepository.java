@@ -21,7 +21,7 @@ class RecordDetailRepository {
         MineExecutors.ioExecutor().execute(() -> {
             Record expense = TallyDatabase.getInstance().recordDao().queryById(expenseId);
             if (expense == null) {
-                MineExecutors.executeOnUiThread(() -> callback.failure(new NonThrowError(ErrorCode.SQL_ERR, "EMPTY DATA")));
+                MineExecutors.executeOnUiThread(() -> ((SimpleCallback<Record>) callback).failure(new NonThrowError(ErrorCode.SQL_ERR, "EMPTY DATA")));
             } else {
                 MineExecutors.executeOnUiThread(() -> callback.success(expense));
             }
@@ -32,7 +32,7 @@ class RecordDetailRepository {
         MineExecutors.ioExecutor().execute(() -> {
             Record income = TallyDatabase.getInstance().recordDao().queryById(incomeId);
             if (income == null) {
-                MineExecutors.executeOnUiThread(() -> callback.failure(new NonThrowError(ErrorCode.SQL_ERR, "EMPTY DATA")));
+                MineExecutors.executeOnUiThread(() -> ((SimpleCallback<Record>) callback).failure(new NonThrowError(ErrorCode.SQL_ERR, "EMPTY DATA")));
             } else {
                 MineExecutors.executeOnUiThread(() -> callback.success(income));
             }

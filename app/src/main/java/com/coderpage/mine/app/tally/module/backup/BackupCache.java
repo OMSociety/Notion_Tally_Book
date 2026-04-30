@@ -12,6 +12,7 @@ import com.coderpage.base.cache.Cache;
 import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
 import com.coderpage.base.common.NonThrowError;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.concurrency.AsyncTaskExecutor;
 import com.coderpage.mine.app.tally.common.error.ErrorCode;
 import com.coderpage.mine.app.tally.persistence.model.Record;
@@ -86,7 +87,7 @@ class BackupCache {
         String fileName = formatBackupJsonFileName();
         File file = new File(backupFolderPath, fileName);
         if (!createFileIfNotExists(file)) {
-            callback.failure(new NonThrowError(
+            ((SimpleCallback<Void>) callback).failure(new NonThrowError(
                     ErrorCode.ILLEGAL_ARGS, "create backup file failed"));
             return null;
         }
@@ -103,7 +104,7 @@ class BackupCache {
             callback.success(null);
         } catch (IOException e) {
             LOGE(TAG, "文件写入错误:", e);
-            callback.failure(new NonThrowError(ErrorCode.UNKNOWN, "文件写入错误:" + e.getMessage()));
+            ((SimpleCallback<Void>) callback).failure(new NonThrowError(ErrorCode.UNKNOWN, "文件写入错误:" + e.getMessage()));
             return null;
         }
 
@@ -183,7 +184,7 @@ class BackupCache {
         try {
             File file = new File(backupFolderPath, AUTOMATIC_BACKUP_FILE_NAME +".json");
             if (!createFileIfNotExists(file)) {
-                listener.failure(new NonThrowError(
+                ((SimpleCallback<Void>) listener).failure(new NonThrowError(
                         ErrorCode.ILLEGAL_ARGS, "create backup file failed"));
                 return null;
             }
@@ -202,7 +203,7 @@ class BackupCache {
             return file;
         } catch (Exception e) {
             LOGE(TAG, "文件写入错误:", e);
-            listener.failure(new NonThrowError(ErrorCode.UNKNOWN, "文件写入错误:" + e.getMessage()));
+            ((SimpleCallback<Void>) listener).failure(new NonThrowError(ErrorCode.UNKNOWN, "文件写入错误:" + e.getMessage()));
             return null;
         }
     }

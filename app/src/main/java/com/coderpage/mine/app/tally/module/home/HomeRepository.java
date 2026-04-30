@@ -93,10 +93,10 @@ class HomeRepository {
 
                 if (isTodayRecord) {
                     if (record.getType() == Record.TYPE_EXPENSE) {
-                        todayExpenseTotalAmount += record.getAmount();
+                        todayExpenseTotalAmount += record.getAmount().doubleValue();
                     }
                     if (record.getType() == Record.TYPE_INCOME) {
-                        todayIncomeTotalAmount += record.getAmount();
+                        todayIncomeTotalAmount += record.getAmount().doubleValue();
                     }
                     todayRecordList.add(record);
                 }
@@ -107,10 +107,10 @@ class HomeRepository {
                 }
 
                 if (record.getType() == Record.TYPE_EXPENSE) {
-                    monthExpenseTotalAmount += record.getAmount();
+                    monthExpenseTotalAmount += record.getAmount().doubleValue();
                 }
                 if (record.getType() == Record.TYPE_INCOME) {
-                    monthIncomeTotalAmount += record.getAmount();
+                    monthIncomeTotalAmount += record.getAmount().doubleValue();
                 }
 
                 if (record.getType() == Record.TYPE_EXPENSE) {
@@ -118,7 +118,7 @@ class HomeRepository {
                     if (categoryAmountTotal == null) {
                         categoryAmountTotal = 0.0D;
                     }
-                    categoryAmountTotal += record.getAmount();
+                    categoryAmountTotal += record.getAmount().doubleValue();
                     getAmountByCategoryName.put(record.getCategoryName(), categoryAmountTotal);
                 }
             }
@@ -155,7 +155,7 @@ class HomeRepository {
             MineExecutors.executeOnUiThread(() -> callback.success(result));
             } catch (Exception e) {
                 Result<Snapshot, IError> errorResult = new Result<>();
-                errorResult.setError(new NonThrowError(e.getMessage()));
+                errorResult.setError(new NonThrowError(-1, e.getMessage()));
                 MineExecutors.executeOnUiThread(() -> callback.success(errorResult));
             }
         });

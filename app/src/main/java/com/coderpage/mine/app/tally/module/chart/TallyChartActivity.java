@@ -36,7 +36,8 @@ import com.coderpage.mine.app.tally.persistence.model.CategoryModel;
 import com.coderpage.mine.common.Font;
 import com.coderpage.mine.tally.module.chart.TallyChartActivityBinding;
 import com.coderpage.mine.ui.BaseActivity;
-import com.github.mikephil.charting.animation.Easing;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -49,6 +50,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -236,19 +238,22 @@ public class TallyChartActivity extends BaseActivity {
         xAxis.setGridColor(ResUtils.getColor(this, R.color.chartGridLine));
         xAxis.setDrawAxisLine(true);
         xAxis.setLabelCount(yValues.size());
-        xAxis.setValueFormatter((value, axis) -> {
-            String format = "";
-            if (value != 0
-                    && value != axis.mEntryCount - 1
-                    && value != axis.mEntryCount / 2) {
+        xAxis.setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, com.github.mikephil.charting.components.AxisBase axis) {
+                String format = "";
+                if (value != 0
+                        && value != axis.mEntryCount - 1
+                        && value != axis.mEntryCount / 2) {
+                    return format;
+                }
+                DailyData dailyData = dailyDataList != null && dailyDataList.size() > value ?
+                        dailyDataList.get((int) value) : null;
+                if (dailyData != null) {
+                    return dailyData.getMonth() + "-" + dailyData.getDayOfMonth();
+                }
                 return format;
             }
-            DailyData dailyData = dailyDataList != null && dailyDataList.size() > value ?
-                    dailyDataList.get((int) value) : null;
-            if (dailyData != null) {
-                return dailyData.getMonth() + "-" + dailyData.getDayOfMonth();
-            }
-            return format;
         });
 
         YAxis axisLeft = mBarChart.getAxisLeft();
@@ -353,11 +358,14 @@ public class TallyChartActivity extends BaseActivity {
         xAxis.setAxisLineColor(ResUtils.getColor(this, R.color.chartGridLine));
         xAxis.setDrawGridLines(false);
         xAxis.setDrawAxisLine(true);
-        xAxis.setValueFormatter((value, axis) -> {
-            if (xAxisLabels.size() > value) {
-                return xAxisLabels.get((int) value);
+        xAxis.setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, com.github.mikephil.charting.components.AxisBase axis) {
+                if (xAxisLabels.size() > value) {
+                    return xAxisLabels.get((int) value);
+                }
+                return "";
             }
-            return "";
         });
 
         YAxis axisLeft = mLineChart.getAxisLeft();
@@ -436,8 +444,11 @@ public class TallyChartActivity extends BaseActivity {
         pieDataSet.setValueTextSize(9);
         pieDataSet.setValueTypeface(valueTypeface);
         pieDataSet.setValueLineVariableLength(true);
-        pieDataSet.setValueFormatter((value, entry, dataSetIndex, viewPortHandler) -> {
-            return percentFormat.format(value) + "%";
+        pieDataSet.setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, com.github.mikephil.charting.data.Entry entry, int dataSetIndex, com.github.mikephil.charting.utils.ViewPortHandler viewPortHandler) {
+                return percentFormat.format(value) + "%";
+            }
         });
 
         PieData pieData = null;
@@ -460,6 +471,6 @@ public class TallyChartActivity extends BaseActivity {
         mPieChart.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
         mPieChart.getLegend().setWordWrapEnabled(true);
         mPieChart.setData(pieData);
-        mPieChart.animateY(1400, Easing.EasingOption.EaseInOutQuart);
+        mPieChart.animateY(1400, new AccelerateDecelerateInterpolator()::getInterpolation);
     }
 }

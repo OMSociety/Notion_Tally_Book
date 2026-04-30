@@ -16,6 +16,9 @@ import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.coderpage.base.common.IError;
+import com.coderpage.base.common.Result;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.utils.ArrayUtils;
 import com.coderpage.base.utils.CommonUtils;
 import com.coderpage.base.utils.ResUtils;
@@ -241,72 +244,88 @@ public class RecordViewModel extends AndroidViewModel implements LifecycleObserv
             return;
         }
         mRecordId = recordId;
-        mRepository.queryRecordById(mRecordId, record -> {
-            if (record == null) {
-                return;
-            }
-            mRecord = record;
-            mAmount = mRecord.getAmount();
-            mDate = mRecord.getTime();
-            mDesc.set(mRecord.getDesc());
-            mDateText.set(mDateFormat.format(new Date(mDate)));
-            mAmountText.set(CommonUtils.removeOddDecimal(mAmountFormat.format(mAmount)));
+        mRepository.queryRecordById(mRecordId, new SimpleCallback<Record>() {
+            @Override
+            public void success(Record record) {
+                if (record == null) {
+                    return;
+                }
+                mRecord = record;
+                mAmount = mRecord.getAmount() != null ? mRecord.getAmount().doubleValue() : 0.0;
+                mDate = mRecord.getTime();
+                mDesc.set(mRecord.getDesc());
+                mDateText.set(mDateFormat.format(new Date(mDate)));
+                mAmountText.set(CommonUtils.removeOddDecimal(mAmountFormat.format(mAmount)));
 
-            String categoryUniqueName = mRecord.getCategoryUniqueName();
-            Category category = ArrayUtils.findFirst(mCategoryList.getValue(),
-                    c -> CommonUtils.isEqual(c.getInternal().getUniqueName(), categoryUniqueName));
-            if (category != null) {
-                mCurrentSelectCategory.setValue(category);
+                String categoryUniqueName = mRecord.getCategoryUniqueName();
+                Category category = ArrayUtils.findFirst(mCategoryList.getValue(),
+                        c -> CommonUtils.isEqual(c.getInternal().getUniqueName(), categoryUniqueName));
+                if (category != null) {
+                    mCurrentSelectCategory.setValue(category);
+                }
             }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 
     private void initData() {
         // 查询所有分类
-        mRepository.queryAllCategory(mType, categoryList -> {
+        mRepository.queryAllCategory(mType, new SimpleCallback<List<CategoryModel>>() {
+            @Override
+            public void success(List<CategoryModel> categoryList) {
+                if (categoryList == null || categoryList.isEmpty()) {
+                    return;
+                }
+                List<Category> displayList = new ArrayList<>(categoryList.size());
+                for (CategoryModel category : categoryList) {
+                    displayList.add(new Category(category));
+                }
+                // 分类设置ITEM
+                displayList.add(mCategorySettingItem);
+                mCategoryList.setValue(displayList);
 
-            if (categoryList == null || categoryList.isEmpty()) {
-                return;
+                if (mRecord == null) {
+                    Category select = displayList.get(0);
+                    makeCategorySelect(displayList, select.getInternal().getUniqueName());
+                } else {
+                    makeCategorySelect(displayList, mRecord.getCategoryUniqueName());
+                }
             }
-            List<Category> displayList = new ArrayList<>(categoryList.size());
-            for (CategoryModel category : categoryList) {
-                displayList.add(new Category(category));
-            }
-            // 分类设置ITEM
-            displayList.add(mCategorySettingItem);
-            mCategoryList.setValue(displayList);
 
-            if (mRecord == null) {
-                Category select = displayList.get(0);
-                makeCategorySelect(displayList, select.getInternal().getUniqueName());
-            } else {
-                makeCategorySelect(displayList, mRecord.getCategoryUniqueName());
-            }
+            @Override
+            public void failure(IError error) { }
         });
     }
 
     private void refreshCategoryList() {
         // 查询所有分类
-        mRepository.queryAllCategory(mType, categoryList -> {
+        mRepository.queryAllCategory(mType, new SimpleCallback<List<CategoryModel>>() {
+            @Override
+            public void success(List<CategoryModel> categoryList) {
+                if (categoryList == null || categoryList.isEmpty()) {
+                    return;
+                }
+                List<Category> displayList = new ArrayList<>(categoryList.size());
+                for (CategoryModel category : categoryList) {
+                    displayList.add(new Category(category));
+                }
 
-            if (categoryList == null || categoryList.isEmpty()) {
-                return;
+                // 当前选择的分类
+                List<Category> currentCategoryList = mCategoryList.getValue();
+                Category selectCategory = ArrayUtils.findFirst(currentCategoryList, Category::isSelect);
+                String selectCategoryUniqueName = selectCategory == null || selectCategory.getInternal() == null
+                        ? "" : selectCategory.getInternal().getUniqueName();
+
+                // 分类设置ITEM
+                displayList.add(mCategorySettingItem);
+                mCategoryList.setValue(displayList);
+                makeCategorySelect(displayList, selectCategoryUniqueName);
             }
-            List<Category> displayList = new ArrayList<>(categoryList.size());
-            for (CategoryModel category : categoryList) {
-                displayList.add(new Category(category));
-            }
 
-            // 当前选择的分类
-            List<Category> currentCategoryList = mCategoryList.getValue();
-            Category selectCategory = ArrayUtils.findFirst(currentCategoryList, Category::isSelect);
-            String selectCategoryUniqueName = selectCategory == null || selectCategory.getInternal() == null
-                    ? "" : selectCategory.getInternal().getUniqueName();
-
-            // 分类设置ITEM
-            displayList.add(mCategorySettingItem);
-            mCategoryList.setValue(displayList);
-            makeCategorySelect(displayList, selectCategoryUniqueName);
+            @Override
+            public void failure(IError error) { }
         });
     }
 
@@ -331,7 +350,7 @@ public class RecordViewModel extends AndroidViewModel implements LifecycleObserv
             record.setType(mType == RecordType.EXPENSE ? Record.TYPE_EXPENSE : Record.TYPE_INCOME);
             record.setSyncId(AndroidUtils.generateUUID());
         }
-        record.setAmount(mAmount);
+        record.setAmount(java.math.BigDecimal.valueOf(mAmount));
         record.setTime(mDate);
         record.setDesc(TextUtils.isEmpty(mDesc.get()) ? "" : mDesc.get());
         record.setCategoryIcon(category.getInternal().getIcon());
@@ -339,19 +358,31 @@ public class RecordViewModel extends AndroidViewModel implements LifecycleObserv
         record.setCategoryUniqueName(category.getInternal().getUniqueName());
 
         if (isNewRecord) {
-            mRepository.saveRecord(record, result -> {
-                if (result.isOk()) {
-                    record.setId(result.data());
-                    EventBus.getDefault().post(new EventRecordAdd(record));
-                    mActivityRelayTask.setValue(Activity::finish);
+            mRepository.saveRecord(record, new SimpleCallback<Result<Long, IError>>() {
+                @Override
+                public void success(Result<Long, IError> result) {
+                    if (result.isOk()) {
+                        record.setId(result.data());
+                        EventBus.getDefault().post(new EventRecordAdd(record));
+                        mActivityRelayTask.setValue(Activity::finish);
+                    }
                 }
+
+                @Override
+                public void failure(IError error) { }
             });
         } else {
-            mRepository.updateExpense(record, result -> {
-                if (result.isOk()) {
-                    EventBus.getDefault().post(new EventRecordUpdate(record));
-                    mActivityRelayTask.setValue(Activity::finish);
+            mRepository.updateExpense(record, new SimpleCallback<Result<Long, IError>>() {
+                @Override
+                public void success(Result<Long, IError> result) {
+                    if (result.isOk()) {
+                        EventBus.getDefault().post(new EventRecordUpdate(record));
+                        mActivityRelayTask.setValue(Activity::finish);
+                    }
                 }
+
+                @Override
+                public void failure(IError error) { }
             });
         }
     }

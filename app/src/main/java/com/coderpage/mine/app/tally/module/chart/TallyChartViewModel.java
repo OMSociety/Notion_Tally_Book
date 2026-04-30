@@ -328,55 +328,67 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
 
         if (isDisplayAsDaily) {
             // 查询日账单数据
-            queryDailyData(v -> {
-                // 显示日账单图标
-                boolean hasExpense = ArrayUtils.contains(mDailyExpenseList, item -> item.getAmount() > 0);
-                boolean hasIncome = ArrayUtils.contains(mDailyIncomeList, item -> item.getAmount() > 0);
-                // 没有消费记录，清除集合
-                if (!hasExpense) {
-                    mDailyExpenseList.clear();
-                }
-                // 没有收入记录，清除集合
-                if (!hasIncome) {
-                    mDailyIncomeList.clear();
-                }
-                if (isDisplayExpense) {
-                    mObservableDailyExpenseList.postValue(mDailyExpenseList);
-                    mObservableCategoryExpenseDataList.postValue(mCategoryDailyExpenseList);
-                } else {
-                    mObservableDailyIncomeList.postValue(mDailyIncomeList);
-                    mObservableCategoryIncomeDataList.postValue(mCategoryDailyIncomeList);
+            queryDailyData(new SimpleCallback<Void>() {
+                @Override
+                public void success(Void v) {
+                    // 显示日账单图标
+                    boolean hasExpense = ArrayUtils.contains(mDailyExpenseList, item -> item.getAmount() > 0);
+                    boolean hasIncome = ArrayUtils.contains(mDailyIncomeList, item -> item.getAmount() > 0);
+                    // 没有消费记录，清除集合
+                    if (!hasExpense) {
+                        mDailyExpenseList.clear();
+                    }
+                    // 没有收入记录，清除集合
+                    if (!hasIncome) {
+                        mDailyIncomeList.clear();
+                    }
+                    if (isDisplayExpense) {
+                        mObservableDailyExpenseList.postValue(mDailyExpenseList);
+                        mObservableCategoryExpenseDataList.postValue(mCategoryDailyExpenseList);
+                    } else {
+                        mObservableDailyIncomeList.postValue(mDailyIncomeList);
+                        mObservableCategoryIncomeDataList.postValue(mCategoryDailyIncomeList);
+                    }
+
+                    // 显示账单金额
+                    displayDailyExpenseAmountTotal();
+                    displayDailyIncomeAmountTotal();
                 }
 
-                // 显示账单金额
-                displayDailyExpenseAmountTotal();
-                displayDailyIncomeAmountTotal();
+                @Override
+                public void failure(IError error) { }
             });
         } else {
-            queryYearlyData(v -> {
-                // 年账单 支出、收入 折线图
-                boolean hasExpense = ArrayUtils.contains(mMonthlyExpenseList, item -> item.getAmount() > 0);
-                boolean hasIncome = ArrayUtils.contains(mMonthlyIncomeList, item -> item.getAmount() > 0);
-                // 没有支出记录也没有收入记录，不显示图标
-                if (!hasExpense && !hasIncome) {
-                    mMonthlyExpenseList.clear();
-                    mMonthlyIncomeList.clear();
+            queryYearlyData(new SimpleCallback<Void>() {
+                @Override
+                public void success(Void v) {
+                    // 年账单 支出、收入 折线图
+                    boolean hasExpense = ArrayUtils.contains(mMonthlyExpenseList, item -> item.getAmount() > 0);
+                    boolean hasIncome = ArrayUtils.contains(mMonthlyIncomeList, item -> item.getAmount() > 0);
+                    // 没有支出记录也没有收入记录，不显示图标
+                    if (!hasExpense && !hasIncome) {
+                        mMonthlyExpenseList.clear();
+                        mMonthlyIncomeList.clear();
+                    }
+
+                    MonthlyDataList monthlyDataList = new MonthlyDataList();
+                    monthlyDataList.setExpenseList(mMonthlyExpenseList);
+                    monthlyDataList.setIncomeList(mMonthlyIncomeList);
+                    mObservableMonthlyDataList.postValue(monthlyDataList);
+
+                    // 年账单 分类饼图
+                    if (isDisplayExpense) {
+                        mObservableCategoryExpenseDataList.postValue(mCategoryYearlyExpenseList);
+                    } else {
+                        mObservableCategoryIncomeDataList.postValue(mCategoryYearlyIncomeList);
+                    }
+
+                    displayMonthlyExpenseAmountTotal();
+                    displayMonthlyIncomeAmountTotal();
                 }
 
-                MonthlyDataList monthlyDataList = new MonthlyDataList();
-                monthlyDataList.setExpenseList(mMonthlyExpenseList);
-                monthlyDataList.setIncomeList(mMonthlyIncomeList);
-                mObservableMonthlyDataList.postValue(monthlyDataList);
-
-                // 年账单 分类饼图
-                if (isDisplayExpense) {
-                    mObservableCategoryExpenseDataList.postValue(mCategoryYearlyExpenseList);
-                } else {
-                    mObservableCategoryIncomeDataList.postValue(mCategoryYearlyIncomeList);
-                }
-
-                displayMonthlyExpenseAmountTotal();
-                displayMonthlyIncomeAmountTotal();
+                @Override
+                public void failure(IError error) { }
             });
         }
     }
@@ -890,13 +902,19 @@ public class TallyChartViewModel extends BaseViewModel implements LifecycleObser
         mEndDate.setTimeInMillis(currentMonthRange.second);
 
         // 初始化数据，等待 init 完成后再刷新，避免竞争条件
-        init(v -> {
-            mInitialized = true;
-            if (mPendingRefresh != null) {
-                mPendingRefresh.run();
-                mPendingRefresh = null;
+        init(new SimpleCallback<Void>() {
+            @Override
+            public void success(Void v) {
+                mInitialized = true;
+                if (mPendingRefresh != null) {
+                    mPendingRefresh.run();
+                    mPendingRefresh = null;
+                }
+                refreshData();
             }
-            refreshData();
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 }

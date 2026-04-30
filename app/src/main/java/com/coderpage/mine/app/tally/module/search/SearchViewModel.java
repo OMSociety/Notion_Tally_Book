@@ -13,6 +13,8 @@ import android.text.TextUtils;
 
 import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
+import com.coderpage.base.common.Result;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.utils.ArrayUtils;
 import com.coderpage.base.utils.CommonUtils;
 import com.coderpage.framework.BaseViewModel;
@@ -174,11 +176,17 @@ public class SearchViewModel extends BaseViewModel {
             showToastShort("请先输入搜索内容");
             return;
         }
-        mLoadDelegate.refresh(result -> {
-            // 显示搜索结果
-            mShowSearchResult.set(true);
-            // 缓存搜索历史记录
-            addSearchHistory(kewWord);
+        mLoadDelegate.refresh(new SimpleCallback<Result<List<Record>, IError>>() {
+            @Override
+            public void success(Result<List<Record>, IError> result) {
+                // 显示搜索结果
+                mShowSearchResult.set(true);
+                // 缓存搜索历史记录
+                addSearchHistory(kewWord);
+            }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 

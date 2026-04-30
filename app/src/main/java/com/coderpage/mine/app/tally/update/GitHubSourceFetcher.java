@@ -107,9 +107,7 @@ public class GitHubSourceFetcher implements SourceFetcher {
             result.setErr(new Error(-1, e.getMessage()));
             return result;
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            // Response body is consumed; no explicit close needed
         }
     }
 

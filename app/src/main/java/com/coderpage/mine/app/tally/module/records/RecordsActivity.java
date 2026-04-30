@@ -116,15 +116,6 @@ public class RecordsActivity extends BaseActivity {
 
         mAdapter = new RecordsAdapter(self());
         LinearLayoutManager layoutManager = new LinearLayoutManager(self(), LinearLayoutManager.VERTICAL, false);
-        // 设置新 adapter 前，清除旧 adapter 上可能残留的 observer，防止泄漏
-        RecyclerView.Adapter oldAdapter = mRecyclerView.getAdapter();
-        if (oldAdapter != null) {
-            try {
-                oldAdapter.unregisterAdapterDataObserver(mAdapterDataObserver);
-            } catch (Exception ignored) {
-                // observer 未注册时会抛异常，忽略即可
-            }
-        }
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(layoutManager);
 

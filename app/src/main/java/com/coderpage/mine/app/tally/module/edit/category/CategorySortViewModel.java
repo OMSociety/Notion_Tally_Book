@@ -9,6 +9,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.OnLifecycleEvent;
 
+import com.coderpage.base.common.IError;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.utils.ArrayUtils;
 import com.coderpage.framework.BaseViewModel;
 import com.coderpage.framework.ViewReliedTask;
@@ -53,11 +55,17 @@ public class CategorySortViewModel extends BaseViewModel implements LifecycleObs
         ArrayUtils.forEach(categoryList, (count, index, item) -> {
             item.setOrder(index);
         });
-        mRepository.updateCategoryOrder(categoryList, v -> {
-            // 分发分类排序修改事件
-            EventBus.getDefault().post(new EventCategoryOrderChange(mType));
-            // 关闭页面
-            mViewReliedTask.postValue(Activity::onBackPressed);
+        mRepository.updateCategoryOrder(categoryList, new SimpleCallback<Void>() {
+            @Override
+            public void success(Void v) {
+                // 分发分类排序修改事件
+                EventBus.getDefault().post(new EventCategoryOrderChange(mType));
+                // 关闭页面
+                mViewReliedTask.postValue(Activity::onBackPressed);
+            }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 
@@ -77,18 +85,40 @@ public class CategorySortViewModel extends BaseViewModel implements LifecycleObs
         ArrayUtils.forEach(categoryList, (count, index, item) -> {
             item.setOrder(index);
         });
-        mRepository.updateCategoryOrder(categoryList, v -> {
-            // 分发分类排序修改事件
-            EventBus.getDefault().post(new EventCategoryOrderChange(mType));
+        mRepository.updateCategoryOrder(categoryList, new SimpleCallback<Void>() {
+            @Override
+            public void success(Void v) {
+                // 分发分类排序修改事件
+                EventBus.getDefault().post(new EventCategoryOrderChange(mType));
+            }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 
     private void refreshData() {
         if (mType == CategoryModel.TYPE_EXPENSE) {
-            mRepository.loadAllExpenseCategory(mCategoryList::postValue);
+            mRepository.loadAllExpenseCategory(new SimpleCallback<List<CategoryModel>>() {
+                @Override
+                public void success(List<CategoryModel> categoryModels) {
+                    mCategoryList.postValue(categoryModels);
+                }
+
+                @Override
+                public void failure(IError error) { }
+            });
         }
         if (mType == CategoryModel.TYPE_INCOME) {
-            mRepository.loadAllIncomeCategory(mCategoryList::postValue);
+            mRepository.loadAllIncomeCategory(new SimpleCallback<List<CategoryModel>>() {
+                @Override
+                public void success(List<CategoryModel> categoryModels) {
+                    mCategoryList.postValue(categoryModels);
+                }
+
+                @Override
+                public void failure(IError error) { }
+            });
         }
     }
 

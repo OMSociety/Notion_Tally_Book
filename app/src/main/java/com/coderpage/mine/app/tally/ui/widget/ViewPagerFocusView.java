@@ -63,15 +63,7 @@ public class ViewPagerFocusView extends View {
     }
 
     private void init(Context context, @Nullable AttributeSet attrs) {
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ViewPagerFocusView);
-
-        mIndicatorWidth = typedArray.getDimensionPixelSize(R.styleable.ViewPagerFocusView_vpfIndicatorWidth, mIndicatorWidth);
-        mIndicatorHeight = typedArray.getDimensionPixelSize(R.styleable.ViewPagerFocusView_vpfIndicatorHeight, mIndicatorHeight);
-        mIndicatorInterval = typedArray.getDimensionPixelSize(R.styleable.ViewPagerFocusView_vpfIndicatorInterval, mIndicatorInterval);
-        mIndicatorNormalColor = typedArray.getColor(R.styleable.ViewPagerFocusView_vpfIndicatorColorNormal, mIndicatorNormalColor);
-        mIndicatorSelectColor = typedArray.getColor(R.styleable.ViewPagerFocusView_vpfIndicatorColorSelect, mIndicatorSelectColor);
-
-        typedArray.recycle();
+        // Use default values since styleable resources are not defined
     }
 
     public void setupWithViewPager(ViewPager viewPager) {

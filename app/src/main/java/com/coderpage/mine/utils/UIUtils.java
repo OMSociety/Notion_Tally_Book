@@ -12,7 +12,7 @@ import com.coderpage.mine.R;
 
 public class UIUtils {
 
-    private static final int[] RES_IDS_ACTION_BAR_SIZE = {R.attr.actionBarSize};
+    private static final int[] RES_IDS_ACTION_BAR_SIZE = {android.R.attr.actionBarSize};
 
     /**
      * Calculates the Action Bar height in pixels.

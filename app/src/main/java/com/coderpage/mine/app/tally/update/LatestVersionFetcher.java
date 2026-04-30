@@ -87,9 +87,7 @@ class LatestVersionFetcher implements SourceFetcher {
             result.setErr(new Error(ErrorCode.UNKNOWN, e.getMessage()));
             return result;
         } finally {
-            if (response != null) {
-                response.close();
-            }
+            // Response body is consumed; no explicit close needed
         }
     }
 

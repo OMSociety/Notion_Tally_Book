@@ -11,6 +11,9 @@ import androidx.lifecycle.OnLifecycleEvent;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
 
+import com.coderpage.base.common.IError;
+import com.coderpage.base.common.Result;
+import com.coderpage.base.common.SimpleCallback;
 import com.coderpage.base.utils.ResUtils;
 import com.coderpage.framework.BaseViewModel;
 import com.coderpage.framework.ViewReliedTask;
@@ -107,9 +110,15 @@ public class CategoryEditViewModel extends BaseViewModel implements LifecycleObs
      * @param name       分类名称
      */
     private void updateCategory(long categoryId, String icon, String name) {
-        mRepository.updateCategory(categoryId, icon, name, categoryModel -> {
-            EventBus.getDefault().post(new EventCategoryUpdate(categoryModel));
-            mViewReliedTask.postValue(Activity::finish);
+        mRepository.updateCategory(categoryId, icon, name, new SimpleCallback<CategoryModel>() {
+            @Override
+            public void success(CategoryModel categoryModel) {
+                EventBus.getDefault().post(new EventCategoryUpdate(categoryModel));
+                mViewReliedTask.postValue(Activity::finish);
+            }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 
@@ -121,18 +130,24 @@ public class CategoryEditViewModel extends BaseViewModel implements LifecycleObs
      * @param name       分类名称
      */
     private void addCategory(String uniqueName, String icon, String name) {
-        mRepository.addCategory(mType.get(), uniqueName, icon, name, result -> {
-            if (result.isOk()) {
-                CategoryModel categoryModel = new CategoryModel();
-                categoryModel.setType(mType.get());
-                categoryModel.setUniqueName(uniqueName);
-                categoryModel.setIcon(icon);
-                categoryModel.setName(name);
-                EventBus.getDefault().post(new EventCategoryAdd(categoryModel));
-                mViewReliedTask.postValue(Activity::finish);
-            } else {
-                showToastShort(result.error().msg());
+        mRepository.addCategory(mType.get(), uniqueName, icon, name, new SimpleCallback<Result<Void, IError>>() {
+            @Override
+            public void success(Result<Void, IError> result) {
+                if (result.isOk()) {
+                    CategoryModel categoryModel = new CategoryModel();
+                    categoryModel.setType(mType.get());
+                    categoryModel.setUniqueName(uniqueName);
+                    categoryModel.setIcon(icon);
+                    categoryModel.setName(name);
+                    EventBus.getDefault().post(new EventCategoryAdd(categoryModel));
+                    mViewReliedTask.postValue(Activity::finish);
+                } else {
+                    showToastShort(result.error().msg());
+                }
             }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 
@@ -141,10 +156,16 @@ public class CategoryEditViewModel extends BaseViewModel implements LifecycleObs
 
         // 修改分类
         if (mCategoryId > 0) {
-            mRepository.queryCategoryById(mCategoryId, category -> {
-                mType.set(category.getType());
-                mCategoryName.set(category.getName());
-                mCategoryIcon.set(category.getIcon());
+            mRepository.queryCategoryById(mCategoryId, new SimpleCallback<CategoryModel>() {
+                @Override
+                public void success(CategoryModel category) {
+                    mType.set(category.getType());
+                    mCategoryName.set(category.getName());
+                    mCategoryIcon.set(category.getIcon());
+                }
+
+                @Override
+                public void failure(IError error) { }
             });
         }
         // 添加分类

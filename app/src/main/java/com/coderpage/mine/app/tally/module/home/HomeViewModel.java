@@ -2,6 +2,10 @@ package com.coderpage.mine.app.tally.module.home;
 
 import android.app.Activity;
 import android.app.Application;
+
+import com.coderpage.base.common.IError;
+import com.coderpage.base.common.Result;
+import com.coderpage.base.common.SimpleCallback;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -95,30 +99,36 @@ public class HomeViewModel extends AndroidViewModel implements LifecycleObserver
             return;
         }
         mRefreshing.setValue(true);
-        mRepository.loadCurrentMonthExpenseData(result -> {
-            mRefreshing.setValue(false);
-            if (result.isOk()) {
-                HomeRepository.Snapshot snapshot = result.getData();
+        mRepository.loadCurrentMonthExpenseData(new SimpleCallback<Result<HomeRepository.Snapshot, IError>>() {
+            @Override
+            public void success(Result<HomeRepository.Snapshot, IError> result) {
+                mRefreshing.setValue(false);
+                if (result.isOk()) {
+                    HomeRepository.Snapshot snapshot = result.data();
 
-                HomeMonthModel monthModel = new HomeMonthModel();
-                monthModel.setMonthExpenseAmount(snapshot.currentMonthExpenseTotalAmount);
-                monthModel.setMonthIncomeAmount(snapshot.currentMonthIncomeTotalAmount);
-                monthModel.setMonthCategoryExpenseData(snapshot.categoryExpenseTotal);
+                    HomeMonthModel monthModel = new HomeMonthModel();
+                    monthModel.setMonthExpenseAmount(snapshot.currentMonthExpenseTotalAmount);
+                    monthModel.setMonthIncomeAmount(snapshot.currentMonthIncomeTotalAmount);
+                    monthModel.setMonthCategoryExpenseData(snapshot.categoryExpenseTotal);
 
-                HomeTodayDayRecordsModel todayRecordsModel = new HomeTodayDayRecordsModel();
-                todayRecordsModel.setToadyExpenseAmount(snapshot.todayExpenseTotalAmount);
-                todayRecordsModel.setTodayIncomeAmount(snapshot.todayIncomeTotalAmount);
-                todayRecordsModel.setRecent3DayRecordsCount(snapshot.recent3DayRecordCount);
+                    HomeTodayDayRecordsModel todayRecordsModel = new HomeTodayDayRecordsModel();
+                    todayRecordsModel.setToadyExpenseAmount(snapshot.todayExpenseTotalAmount);
+                    todayRecordsModel.setTodayIncomeAmount(snapshot.todayIncomeTotalAmount);
+                    todayRecordsModel.setRecent3DayRecordsCount(snapshot.recent3DayRecordCount);
 
-                List<HomeDisplayData> dataList = new ArrayList<>();
-                dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_MONTH_INFO, monthModel));
-                dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_RECENT_DAY_INFO, todayRecordsModel));
+                    List<HomeDisplayData> dataList = new ArrayList<>();
+                    dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_MONTH_INFO, monthModel));
+                    dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_RECENT_DAY_INFO, todayRecordsModel));
 
-                for (Record record : snapshot.todayRecordList) {
-                    dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_RECORD_ITEM, record));
+                    for (Record record : snapshot.todayRecordList) {
+                        dataList.add(new HomeDisplayData(HomeDisplayData.TYPE_RECORD_ITEM, record));
+                    }
+                    mDataList.setValue(dataList);
                 }
-                mDataList.setValue(dataList);
             }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 

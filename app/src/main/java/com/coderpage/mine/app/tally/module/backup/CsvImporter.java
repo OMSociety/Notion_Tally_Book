@@ -182,7 +182,7 @@ public class CsvImporter {
 
         RecordEntity record = new RecordEntity();
         record.setTime(time);
-        record.setAmount(Math.abs(amountWithSign));
+        record.setAmount(java.math.BigDecimal.valueOf(Math.abs(amountWithSign)));
         record.setType(type);
         record.setCategoryUniqueName(isBlank(categoryUniqueName) ? "" : categoryUniqueName);
         record.setDesc(isBlank(descField) ? "" : descField.trim());

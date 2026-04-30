@@ -22,6 +22,8 @@ import com.coderpage.mine.app.tally.update.UpdateUtils;
 import com.coderpage.mine.ui.BaseActivity;
 import com.coderpage.mine.BuildConfig;
 
+import android.graphics.Color;
+
 import java.util.Locale;
 
 /**
@@ -50,7 +52,7 @@ public class AboutActivity extends BaseActivity {
             ApkModel apkModel = Updater.getNewVersionApkModelPersisted(this);
             mNewVersionTv.setText(getString(R.string.tally_about_find_new_version,
                     apkModel.getVersion(), apkModel.getBuildCode()));
-            mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
+            mNewVersionTv.setTextColor(Color.parseColor("#FF6700"));
         }
 
         findViewById(R.id.lyAppInfo).setOnClickListener(mOnClickListener);
@@ -79,7 +81,7 @@ public class AboutActivity extends BaseActivity {
                         public void onFindNewVersion(ApkModel apkModel) {
                             mNewVersionTv.setText(getString(R.string.tally_about_find_new_version,
                                     apkModel.getVersion(), apkModel.getBuildCode()));
-                            mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
+                            mNewVersionTv.setTextColor(Color.parseColor("#FF6700"));
                         }
 
                         @Override
@@ -103,7 +105,7 @@ public class AboutActivity extends BaseActivity {
                             } else {
                                 mNewVersionTv.setText("更新遇到些问题");
                             }
-                            mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
+                            mNewVersionTv.setTextColor(Color.parseColor("#FF6700"));
                         }
                     });
                 } else if (mCurrentUpdateSource == 1){
@@ -113,7 +115,7 @@ public class AboutActivity extends BaseActivity {
                         public void onFindNewVersion(ApkModel apkModel) {
                             mNewVersionTv.setText(getString(R.string.tally_about_find_new_version,
                                     apkModel.getVersion(), apkModel.getBuildCode()));
-                            mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
+                            mNewVersionTv.setTextColor(Color.parseColor("#FF6700"));
                         }
 
                         @Override
@@ -137,7 +139,7 @@ public class AboutActivity extends BaseActivity {
                             } else {
                                 mNewVersionTv.setText("更新遇到些问题");
                             }
-                            mNewVersionTv.setTextColor(getResources().getColor(R.color.libupdate_warning));
+                            mNewVersionTv.setTextColor(Color.parseColor("#FF6700"));
                         }
                     });
                 }

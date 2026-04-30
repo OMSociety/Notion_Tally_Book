@@ -151,18 +151,18 @@ public class Backup {
         AsyncTaskExecutor.execute(() -> {
             listener.onProgressUpdate(RestoreProgress.READ_FILE);
             if (file == null) {
-                listener.failure(new NonThrowError(ErrorCode.INTERNAL_ERR, "File is null"));
+                ((SimpleCallback<BackupModel>) listener).failure(new NonThrowError(ErrorCode.INTERNAL_ERR, "File is null"));
                 return;
             }
 
             LogUtils.LOGD(TAG,"Read backup json file: " + file.getAbsolutePath());
 
             if (!file.exists()) {
-                listener.failure(new NonThrowError(ErrorCode.ILLEGAL_ARGS, "File not exist"));
+                ((SimpleCallback<BackupModel>) listener).failure(new NonThrowError(ErrorCode.ILLEGAL_ARGS, "File not exist"));
                 return;
             }
             if (file.isDirectory()) {
-                listener.failure(new NonThrowError(ErrorCode.ILLEGAL_ARGS, "Illegal file type"));
+                ((SimpleCallback<BackupModel>) listener).failure(new NonThrowError(ErrorCode.ILLEGAL_ARGS, "Illegal file type"));
                 return;
             }
 
@@ -178,11 +178,11 @@ public class Backup {
                 sourceString = sourceBuilder.toString();
             } catch (FileNotFoundException e) {
                 LOGE(TAG, "File not found", e);
-                listener.failure(new NonThrowError(ErrorCode.ILLEGAL_ARGS, "File not found"));
+                ((SimpleCallback<BackupModel>) listener).failure(new NonThrowError(ErrorCode.ILLEGAL_ARGS, "File not found"));
                 return;
             } catch (IOException e) {
                 LOGE(TAG, "IO Err", e);
-                listener.failure(new NonThrowError(ErrorCode.INTERNAL_ERR, "File io err"));
+                ((SimpleCallback<BackupModel>) listener).failure(new NonThrowError(ErrorCode.INTERNAL_ERR, "File io err"));
                 return;
             }
 
@@ -192,7 +192,7 @@ public class Backup {
                 listener.success(backupModel);
             } catch (Exception e) {
                 LOGE(TAG, "Parse json err", e);
-                listener.failure(new NonThrowError(ErrorCode.INTERNAL_ERR, "not a json file"));
+                ((SimpleCallback<BackupModel>) listener).failure(new NonThrowError(ErrorCode.INTERNAL_ERR, "not a json file"));
             }
         });
     }
@@ -216,7 +216,7 @@ public class Backup {
             if (categoryList != null && !categoryList.isEmpty()) {
                 boolean restoreCategoryOk = restoreCategoryTable(metadata, categoryList);
                 if (!restoreCategoryOk) {
-                    listener.failure(new NonThrowError(ErrorCode.SQL_ERR, "恢复分类数据失败"));
+                    ((SimpleCallback<BackupModel>) listener).failure(new NonThrowError(ErrorCode.SQL_ERR, "恢复分类数据失败"));
                     return;
                 }
             }
@@ -226,7 +226,7 @@ public class Backup {
             if (expenseList != null && !expenseList.isEmpty()) {
                 boolean restoreExpenseOk = restoreExpenseTable(metadata, expenseList);
                 if (!restoreExpenseOk) {
-                    listener.failure(new NonThrowError(ErrorCode.SQL_ERR, "恢复消费数据失败"));
+                    ((SimpleCallback<BackupModel>) listener).failure(new NonThrowError(ErrorCode.SQL_ERR, "恢复消费数据失败"));
                     return;
                 }
             }
@@ -409,7 +409,7 @@ public class Backup {
         recordList = new ArrayList<>(recordEntityList.size());
         for (Record entity : recordEntityList) {
             BackupModelRecord expense = new BackupModelRecord();
-            expense.setAmount(entity.getAmount());
+            expense.setAmount(entity.getAmount() != null ? entity.getAmount().doubleValue() : 0.0);
             expense.setDesc(entity.getDesc());
             expense.setCategory(entity.getCategoryName());
             expense.setTime(entity.getTime());
@@ -606,7 +606,7 @@ public class Backup {
                 row.createCell(1).setCellValue(record.getCategoryName() != null ? record.getCategoryName() : "");
 
                 // 金额
-                row.createCell(2).setCellValue(record.getAmount());
+                row.createCell(2).setCellValue(record.getAmount() != null ? record.getAmount().doubleValue() : 0.0);
 
                 // 类型
                 String type = record.getType() == Record.TYPE_EXPENSE ? "支出" : "收入";

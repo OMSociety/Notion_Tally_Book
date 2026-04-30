@@ -77,12 +77,8 @@ public class RecordDetailActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        switch (itemId) {
-            case R.id.menu_trash:
-                mViewModel.onDeleteClick(this);
-                break;
-            default:
-                break;
+        if (itemId == R.id.menu_trash) {
+            mViewModel.onDeleteClick(this);
         }
         return super.onOptionsItemSelected(item);
     }

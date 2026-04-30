@@ -73,7 +73,7 @@ public class SyncRepository {
 
     private void applyRecordFields(com.coderpage.mine.app.tally.persistence.model.Record target,
                                    ConflictResolver.Record source) {
-        target.setAmount(source.amount);
+        target.setAmount(java.math.BigDecimal.valueOf(source.amount));
         target.setTime(source.time);
         target.setDesc(source.remark != null ? source.remark : "");
         boolean isExpense = "expense".equals(source.type) || "支出".equals(source.type);

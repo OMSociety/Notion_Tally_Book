@@ -6,6 +6,8 @@ import android.os.Looper;
 import com.coderpage.base.common.Callback;
 import com.coderpage.base.common.IError;
 import com.coderpage.base.common.NonThrowError;
+import com.coderpage.base.common.SimpleCallback;
+import com.coderpage.concurrency.MineExecutors;
 import com.coderpage.mine.app.tally.module.chart.data.CategoryData;
 import com.coderpage.mine.app.tally.module.chart.data.DailyData;
 import com.coderpage.mine.app.tally.module.chart.data.Month;
@@ -37,14 +39,12 @@ class TallyChartRepository {
     void queryFirstRecordTime(Callback<Long, IError> callback) {
         MineExecutors.ioExecutor().execute(() -> {
             try {
-                long firstTime = System.currentTimeMillis();
+                long currentTime = System.currentTimeMillis();
                 Record recordFirst = TallyDatabase.getInstance().recordDao().queryFirst();
-                if (recordFirst != null) {
-                    firstTime = recordFirst.getTime();
-                }
+                final long firstTime = (recordFirst != null) ? recordFirst.getTime() : currentTime;
                 new Handler(Looper.getMainLooper()).post(() -> callback.success(firstTime));
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> callback.failure(new NonThrowError(e.getMessage())));
+                new Handler(Looper.getMainLooper()).post(() -> ((SimpleCallback<?>) callback).failure(new NonThrowError(-1, e.getMessage())));
             }
         });
     }
@@ -68,7 +68,7 @@ class TallyChartRepository {
                     calendar.setTimeInMillis(dailyGroup.getTime());
                     DailyData dailyData = new DailyData();
                     dailyData.setCount(dailyGroup.getCount());
-                    dailyData.setAmount(dailyGroup.getAmount());
+                    dailyData.setAmount((float) dailyGroup.getAmount());
                     dailyData.setYear(calendar.get(Calendar.YEAR));
                     dailyData.setMonth(calendar.get(Calendar.MONTH) + 1);
                     dailyData.setDayOfMonth(calendar.get(Calendar.DAY_OF_MONTH));
@@ -77,7 +77,7 @@ class TallyChartRepository {
                 }
                 new Handler(Looper.getMainLooper()).post(() -> callback.success(dailyList));
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> callback.failure(new NonThrowError(e.getMessage())));
+                new Handler(Looper.getMainLooper()).post(() -> ((SimpleCallback<?>) callback).failure(new NonThrowError(-1, e.getMessage())));
             }
         });
     }
@@ -101,7 +101,7 @@ class TallyChartRepository {
                     calendar.setTimeInMillis(dailyGroup.getTime());
                     DailyData dailyData = new DailyData();
                     dailyData.setCount(dailyGroup.getCount());
-                    dailyData.setAmount(dailyGroup.getAmount());
+                    dailyData.setAmount((float) dailyGroup.getAmount());
                     dailyData.setYear(calendar.get(Calendar.YEAR));
                     dailyData.setMonth(calendar.get(Calendar.MONTH) + 1);
                     dailyData.setDayOfMonth(calendar.get(Calendar.DAY_OF_MONTH));
@@ -111,7 +111,7 @@ class TallyChartRepository {
 
                 new Handler(Looper.getMainLooper()).post(() -> callback.success(dailyList));
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> callback.failure(new NonThrowError(e.getMessage())));
+                new Handler(Looper.getMainLooper()).post(() -> ((SimpleCallback<?>) callback).failure(new NonThrowError(-1, e.getMessage())));
             }
         });
     }
@@ -131,7 +131,7 @@ class TallyChartRepository {
                 Calendar calendar = Calendar.getInstance();
                 for (RecordGroup group : expenseMonthGroups) {
                     long time = group.getTime();
-                    float sum = group.getAmount();
+                    float sum = (float) group.getAmount();
 
                     calendar.setTimeInMillis(time);
                     int year = calendar.get(Calendar.YEAR);
@@ -146,7 +146,7 @@ class TallyChartRepository {
                 }
                 new Handler(Looper.getMainLooper()).post(() -> callback.success(result));
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> callback.failure(new NonThrowError(e.getMessage())));
+                new Handler(Looper.getMainLooper()).post(() -> ((SimpleCallback<?>) callback).failure(new NonThrowError(-1, e.getMessage())));
             }
         });
     }
@@ -166,7 +166,7 @@ class TallyChartRepository {
                 Calendar calendar = Calendar.getInstance();
                 for (RecordGroup group : incomeMonthGroups) {
                     long time = group.getTime();
-                    float sum = group.getAmount();
+                    float sum = (float) group.getAmount();
 
                     calendar.setTimeInMillis(time);
                     int year = calendar.get(Calendar.YEAR);
@@ -181,7 +181,7 @@ class TallyChartRepository {
                 }
                 new Handler(Looper.getMainLooper()).post(() -> callback.success(result));
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> callback.failure(new NonThrowError(e.getMessage())));
+                new Handler(Looper.getMainLooper()).post(() -> ((SimpleCallback<?>) callback).failure(new NonThrowError(-1, e.getMessage())));
             }
         });
     }
@@ -223,7 +223,7 @@ class TallyChartRepository {
                 Collections.reverse(result);
                 new Handler(Looper.getMainLooper()).post(() -> callback.success(result));
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> callback.failure(new NonThrowError(e.getMessage())));
+                new Handler(Looper.getMainLooper()).post(() -> ((SimpleCallback<?>) callback).failure(new NonThrowError(-1, e.getMessage())));
             }
         });
     }
@@ -266,7 +266,7 @@ class TallyChartRepository {
 
                 new Handler(Looper.getMainLooper()).post(() -> callback.success(result));
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> callback.failure(new NonThrowError(e.getMessage())));
+                new Handler(Looper.getMainLooper()).post(() -> ((SimpleCallback<?>) callback).failure(new NonThrowError(-1, e.getMessage())));
             }
         });
     }
@@ -301,7 +301,7 @@ class TallyChartRepository {
                 Collections.reverse(months);
                 new Handler(Looper.getMainLooper()).post(() -> callback.success(months));
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(() -> callback.failure(new NonThrowError(e.getMessage())));
+                new Handler(Looper.getMainLooper()).post(() -> ((SimpleCallback<?>) callback).failure(new NonThrowError(-1, e.getMessage())));
             }
         });
     }
