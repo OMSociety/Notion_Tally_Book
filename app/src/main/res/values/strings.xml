@@ -131,6 +131,7 @@
     <string name="setting_import_json">JSON 备份</string>
     <string name="setting_import_csv">CSV 文件</string>
     <string name="setting_csv_import_failed">CSV 导入失败：%s</string>
+    <string name="setting_exporting">正在导出数据…</string>
     <string name="setting_clear_confirm">确定要清除所有记账数据吗？此操作不可恢复。</string>
     <string name="setting_clear_success">数据已清除</string>
     <string name="setting_clear_failed">数据清除失败，请稍后重试</string>
@@ -190,6 +191,8 @@
     <string name="tally_edit_category_name_hint">请输入分类名称</string>
 
     <!-- search activity -->
+    <string name="tally_clear_date_filter">清除日期</string>
+    <string name="tally_select_date">选择日期</string>
     <string name="tally_clear_search_history">清除所有</string>
     <string name="tally_search_et_hint">搜索消费记录</string>
 
@@ -199,11 +202,11 @@
     <string name="tally_about_check_new_version">检查更新</string>
     <string name="tally_about_find_new_version" formatted="false">新版本 %s(%d)</string>
     <string name="tally_about_title_about_app">关于应用</string>
-    <string name="tally_about_about_app_content">一个记账本应用, 简单干净. 我很喜欢这个记账本因为简单干净专注. 平时自己也在用, 但记账真的是一件需要有毅力的事情. 我想让这件事变得简单, 方便, 甚至不需要自己动手去完成. </string>
+    <string name="tally_about_about_app_content">Notion 记账本 — 基于 Notion 同步的轻量记账应用。支持手动记账、CSV 导入导出、数据自动同步到 Notion 数据库、自动备份与恢复、自定义分类管理、AI 识别记账。</string>
     <string name="tally_about_title_developer_info">开发者</string>
     <string name="tally_about_title_about_me">关于我</string>
     <string name="tally_about_about_me_content">开发者：山海学社OMSociety
-开发辅助：Astrbot、MiniMax2.7</string>
+开发辅助：Claude Code、AstrBot</string>
 
     <string name="tally_about_title_wechat">微信公众号</string>
     <string name="tally_about_wechat_content">微信公众号：没有! 没有你写它干嘛呢? (´・ω・`)</string>

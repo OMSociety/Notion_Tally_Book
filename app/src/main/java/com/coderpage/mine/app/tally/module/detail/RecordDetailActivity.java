@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.detail;
 
 import android.app.Activity;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.content.Intent;
 import androidx.databinding.DataBindingUtil;
@@ -29,7 +29,7 @@ public class RecordDetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.tally_module_detail_record_detail_activity);
-        mViewModel = ViewModelProviders.of(this).get(RecordDetailViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(RecordDetailViewModel.class);
         getLifecycle().addObserver(mViewModel);
 
         initView();

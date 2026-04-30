@@ -2,13 +2,13 @@ package com.coderpage.mine.app.tally.module.records;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.Context;
 import android.content.Intent;
 import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import android.widget.Button;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
@@ -45,13 +45,13 @@ public class RecordsActivity extends BaseActivity {
     private TwinklingRefreshLayout mRefreshLayout;
     private RecyclerView mRecyclerView;
     private RecordsAdapter mAdapter;
-    private FloatingActionButton mFabClearDate; // 添加清除按钮引用
+    private Button mFabClearDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(self(), R.layout.tally_module_records_activity);
-        mViewModel = ViewModelProviders.of(this).get(RecordsViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(RecordsViewModel.class);
         getLifecycle().addObserver(mViewModel);
         initView();
         subscribeUi();
@@ -119,8 +119,7 @@ public class RecordsActivity extends BaseActivity {
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        // 添加 FloatingActionButton 的点击事件处理
-        FloatingActionButton fabCalendar = mBinding.fabCalendar;
+        Button fabCalendar = mBinding.fabCalendar;
         fabCalendar.setOnClickListener(v -> showDatePicker());
 
         // 添加清除日期按钮的点击事件处理
@@ -168,8 +167,6 @@ public class RecordsActivity extends BaseActivity {
         }
     }
 
-
-
     // 添加显示日期选择器的方法
     private void showDatePicker() {
         // 获取当前日期作为默认值
@@ -206,18 +203,6 @@ public class RecordsActivity extends BaseActivity {
         );
         datePickerDialog.show();
     }
-
-    // 更新清除按钮可见性
-    private void updateClearButtonVisibility(CharSequence title) {
-        if (title != null && title.toString().contains(" - ")) {
-            // 如果标题包含日期范围信息，则显示清除按钮
-            mFabClearDate.setVisibility(View.VISIBLE);
-        } else {
-            // 否则隐藏清除按钮
-            mFabClearDate.setVisibility(View.GONE);
-        }
-    }
-
 
     // 清除日期筛选
     private void clearDateFilter() {

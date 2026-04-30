@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.widget.Button;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ import com.coderpage.mine.app.tally.common.router.TallyRouter;
 import com.coderpage.mine.app.tally.config.NotionConfig;
 import com.coderpage.mine.app.tally.module.about.AboutActivity;
 import com.coderpage.mine.app.tally.module.backup.BackupFileActivity;
+import com.coderpage.mine.app.tally.module.backup.CsvExporter;
 import com.coderpage.mine.app.tally.module.backup.CsvImporter;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
 import com.coderpage.mine.app.tally.sync.NotionSyncManager;
@@ -115,8 +117,13 @@ public class SettingActivity extends BaseActivity {
         lyManualSync.setOnClickListener(v -> startManualSync());
         lyNotionHelp.setOnClickListener(v -> startActivity(new Intent(this, NotionDatabaseHelpActivity.class)));
         lyImport.setOnClickListener(v -> checkPermissionAndImport());
-        lyExport.setOnClickListener(v -> startActivity(new Intent(this, BackupFileActivity.class)));
+        lyExport.setOnClickListener(v -> exportCsvDirectly());
         lyClear.setOnClickListener(v -> showClearDialog());
+        // 为清除按钮也设置点击事件
+        Button btnClearData = findViewById(R.id.btnClearData);
+        if (btnClearData != null) {
+            btnClearData.setOnClickListener(v -> showClearDialog());
+        }
         lyAbout.setOnClickListener(v -> startActivity(new Intent(this, AboutActivity.class)));
         lyUpdate.setOnClickListener(v -> {
             Toast.makeText(this, getString(R.string.setting_latest_version, BuildConfig.VERSION_NAME), Toast.LENGTH_SHORT).show();
@@ -175,13 +182,18 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void checkPermissionAndImport() {
+        // Android 11+ 不需要存储权限，ACTION_OPEN_DOCUMENT 使用 SAF
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            chooseCsvFileForImport();
+            return;
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
                 return;
             }
         }
-        showImportDialog();
+        chooseCsvFileForImport();
     }
 
     private void showImportDialog() {
@@ -199,7 +211,8 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void chooseCsvFileForImport() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        // 使用 ACTION_OPEN_DOCUMENT 以获得更好的 SAF 兼容性
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("*/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
@@ -209,14 +222,26 @@ public class SettingActivity extends BaseActivity {
                 "application/vnd.ms-excel",
                 "text/plain"
         });
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.setting_import_csv)), REQUEST_IMPORT_CSV);
+        try {
+            startActivityForResult(intent, REQUEST_IMPORT_CSV);
+        } catch (Exception e) {
+            // 回退到 ACTION_GET_CONTENT
+            Intent fallback = new Intent(Intent.ACTION_GET_CONTENT);
+            fallback.setType("*/*");
+            fallback.addCategory(Intent.CATEGORY_OPENABLE);
+            fallback.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
+                    "text/csv", "text/comma-separated-values",
+                    "application/csv", "application/vnd.ms-excel", "text/plain"
+            });
+            startActivityForResult(Intent.createChooser(fallback, getString(R.string.setting_import_csv)), REQUEST_IMPORT_CSV);
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            showImportDialog();
+            chooseCsvFileForImport();
         }
     }
 
@@ -258,6 +283,23 @@ public class SettingActivity extends BaseActivity {
                     Toast.makeText(this, importResult.message, Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(this, getString(R.string.setting_csv_import_failed, importResult.message), Toast.LENGTH_LONG).show();
+                }
+            });
+        });
+    }
+
+    private void exportCsvDirectly() {
+        if (mDatabaseExecutor == null || mDatabaseExecutor.isShutdown()) {
+            mDatabaseExecutor = Executors.newSingleThreadExecutor();
+        }
+        Toast.makeText(this, R.string.setting_exporting, Toast.LENGTH_SHORT).show();
+        mDatabaseExecutor.execute(() -> {
+            CsvExporter.ExportResult exportResult = CsvExporter.exportToCsv(this);
+            runOnUiThread(() -> {
+                if (exportResult.success) {
+                    Toast.makeText(this, exportResult.message + "\n" + exportResult.filePath, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, exportResult.message, Toast.LENGTH_LONG).show();
                 }
             });
         });
