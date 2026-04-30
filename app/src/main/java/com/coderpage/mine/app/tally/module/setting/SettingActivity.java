@@ -23,7 +23,6 @@ import com.coderpage.mine.app.tally.ai.AiSettingActivity;
 import com.coderpage.mine.app.tally.common.router.TallyRouter;
 import com.coderpage.mine.app.tally.config.NotionConfig;
 import com.coderpage.mine.app.tally.module.about.AboutActivity;
-import com.coderpage.mine.app.tally.module.backup.BackupFileActivity;
 import com.coderpage.mine.app.tally.module.backup.CsvExporter;
 import com.coderpage.mine.app.tally.module.backup.CsvImporter;
 import com.coderpage.mine.app.tally.persistence.sql.TallyDatabase;
@@ -60,6 +59,7 @@ public class SettingActivity extends BaseActivity {
     private LinearLayout lyClear;
 
     // 其他
+    private LinearLayout lyLogViewer;
     private LinearLayout lyAbout;
     private LinearLayout lyUpdate;
     private TextView tvVersion;
@@ -101,6 +101,7 @@ public class SettingActivity extends BaseActivity {
         lyImport = findViewById(R.id.lyImport);
         lyExport = findViewById(R.id.lyExport);
         lyClear = findViewById(R.id.lyClear);
+        lyLogViewer = findViewById(R.id.lyLogViewer);
         lyAbout = findViewById(R.id.lyAbout);
         lyUpdate = findViewById(R.id.lyUpdate);
         tvVersion = findViewById(R.id.tvVersion);
@@ -124,6 +125,7 @@ public class SettingActivity extends BaseActivity {
         if (btnClearData != null) {
             btnClearData.setOnClickListener(v -> showClearDialog());
         }
+        lyLogViewer.setOnClickListener(v -> startActivity(new Intent(this, LogViewerActivity.class)));
         lyAbout.setOnClickListener(v -> startActivity(new Intent(this, AboutActivity.class)));
         lyUpdate.setOnClickListener(v -> {
             Toast.makeText(this, getString(R.string.setting_latest_version, BuildConfig.VERSION_NAME), Toast.LENGTH_SHORT).show();
@@ -196,20 +198,6 @@ public class SettingActivity extends BaseActivity {
         chooseCsvFileForImport();
     }
 
-    private void showImportDialog() {
-        new AlertDialog.Builder(this)
-            .setTitle(R.string.setting_data_import)
-            .setItems(new String[]{getString(R.string.setting_import_json), getString(R.string.setting_import_csv)}, (dialog, which) -> {
-                if (which == 0) {
-                    startActivity(new Intent(this, BackupFileActivity.class));
-                } else {
-                    chooseCsvFileForImport();
-                }
-            })
-            .setNegativeButton(R.string.dialog_btn_cancel, null)
-            .show();
-    }
-
     private void chooseCsvFileForImport() {
         // 使用 ACTION_OPEN_DOCUMENT 以获得更好的 SAF 兼容性
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -259,32 +247,31 @@ public class SettingActivity extends BaseActivity {
             Toast.makeText(this, R.string.tally_toast_illegal_path, Toast.LENGTH_SHORT).show();
             return;
         }
-        String path = FileUtils.getPath(this, uri);
-        if (path == null || path.trim().isEmpty()) {
-            Toast.makeText(this, R.string.tally_toast_illegal_path, Toast.LENGTH_SHORT).show();
-            return;
-        }
-        importCsvFile(path);
+        importCsvFromUri(uri);
     }
 
-    private void importCsvFile(String path) {
-        File file = new File(path);
-        if (!file.exists() || !file.isFile()) {
-            Toast.makeText(this, R.string.tally_toast_illegal_path, Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void importCsvFromUri(Uri uri) {
         if (mDatabaseExecutor == null || mDatabaseExecutor.isShutdown()) {
             mDatabaseExecutor = Executors.newSingleThreadExecutor();
         }
         mDatabaseExecutor.execute(() -> {
-            CsvImporter.ImportResult importResult = CsvImporter.importFromCsv(this, file);
-            runOnUiThread(() -> {
-                if (importResult.success) {
-                    Toast.makeText(this, importResult.message, Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(this, getString(R.string.setting_csv_import_failed, importResult.message), Toast.LENGTH_LONG).show();
+            try {
+                java.io.InputStream inputStream = getContentResolver().openInputStream(uri);
+                if (inputStream == null) {
+                    runOnUiThread(() -> Toast.makeText(this, R.string.tally_toast_illegal_path, Toast.LENGTH_SHORT).show());
+                    return;
                 }
-            });
+                CsvImporter.ImportResult importResult = CsvImporter.importFromCsv(this, inputStream);
+                runOnUiThread(() -> {
+                    if (importResult.success) {
+                        Toast.makeText(this, importResult.message, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, getString(R.string.setting_csv_import_failed, importResult.message), Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(this, getString(R.string.setting_csv_import_failed, e.getMessage()), Toast.LENGTH_LONG).show());
+            }
         });
     }
 

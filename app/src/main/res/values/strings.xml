@@ -55,6 +55,7 @@
     <string name="tally_toolbar_title_chart">账单统计</string>
     <string name="tally_toolbar_title_records">账单记录</string>
     <string name="tally_toolbar_title_setting">设置</string>
+    <string name="tally_setting_log_viewer">日志查看器</string>
     <string name="tally_toolbar_title_detail">详情</string>
     <string name="tally_toolbar_title_debug">DEBUG</string>
     <string name="tally_toolbar_title_backup_file">备份文件</string>

@@ -113,6 +113,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Tally" />
         <activity
+            android:name=".app.tally.module.setting.LogViewerActivity"
+            android:exported="false"
+            android:label="@string/tally_setting_log_viewer"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Tally" />
+        <activity
             android:name=".app.tally.ai.AiSettingActivity"
             android:exported="false"
             android:label="@string/setting_group_ai"

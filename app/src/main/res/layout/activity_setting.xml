@@ -269,6 +269,31 @@
                 android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@+id/lyLogViewer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_common_card_white"
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/tally_setting_log_viewer"
+                    android:textColor="@color/appTextColorPrimary"
+                    android:textSize="16sp" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_icon_arrow_right_gray" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/lyAbout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

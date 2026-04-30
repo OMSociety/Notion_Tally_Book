@@ -135,7 +135,6 @@ public class TallyChartActivity extends BaseActivity {
         mCategoryDataRecycler.setLayoutManager(new LinearLayoutManager(self(), LinearLayoutManager.VERTICAL, false));
         mCategoryDataAdapter = new TallyChartCategoryDataAdapter(mViewModel);
         mCategoryDataRecycler.setAdapter(mCategoryDataAdapter);
-        mCategoryDataRecycler.setHasFixedSize(true);
         mCategoryDataRecycler.setNestedScrollingEnabled(false);
     }
 

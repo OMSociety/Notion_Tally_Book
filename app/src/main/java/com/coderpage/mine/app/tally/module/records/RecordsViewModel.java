@@ -225,17 +225,34 @@ public class RecordsViewModel extends BaseViewModel implements LifecycleObserver
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     public void onCreate(LifecycleOwner owner) {
-        Activity activity = (Activity) owner;
-        Intent intent = activity.getIntent();
-        RecordQuery query = intent.getParcelableExtra(RecordsActivity.EXTRA_QUERY);
-        mQuery = query == null ? new RecordQuery.Builder()
-                .setType(RecordQuery.TYPE_ALL)
-                .setStartTime(0)
-                .setEndTime(System.currentTimeMillis())
-                .build() : query;
-        setQuery(mQuery);
+        try {
+            Activity activity = (Activity) owner;
+            Intent intent = activity.getIntent();
+            RecordQuery query = intent.getParcelableExtra(RecordsActivity.EXTRA_QUERY);
+            mQuery = query == null ? new RecordQuery.Builder()
+                    .setType(RecordQuery.TYPE_ALL)
+                    .setStartTime(0)
+                    .setEndTime(System.currentTimeMillis())
+                    .build() : query;
+            setQuery(mQuery);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mQuery = new RecordQuery.Builder()
+                    .setType(RecordQuery.TYPE_ALL)
+                    .setStartTime(0)
+                    .setEndTime(System.currentTimeMillis())
+                    .build();
+            try {
+                setQuery(mQuery);
+            } catch (Exception ignored) {
+            }
+        }
 
-        EventBus.getDefault().register(this);
+        try {
+            EventBus.getDefault().register(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

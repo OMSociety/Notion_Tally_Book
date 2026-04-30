@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.coderpage.base.widget.LoadingLayout;
@@ -50,11 +51,17 @@ public class RecordsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(self(), R.layout.tally_module_records_activity);
-        mViewModel = new ViewModelProvider(this).get(RecordsViewModel.class);
-        getLifecycle().addObserver(mViewModel);
-        initView();
-        subscribeUi();
+        try {
+            mBinding = DataBindingUtil.setContentView(self(), R.layout.tally_module_records_activity);
+            mViewModel = new ViewModelProvider(this).get(RecordsViewModel.class);
+            getLifecycle().addObserver(mViewModel);
+            initView();
+            subscribeUi();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "页面加载失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     @Override

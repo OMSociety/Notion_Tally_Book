@@ -25,4 +25,6 @@ public class TallyRouter {
     public static final String NOTION_DATABASE_HELP = "/app/tally/notionDatabaseHelp";
     /** AI 识别设置 */
     public static final String AI_SETTING = "/app/tally/aiSetting";
+    /** 日志查看 */
+    public static final String LOG_VIEWER = "/app/tally/logViewer";
 }

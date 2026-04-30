@@ -11,6 +11,7 @@ import com.coderpage.mine.app.tally.persistence.sql.entity.RecordEntity;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
@@ -50,78 +51,113 @@ public class CsvImporter {
         List<RecordEntity> records = new ArrayList<>();
         TallyDatabase database = TallyDatabase.getInstance();
         CategoryResolver categoryResolver = new CategoryResolver(database.categoryDao().allCategory());
-        
+
         try (FileInputStream fis = new FileInputStream(file);
              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(isr)) {
-            
-            String line;
-            boolean firstDataLineChecked = false;
-            Map<String, Integer> headerIndexMap = null;
-            int lineNumber = 0;
-            int successCount = 0;
-            int failCount = 0;
-            int totalDataCount = 0;
-            
-            while ((line = reader.readLine()) != null) {
-                lineNumber++;
-                
-                // 跳过 BOM
-                if (line.startsWith("\uFEFF")) {
-                    line = line.substring(1);
-                }
-                
-                // 跳过空行
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
-
-                List<String> fields = parseCsvFields(line);
-                if (isAllEmpty(fields)) {
-                    continue;
-                }
-
-                if (!firstDataLineChecked) {
-                    firstDataLineChecked = true;
-                    headerIndexMap = tryParseHeader(fields);
-                    if (headerIndexMap != null) {
-                        continue;
-                    }
-                }
-
-                totalDataCount++;
-                RecordEntity record = parseLine(fields, headerIndexMap, categoryResolver);
-                if (record != null) {
-                    records.add(record);
-                    successCount++;
-                } else {
-                    failCount++;
-                    Log.w(TAG, "CSV 第 " + lineNumber + " 行解析失败");
-                }
-            }
-            
-            // 保存到数据库（整体事务，失败时全部回滚）
-            if (!records.isEmpty()) {
-                RecordEntity[] insertArray = records.toArray(new RecordEntity[0]);
-                database.runInTransaction(() -> database.recordDao().insert(insertArray));
-            }
-            
-            result.success = true;
-            result.totalCount = totalDataCount;
-            result.successCount = successCount;
-            result.failCount = failCount;
-            result.message = "成功导入 " + successCount + " 条记录，失败 " + failCount + " 条";
-            
-            Log.d(TAG, "CSV 导入完成: 总计=" + totalDataCount + ", 成功=" + successCount + ", 失败=" + failCount);
-            
+            result = doImportFromReader(reader, database, categoryResolver);
         } catch (Exception e) {
             Log.e(TAG, "CSV 导入失败", e);
             result.success = false;
             result.message = "导入失败: " + e.getMessage();
         }
-        
+
         return result;
     }
+
+    /**
+     * 从 InputStream 导入 CSV 记录（用于 SAF URI 导入）
+     */
+    public static ImportResult importFromCsv(Context context, InputStream inputStream) {
+        ImportResult result = new ImportResult();
+        if (inputStream == null) {
+            result.success = false;
+            result.message = "无法读取文件内容";
+            return result;
+        }
+
+        TallyDatabase database = TallyDatabase.getInstance();
+        CategoryResolver categoryResolver = new CategoryResolver(database.categoryDao().allCategory());
+
+        try (InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(isr)) {
+            result = doImportFromReader(reader, database, categoryResolver);
+        } catch (Exception e) {
+            Log.e(TAG, "CSV 导入失败", e);
+            result.success = false;
+            result.message = "导入失败: " + e.getMessage();
+        }
+
+        return result;
+    }
+
+    private static ImportResult doImportFromReader(BufferedReader reader,
+                                                    TallyDatabase database,
+                                                    CategoryResolver categoryResolver) throws Exception {
+        ImportResult result = new ImportResult();
+        List<RecordEntity> records = new ArrayList<>();
+
+        String line;
+        boolean firstDataLineChecked = false;
+        Map<String, Integer> headerIndexMap = null;
+        int lineNumber = 0;
+        int successCount = 0;
+        int failCount = 0;
+        int totalDataCount = 0;
+
+        while ((line = reader.readLine()) != null) {
+            lineNumber++;
+
+            // 跳过 BOM
+            if (line.startsWith("\uFEFF")) {
+                line = line.substring(1);
+            }
+
+            // 跳过空行
+            if (line.trim().isEmpty()) {
+                continue;
+            }
+
+            List<String> fields = parseCsvFields(line);
+            if (isAllEmpty(fields)) {
+                continue;
+            }
+
+            if (!firstDataLineChecked) {
+                firstDataLineChecked = true;
+                headerIndexMap = tryParseHeader(fields);
+                if (headerIndexMap != null) {
+                    continue;
+                }
+            }
+
+            totalDataCount++;
+            RecordEntity record = parseLine(fields, headerIndexMap, categoryResolver);
+            if (record != null) {
+                records.add(record);
+                successCount++;
+            } else {
+                failCount++;
+                Log.w(TAG, "CSV 第 " + lineNumber + " 行解析失败");
+            }
+        }
+
+        // 保存到数据库（整体事务，失败时全部回滚）
+        if (!records.isEmpty()) {
+            RecordEntity[] insertArray = records.toArray(new RecordEntity[0]);
+            database.runInTransaction(() -> database.recordDao().insert(insertArray));
+        }
+
+        result.success = true;
+        result.totalCount = totalDataCount;
+        result.successCount = successCount;
+        result.failCount = failCount;
+        result.message = "成功导入 " + successCount + " 条记录，失败 " + failCount + " 条";
+
+        Log.d(TAG, "CSV 导入完成: 总计=" + totalDataCount + ", 成功=" + successCount + ", 失败=" + failCount);
+        return result;
+    }
+
 
     private static RecordEntity parseLine(List<String> fields,
                                           Map<String, Integer> headerIndexMap,

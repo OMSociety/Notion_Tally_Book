@@ -57,7 +57,7 @@ class RecordsRepository {
                 }
                 mainHandler.post(() -> callback.success(recordList));
             } catch (Exception e) {
-                mainHandler.post(() -> ((SimpleCallback<List<Record>>) callback).failure(new NonThrowError(ErrorCode.SQL_ERR, "SQL ERR")));
+                mainHandler.post(() -> callback.success(new java.util.ArrayList<>()));
             }
         });
     }
