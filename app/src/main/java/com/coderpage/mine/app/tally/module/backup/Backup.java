@@ -4,8 +4,11 @@ import static com.coderpage.base.utils.LogUtils.LOGE;
 import static com.coderpage.base.utils.LogUtils.makeLogTag;
 import static com.coderpage.base.utils.UIUtils.showToastShort;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -508,6 +511,63 @@ public class Backup {
     }
 
     /**
+     * 通过 SAF 导出数据到用户选择的 URI
+     * @param context 上下文
+     * @param uri 用户通过 SAF 选择的目标文件 URI
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @param formatId 格式ID
+     * @param onComplete 导出完成回调
+     */
+    public void performExportToUri(Context context, Uri uri, Long startDate, Long endDate,
+                                    int formatId, SimpleCallback<Void> onComplete) {
+        TallyDatabase database = TallyDatabase.getInstance();
+        AsyncTaskExecutor.execute(() -> {
+            List<Record> records = database.recordDao().queryAllBetweenTimeTimeDesc(startDate, endDate);
+            if (records == null || records.size() == 0) {
+                String err = "导出失败: 没有查询到账单记录";
+                exportTips(context, err);
+                if (onComplete != null) onComplete.failure(
+                        new NonThrowError(ErrorCode.ILLEGAL_ARGS, err));
+                return;
+            }
+
+            try {
+                ContentResolver resolver = context.getContentResolver();
+                ParcelFileDescriptor pfd = resolver.openFileDescriptor(uri, "w");
+                if (pfd == null) {
+                    if (onComplete != null) onComplete.failure(
+                            new NonThrowError(ErrorCode.UNKNOWN, "无法打开目标文件"));
+                    return;
+                }
+                java.io.FileOutputStream fos = new java.io.FileOutputStream(pfd.getFileDescriptor());
+                boolean writeOk;
+                if (formatId == R.id.rbCsv) {
+                    writeOk = writeCsvToStream(fos, records);
+                } else {
+                    writeOk = writeExcelToStream(fos, records);
+                }
+                fos.close();
+                pfd.close();
+
+                if (!writeOk) {
+                    String err = "导出失败: 文件写入错误";
+                    exportTips(context, err);
+                    if (onComplete != null) onComplete.failure(
+                            new NonThrowError(ErrorCode.UNKNOWN, err));
+                    return;
+                }
+                exportTips(context, "导出成功");
+                if (onComplete != null) onComplete.success(null);
+            } catch (IOException e) {
+                e.printStackTrace();
+                if (onComplete != null) onComplete.failure(
+                        new NonThrowError(ErrorCode.UNKNOWN, "导出失败: " + e.getMessage()));
+            }
+        });
+    }
+
+    /**
      * 将记录写入CSV文件
      * @param file 目标文件
      * @param records 记录列表
@@ -633,6 +693,66 @@ public class Backup {
             return false;
         }
     }
+
+    /**
+     * 将记录写入CSV输出流
+     */
+    private boolean writeCsvToStream(java.io.OutputStream outputStream, List<Record> records) {
+        try (java.io.Writer writer = new java.io.OutputStreamWriter(outputStream, "UTF-8")) {
+            writer.append("﻿");
+            writer.append("时间,分类,金额,类型,备注\n");
+            for (Record record : records) {
+                String time = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                        .format(new java.util.Date(record.getTime()));
+                String type = record.getType() == Record.TYPE_EXPENSE ? "支出" : "收入";
+                writer.append("\"").append(time).append("\"")
+                        .append(",").append("\"").append(sanitizeCsvField(record.getCategoryName())).append("\"")
+                        .append(",").append("\"").append(String.valueOf(record.getAmount())).append("\"")
+                        .append(",").append("\"").append(type).append("\"")
+                        .append(",").append("\"").append(sanitizeCsvField(record.getDesc())).append("\"")
+                        .append("\n");
+            }
+            writer.flush();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 将记录写入Excel输出流
+     */
+    private boolean writeExcelToStream(java.io.OutputStream outputStream, List<Record> records) {
+        try (Workbook workbook = new HSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("账单明细");
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"时间", "分类", "金额", "类型", "备注"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+            }
+            for (int i = 0; i < records.size(); i++) {
+                Record record = records.get(i);
+                Row row = sheet.createRow(i + 1);
+                String time = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                        .format(new java.util.Date(record.getTime()));
+                row.createCell(0).setCellValue(time);
+                row.createCell(1).setCellValue(record.getCategoryName() != null ? record.getCategoryName() : "");
+                row.createCell(2).setCellValue(record.getAmount() != null ? record.getAmount().doubleValue() : 0.0);
+                String type = record.getType() == Record.TYPE_EXPENSE ? "支出" : "收入";
+                row.createCell(3).setCellValue(type);
+                row.createCell(4).setCellValue(record.getDesc() != null ? record.getDesc() : "");
+            }
+            for (int i = 0; i < headers.length; i++) {
+                sheet.setColumnWidth(i, 20 * 256);
+            }
+            workbook.write(outputStream);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private void exportTips(Context context, String msg){
         new Handler(Looper.getMainLooper()).post(() -> {
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();

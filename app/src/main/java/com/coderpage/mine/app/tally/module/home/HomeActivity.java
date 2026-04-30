@@ -1,6 +1,7 @@
 package com.coderpage.mine.app.tally.module.home;
 
 import android.Manifest;
+import android.os.Build;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -150,8 +151,24 @@ public class HomeActivity extends BaseActivity {
     }
 
     private void handlePermission() {
+        // Android 11+ 存储权限已废弃，不再请求
+        String[] permissionsToRequest = mNeedPermissionArray;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            List<String> filtered = new ArrayList<>();
+            for (String p : mNeedPermissionArray) {
+                if (!Manifest.permission.READ_EXTERNAL_STORAGE.equals(p)
+                        && !Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(p)) {
+                    filtered.add(p);
+                }
+            }
+            permissionsToRequest = filtered.toArray(new String[0]);
+        }
+        if (permissionsToRequest.length == 0) {
+            return;
+        }
+
         // 检查授权，请求权限
-        String[] notGrantedPermissionArray = mPermissionReqHandler.getNotGrantedPermissionArray(self(), mNeedPermissionArray);
+        String[] notGrantedPermissionArray = mPermissionReqHandler.getNotGrantedPermissionArray(self(), permissionsToRequest);
         if (notGrantedPermissionArray.length == 0) {
             return;
         }

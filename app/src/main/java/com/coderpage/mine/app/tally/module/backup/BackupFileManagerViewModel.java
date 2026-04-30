@@ -3,6 +3,7 @@ package com.coderpage.mine.app.tally.module.backup;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
+import android.os.Build;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -90,24 +91,18 @@ public class BackupFileManagerViewModel extends BaseViewModel implements Lifecyc
 
     /** 刷新列表数据 */
     private void refreshData() {
+        // Android 11+ 存储权限已废弃，且备份文件在 getCacheDir() 内部存储，无需权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            loadBackupFileList();
+            return;
+        }
         mViewReliedTask.setValue(activity -> {
             mPermissionReqHandler.requestPermission(true,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     new PermissionReqHandler.Listener() {
                         @Override
                         public void onGranted(boolean grantedAll, String[] permissionArray) {
-                            MineExecutors.ioExecutor().execute(() -> {
-                                List<File> fileList = Backup.listBackupFiles(getApplication());
-                                List<BackupFileManagerItem> resultList = new ArrayList<>(fileList.size());
-                                ArrayUtils.forEach(fileList, (count, index, item) -> resultList.add(new BackupFileManagerItem(item)));
-                                Collections.sort(resultList, (o1, o2) -> {
-                                    if (o1.getCreateTime() == o2.getCreateTime()) {
-                                        return 0;
-                                    }
-                                    return o1.getCreateTime() > o2.getCreateTime() ? -1 : 1;
-                                });
-                                mBackupFileList.postValue(resultList);
-                            });
+                            loadBackupFileList();
                         }
 
                         @Override
@@ -137,6 +132,21 @@ public class BackupFileManagerViewModel extends BaseViewModel implements Lifecyc
                                     .show();
                         }
                     });
+        });
+    }
+
+    private void loadBackupFileList() {
+        MineExecutors.ioExecutor().execute(() -> {
+            List<File> fileList = Backup.listBackupFiles(getApplication());
+            List<BackupFileManagerItem> resultList = new ArrayList<>(fileList.size());
+            ArrayUtils.forEach(fileList, (count, index, item) -> resultList.add(new BackupFileManagerItem(item)));
+            Collections.sort(resultList, (o1, o2) -> {
+                if (o1.getCreateTime() == o2.getCreateTime()) {
+                    return 0;
+                }
+                return o1.getCreateTime() > o2.getCreateTime() ? -1 : 1;
+            });
+            mBackupFileList.postValue(resultList);
         });
     }
 

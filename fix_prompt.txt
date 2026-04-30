@@ -1,0 +1,53 @@
+Fix ALL 75 compilation errors in this Android project. Read the full error list from build_errors_full.txt first.
+
+## Error Categories and Fix Strategies
+
+### 1. "cannot find symbol" (25 errors)
+For each file, add missing imports or fix references:
+- R.attr.* / R.styleable.* -> if not in R.java, replace with hardcoded values or remove
+- LogUtils -> import com.coderpage.lib.log.LogUtils
+- ValueAnimator/ObjectAnimator -> import android.animation.*
+- Easing/Easing.EaseInOut -> replace with AccelerateDecelerateInterpolator
+- response.close() -> if OkHttp Response, use response.body().close() or remove if unnecessary
+- Other missing symbols -> find the right class and add import
+
+### 2. "SimpleCallback is not a functional interface" (21 errors)
+SimpleCallback has 2 abstract methods (onSuccess + onFailure), can't use lambda.
+Convert ALL SimpleCallback lambdas to full anonymous class:
+
+Pattern to replace:
+```java
+new SimpleCallback<Type>() {
+    result -> handleResult(result)
+}
+```
+Replace with:
+```java
+new SimpleCallback<Type>() {
+    @Override
+    public void onSuccess(Type result) { handleResult(result); }
+    @Override
+    public void onFailure(int code, String msg) { }
+}
+```
+
+### 3. "reference to failure is ambiguous" (17 errors)
+Two failure() methods from different interfaces conflict. Convert to explicit anonymous class with @Override on all methods (onSuccess + onFailure).
+
+### 4. "constructor NonThrowError cannot be applied to given types" (9 errors)
+First read NonThrowError.java to find its constructor signatures. Then fix all call sites to match.
+
+### 5. "ValueFormatter is not a functional interface" (3 errors)
+Same as SimpleCallback - convert lambdas to anonymous class.
+
+## Verification
+After fixing, run:
+```bash
+ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk ./gradlew assembleDebug 2>&1 | grep -c "error:"
+```
+Iterate until 0 errors.
+
+## Rules
+- Read each file before editing
+- Do NOT commit
+- Fix ALL errors, then verify with the build command

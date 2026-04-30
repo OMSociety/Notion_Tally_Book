@@ -1,0 +1,75 @@
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/utils/UIUtils.java:15: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/ui/widget/ViewPagerFocusView.java:66: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/ui/widget/ViewPagerFocusView.java:68: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/ui/widget/ViewPagerFocusView.java:69: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/ui/widget/ViewPagerFocusView.java:70: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/ui/widget/ViewPagerFocusView.java:71: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/ui/widget/ViewPagerFocusView.java:72: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/update/GitHubSourceFetcher.java:111: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/update/GiteeSourceFetcher.java:156: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/update/LatestVersionFetcher.java:91: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/detail/RecordDetailRepository.java:24: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/detail/RecordDetailRepository.java:35: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/records/RecordsRepository.java:59: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/records/RecordsRepository.java:73: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/records/RecordsActivity.java:123: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/setting/SettingViewModel.java:273: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartActivity.java:239: error: incompatible types: ValueFormatter is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartActivity.java:356: error: incompatible types: ValueFormatter is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartActivity.java:439: error: incompatible types: ValueFormatter is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartActivity.java:463: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartViewModel.java:331: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartViewModel.java:356: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartViewModel.java:893: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:38: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:47: error: constructor NonThrowError in class NonThrowError cannot be applied to given types;
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:60: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:80: error: constructor NonThrowError in class NonThrowError cannot be applied to given types;
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:93: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:114: error: constructor NonThrowError in class NonThrowError cannot be applied to given types;
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:125: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:149: error: constructor NonThrowError in class NonThrowError cannot be applied to given types;
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:160: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:184: error: constructor NonThrowError in class NonThrowError cannot be applied to given types;
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:197: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:226: error: constructor NonThrowError in class NonThrowError cannot be applied to given types;
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:239: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:269: error: constructor NonThrowError in class NonThrowError cannot be applied to given types;
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:275: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/chart/TallyChartRepository.java:304: error: constructor NonThrowError in class NonThrowError cannot be applied to given types;
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/home/HomeViewModel.java:98: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/home/HomeRepository.java:158: error: constructor NonThrowError in class NonThrowError cannot be applied to given types;
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/record/RecordViewModel.java:244: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/record/RecordViewModel.java:266: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/record/RecordViewModel.java:290: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/record/RecordViewModel.java:342: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/record/RecordViewModel.java:350: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/category/CategoryEditViewModel.java:110: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/category/CategoryEditViewModel.java:124: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/category/CategoryEditViewModel.java:144: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/category/CategorySortViewModel.java:56: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/category/CategorySortViewModel.java:80: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/category/CategorySortViewModel.java:88: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/category/CategorySortViewModel.java:91: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/category/CategoryManagerViewModel.java:104: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/edit/category/CategoryManagerViewModel.java:107: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/about/AboutActivity.java:53: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/about/AboutActivity.java:82: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/about/AboutActivity.java:106: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/about/AboutActivity.java:116: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/about/AboutActivity.java:140: error: cannot find symbol
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/auto/ImageReceiverActivity.java:202: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/auto/SmsReceiver.java:301: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/search/SearchViewModel.java:178: error: incompatible types: SimpleCallback is not a functional interface
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/BackupCache.java:89: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/BackupCache.java:106: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/BackupCache.java:186: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/BackupCache.java:205: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/Backup.java:154: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/Backup.java:161: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/Backup.java:165: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/Backup.java:181: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/Backup.java:185: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/Backup.java:195: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/Backup.java:219: error: reference to failure is ambiguous
+/AstrBot/data/workspaces/Notion_Tally_Book/app/src/main/java/com/coderpage/mine/app/tally/module/backup/Backup.java:229: error: reference to failure is ambiguous

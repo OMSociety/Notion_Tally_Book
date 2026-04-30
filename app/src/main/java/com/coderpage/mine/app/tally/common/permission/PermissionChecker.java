@@ -14,6 +14,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
@@ -195,6 +196,9 @@ public class PermissionChecker {
      * @return true if success
      */
     private static boolean checkWriteStorage(Activity activity) throws Exception {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return true;
+        }
         File file = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES).getPath(), TAG);
         if (!file.exists()) {
@@ -217,6 +221,9 @@ public class PermissionChecker {
      * @return true if success
      */
     private static boolean checkReadStorage(Activity activity) throws Exception {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return true;
+        }
         File file = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES).getPath());
         File[] files = file.listFiles();

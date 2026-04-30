@@ -17,6 +17,8 @@ import android.provider.DocumentsContract;
 import androidx.annotation.NonNull;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.appcompat.app.AlertDialog;
+
+import java.io.OutputStream;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -58,12 +60,19 @@ import java.util.concurrent.TimeUnit;
 
 public class BackupFileViewModel extends BaseViewModel {
 
+    private static final int REQUEST_CODE_SAF_EXPORT = 1001;
+
     /** 处理加载信息 */
     private MutableLiveData<String> mProcessMessage = new MutableLiveData<>();
 
     private PermissionReqHandler mPermissionReqHandler;
 
     private TextView mCurrentFolderTextView;
+
+    // SAF 导出待处理参数
+    private Long mPendingExportStartDate;
+    private Long mPendingExportEndDate;
+    private int mPendingExportFormatId;
 
     // 自动备份状态
     private MutableLiveData<Boolean> mAutoBackupEnabled = new MutableLiveData<>();
@@ -173,6 +182,10 @@ public class BackupFileViewModel extends BaseViewModel {
 
     /** 备份数据点击 */
     public void onExportDataClick(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            backup2JsonFile();
+            return;
+        }
         String[] permissionArray = new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
@@ -194,6 +207,10 @@ public class BackupFileViewModel extends BaseViewModel {
 
     /** 导入数据点击 */
     public void onImportDataClick(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            showBackupFileSelectDialog(activity);
+            return;
+        }
         String[] permissionArray = new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
@@ -478,10 +495,18 @@ public class BackupFileViewModel extends BaseViewModel {
         tvStartDate.setTag(startDate);
         tvEndDate.setTag(endDate);
 
-        //设置一个默认导出的文件夹
-        String defaultExportFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-        tvFolder.setText(defaultExportFolder);
-        tvFolder.setTag(defaultExportFolder);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+: 使用 SAF 选择保存位置，隐藏文件夹选择
+            tvFolder.setVisibility(View.GONE);
+            view.findViewById(R.id.tvFolderLabel).setVisibility(View.GONE);
+            view.findViewById(R.id.dividerBeforeFolder).setVisibility(View.GONE);
+            view.findViewById(R.id.dividerAfterFolder).setVisibility(View.GONE);
+        } else {
+            // Android 10 及以下: 使用传统文件夹路径
+            String defaultExportFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+            tvFolder.setText(defaultExportFolder);
+            tvFolder.setTag(defaultExportFolder);
+        }
 
         // 更新清除按钮的可见性
         updateClearButtonVisibility(tvStartDate, ivClearStartDate, startDate);
@@ -489,7 +514,6 @@ public class BackupFileViewModel extends BaseViewModel {
 
         // 设置日期选择监听器
         tvStartDate.setOnClickListener(v -> {
-            // 获取当前选择的日期作为默认值
             Calendar c = Calendar.getInstance();
             Long currentDate = (Long) v.getTag();
             if (currentDate != null) {
@@ -499,11 +523,9 @@ public class BackupFileViewModel extends BaseViewModel {
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
 
-            // 创建并显示 DatePickerDialog
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     activity,
                     (view1, selectedYear, selectedMonth, selectedDay) -> {
-                        // 用户选择日期后的回调处理
                         Calendar selectedDate = Calendar.getInstance();
                         selectedDate.set(selectedYear, selectedMonth, selectedDay);
                         selectedDate.set(Calendar.HOUR_OF_DAY, 0);
@@ -521,7 +543,6 @@ public class BackupFileViewModel extends BaseViewModel {
         });
 
         tvEndDate.setOnClickListener(v -> {
-            // 获取当前选择的日期作为默认值
             Calendar c = Calendar.getInstance();
             Long currentDate = (Long) v.getTag();
             if (currentDate != null) {
@@ -531,11 +552,9 @@ public class BackupFileViewModel extends BaseViewModel {
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
 
-            // 创建并显示 DatePickerDialog
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     activity,
                     (view1, selectedYear, selectedMonth, selectedDay) -> {
-                        // 用户选择日期后的回调处理
                         Calendar selectedDate = Calendar.getInstance();
                         selectedDate.set(selectedYear, selectedMonth, selectedDay);
                         selectedDate.set(Calendar.HOUR_OF_DAY, 23);
@@ -552,12 +571,10 @@ public class BackupFileViewModel extends BaseViewModel {
             datePickerDialog.show();
         });
 
-        // 设置文件夹选择监听器
-        tvFolder.setOnClickListener(v -> {
-            // 这里应该打开文件夹选择器
-            // 目前我们显示一个简单的输入对话框作为示例
-            showFolderSelectionDialog(activity, tvFolder);
-        });
+        // 设置文件夹选择监听器 (Android 10 及以下)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            tvFolder.setOnClickListener(v -> showFolderSelectionDialog(activity, tvFolder));
+        }
 
         // 设置清除按钮监听器
         ivClearStartDate.setOnClickListener(v -> {
@@ -579,16 +596,30 @@ public class BackupFileViewModel extends BaseViewModel {
                 .setView(view)
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                    // 获取用户选择的参数
                     Object startTag = tvStartDate.getTag();
                     Object endTag = tvEndDate.getTag();
                     Long selectedStartDate = startTag instanceof Long ? (Long) startTag : null;
                     Long selectedEndDate = endTag instanceof Long ? (Long) endTag : null;
-                    String selectedFolder = (String) tvFolder.getTag();
                     int selectedFormat = rgFormat.getCheckedRadioButtonId();
 
-                    // 执行导出操作
-                    exportData(activity, selectedStartDate, selectedEndDate, selectedFolder, selectedFormat);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        // Android 11+: 使用 SAF 让用户选择保存文件位置
+                        mPendingExportStartDate = selectedStartDate;
+                        mPendingExportEndDate = selectedEndDate;
+                        mPendingExportFormatId = selectedFormat;
+                        String format = selectedFormat == R.id.rbCsv ? ".csv" : ".xls";
+                        String dateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                .format(Calendar.getInstance().getTime());
+                        String fileName = "bill_export_" + dateFormatted + format;
+                        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.setType("application/octet-stream");
+                        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+                        activity.startActivityForResult(intent, REQUEST_CODE_SAF_EXPORT);
+                    } else {
+                        String selectedFolder = (String) tvFolder.getTag();
+                        exportData(activity, selectedStartDate, selectedEndDate, selectedFolder, selectedFormat);
+                    }
                     dialog.dismiss();
                 });
         AlertDialog dialog = builder.create();
@@ -635,7 +666,11 @@ public class BackupFileViewModel extends BaseViewModel {
      * @param formatId 格式ID（CSV或Excel）
      */
     private void exportData(Activity activity, Long startDate, Long endDate, String folder, int formatId) {
-        // 检查存储权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            doExport(startDate, endDate, folder, formatId);
+            return;
+        }
+        // Android 10 及以下: 检查存储权限
         String[] permissionArray = new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -646,22 +681,7 @@ public class BackupFileViewModel extends BaseViewModel {
         mPermissionReqHandler.requestPermission(false, permissionArray, new PermissionReqHandler.Listener() {
             @Override
             public void onGranted(boolean grantedAll, String[] permissionArray) {
-                // 显示导出进度
-                mProcessMessage.postValue("正在导出数据...");
-
-                // 执行实际的导出操作，在完成回调中隐藏加载指示器
-                Backup backup = new Backup();
-                backup.performExport(startDate, endDate, folder, formatId, new SimpleCallback<Void>() {
-                    @Override
-                    public void success(Void aVoid) {
-                        mProcessMessage.postValue(null);
-                    }
-
-                    @Override
-                    public void failure(IError iError) {
-                        mProcessMessage.postValue(null);
-                    }
-                });
+                doExport(startDate, endDate, folder, formatId);
             }
 
             @Override
@@ -669,6 +689,44 @@ public class BackupFileViewModel extends BaseViewModel {
                 showToastShort(R.string.permission_request_failed_write_external_storage);
             }
         });
+    }
+
+    private void doExport(Long startDate, Long endDate, String folder, int formatId) {
+        mProcessMessage.postValue("正在导出数据...");
+        Backup backup = new Backup();
+        backup.performExport(startDate, endDate, folder, formatId, new SimpleCallback<Void>() {
+            @Override
+            public void success(Void aVoid) {
+                mProcessMessage.postValue(null);
+            }
+
+            @Override
+            public void failure(IError iError) {
+                mProcessMessage.postValue(null);
+            }
+        });
+    }
+
+    /**
+     * 通过 SAF 导出数据到用户选择的 URI
+     */
+    private void performExportToUri(Activity activity, Uri uri) {
+        mProcessMessage.postValue("正在导出数据...");
+        Backup backup = new Backup();
+        backup.performExportToUri(activity, uri, mPendingExportStartDate, mPendingExportEndDate,
+                mPendingExportFormatId, new SimpleCallback<Void>() {
+                    @Override
+                    public void success(Void aVoid) {
+                        mProcessMessage.postValue(null);
+                        showToastShort(R.string.tally_alert_backup_success);
+                    }
+
+                    @Override
+                    public void failure(IError iError) {
+                        mProcessMessage.postValue(null);
+                        showToastLong("导出失败: " + iError.msg());
+                    }
+                });
     }
 
 
@@ -760,15 +818,19 @@ public class BackupFileViewModel extends BaseViewModel {
                 // 处理文件夹选择结果
                 Uri uri = data.getData();
                 if (uri != null) {
-                    // 使用DocumentFile处理文件夹URI
                     String path = getFolderPathFromUri(activity, uri);
                     if (path != null) {
-                        // 更新UI
                         if (mCurrentFolderTextView != null) {
                             mCurrentFolderTextView.setText(path);
                             mCurrentFolderTextView.setTag(path);
                         }
                     }
+                }
+            } else if (requestCode == REQUEST_CODE_SAF_EXPORT) {
+                // SAF 导出: 用户选择了保存位置
+                Uri uri = data.getData();
+                if (uri != null) {
+                    performExportToUri(activity, uri);
                 }
             }
         }
