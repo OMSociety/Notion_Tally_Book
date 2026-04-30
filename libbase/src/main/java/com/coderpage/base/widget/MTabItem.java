@@ -27,7 +27,7 @@ public class MTabItem extends View {
     public MTabItem(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TabItem);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MTabItem);
         mText = typedArray.getText(R.styleable.MTabItem_android_text);
         mIcon = getDrawable(context, typedArray, R.styleable.MTabItem_android_icon);
         mCustomLayout = typedArray.getResourceId(R.styleable.MTabItem_android_layout, 0);

@@ -2,7 +2,7 @@ package com.coderpage.mine.app.tally.module.home;
 
 import android.app.Activity;
 import androidx.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;

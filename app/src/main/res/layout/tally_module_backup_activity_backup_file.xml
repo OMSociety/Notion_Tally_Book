@@ -15,7 +15,7 @@
 
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/background"
@@ -25,7 +25,7 @@
             android:id="@+id/toolbar"
             layout="@layout/toolbar" />
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/spacing_micro"
@@ -42,7 +42,7 @@
                 android:layout_marginTop="10dp"
                 android:orientation="vertical">
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/lyDataExport"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -79,9 +79,9 @@
                         android:layout_height="1px"
                         android:layout_marginTop="@dimen/padding_normal"
                         app:layout_constraintTop_toBottomOf="@id/tvExportDataTip" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/lyDataImport"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -118,10 +118,10 @@
                         android:layout_marginTop="@dimen/padding_normal"
                         app:layout_constraintTop_toBottomOf="@id/tvImportDataTip" />
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- 自动备份卡片 -->
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/lyAutoBackup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -180,10 +180,10 @@
                         android:background="@color/colorPrimaryDark"
                         android:layout_marginTop="@dimen/padding_normal"
                         app:layout_constraintTop_toBottomOf="@id/tvAutoBackupTip" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- 导出数据卡片 -->
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/lyExportData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -219,13 +219,13 @@
                         android:layout_height="1px"
                         android:layout_marginTop="@dimen/padding_normal"
                         app:layout_constraintTop_toBottomOf="@id/tvExportDataDesc" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
 
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

@@ -3,7 +3,7 @@ package com.coderpage.mine.app.tally.ui.dialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;

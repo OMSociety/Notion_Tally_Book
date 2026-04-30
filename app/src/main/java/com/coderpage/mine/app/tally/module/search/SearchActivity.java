@@ -1,7 +1,7 @@
 package com.coderpage.mine.app.tally.module.search;
 
 import androidx.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;

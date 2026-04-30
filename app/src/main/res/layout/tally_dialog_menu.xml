@@ -15,7 +15,7 @@
         android:onClick="@{() -> vm.onCloseClick()}"
         android:layout_height="match_parent">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -24,7 +24,7 @@
             android:paddingTop="@dimen/padding_normal"
             android:paddingEnd="@dimen/padding_normal">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivClose"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
@@ -47,7 +47,7 @@
                 app:srcCompat="@drawable/ic_close"
                 app:tint="@color/black" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </FrameLayout>
 </layout>

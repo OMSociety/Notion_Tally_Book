@@ -3,7 +3,7 @@ package com.coderpage.mine.app.tally.module.home;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
-import android.databinding.ObservableField;
+import androidx.databinding.ObservableField;
 
 import com.coderpage.base.utils.ResUtils;
 import com.coderpage.framework.BaseViewModel;

@@ -28,7 +28,7 @@
             android:background="@{category.internal.type == category.internal.TYPE_EXPENSE ? @drawable/bg_category_expense : @drawable/bg_category_income}"
             android:padding="6dp">
 
-            <android.support.v7.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 categoryIcon="@{category.internal.icon}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

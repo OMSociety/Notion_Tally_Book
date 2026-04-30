@@ -1,6 +1,6 @@
 package com.coderpage.mine.app.tally.ui.dialog;
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;

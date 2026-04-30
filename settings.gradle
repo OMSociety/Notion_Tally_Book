@@ -1,1 +1,1 @@
-include ':app', ':libbase', ':libupdate', 'buildSrc'
+include ':app', ':libbase', ':libupdate'

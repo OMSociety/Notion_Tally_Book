@@ -4,6 +4,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,6 +30,7 @@ import java.util.List;
  */
 
 @Database(entities = {RecordEntity.class, CategoryEntity.class}, version = 60, exportSchema = false)
+@TypeConverters({Converters.class})
 public abstract class TallyDatabase extends RoomDatabase {
     /** sqlite db name */
     private static final String DATABASE_NAME = "sql_tally";

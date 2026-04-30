@@ -16,7 +16,7 @@
             type="com.coderpage.mine.app.tally.module.chart.TallyChartViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/main_content"
@@ -25,7 +25,7 @@
         android:fitsSystemWindows="true"
         tools:context=".app.tally.module.chart.TallyChartActivity">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             style="@style/Widget.Toolbar"
             android:layout_width="match_parent"
@@ -36,7 +36,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:titleTextColor="@color/appTextColorPrimary" />
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/lyContainer"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -56,7 +56,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/padding_normal" />
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/spacing_micro"
@@ -103,9 +103,9 @@
                         app:layout_constraintTop_toBottomOf="@id/tvGlobalInfoExpense"
                         tools:text="共6笔收入，￥100.00" />
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="@dimen/padding_micro"
@@ -156,7 +156,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <!-- 切换日账单、年账单 -->
-                    <android.support.constraint.ConstraintLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:layout_constraintBottom_toBottomOf="@id/tvSwitchIncome"
@@ -164,7 +164,7 @@
                         app:layout_constraintStart_toEndOf="@id/tvSwitchIncome"
                         app:layout_constraintTop_toTopOf="@id/tvSwitchIncome">
 
-                        <android.support.v7.widget.AppCompatImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/ivSwitchDailyAndYearly"
                             android:layout_width="10dp"
                             android:layout_height="match_parent"
@@ -192,12 +192,12 @@
                             app:layout_constraintTop_toTopOf="parent"
                             tools:text="查看月账单" />
 
-                    </android.support.constraint.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- 日支出柱状图、日收入状图 & 月支出、收入折线图 -->
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/spacing_micro"
@@ -228,7 +228,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.coderpage.mine.app.tally.module.chart.widget.MinePieChart
                     android:id="@+id/pieChart"
@@ -239,7 +239,7 @@
                     android:layout_marginRight="@dimen/spacing_micro"
                     android:background="@drawable/bg_common_card_white" />
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -251,7 +251,7 @@
                     android:descendantFocusability="blocksDescendants" />
 
             </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

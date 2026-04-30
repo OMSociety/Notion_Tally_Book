@@ -18,7 +18,7 @@
         tools:context=".app.tally.module.search.SearchActivity">
 
         <!-- 搜多历史 -->
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/lySearchHistoryView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -27,7 +27,7 @@
             android:paddingTop="@dimen/toolbar_height"
             android:visibility="@{vm.showSearchResult ? View.GONE : View.VISIBLE}">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerHistory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- 搜索结果 -->
         <com.coderpage.base.widget.LoadingLayout
@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerResult"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
@@ -68,7 +68,7 @@
             android:background="@color/transparent"
             android:orientation="vertical">
 
-            <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+            <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/toolbar"
                 style="@style/Widget.Toolbar"
@@ -87,7 +87,7 @@
                     android:imeOptions="actionSearch|flagNoExtractUi"
                     android:text="@={vm.searchKeyWord}" />
 
-            </android.support.v7.widget.Toolbar>
+            </androidx.appcompat.widget.Toolbar>
 
         </LinearLayout>
 

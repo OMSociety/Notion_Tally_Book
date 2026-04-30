@@ -234,7 +234,7 @@ public class MTabLayout extends HorizontalScrollView {
                 LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MTabLayout,
-                defStyleAttr, R.style.Widget_Design_TabLayout);
+                defStyleAttr, 0);
 
         mTabStrip.setSelectedIndicatorHeight(
                 a.getDimensionPixelSize(R.styleable.MTabLayout_mTabIndicatorHeight, 0));

@@ -3,7 +3,7 @@ package com.coderpage.mine.app.tally.ai;
 import android.app.Application;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import android.databinding.ObservableField;
+import androidx.databinding.ObservableField;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
