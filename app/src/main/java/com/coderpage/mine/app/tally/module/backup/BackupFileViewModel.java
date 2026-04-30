@@ -15,7 +15,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import androidx.annotation.NonNull;
-import androidx.core.provider.DocumentFile;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
@@ -229,7 +229,15 @@ public class BackupFileViewModel extends BaseViewModel {
             showToastShort(R.string.tally_toast_illegal_path);
             return;
         }
-        readDataFromBackupJsonFile(filePath, backupModel -> showRestoreDataConfirmDialog(activity, backupModel));
+        readDataFromBackupJsonFile(filePath, new SimpleCallback<BackupModel>() {
+            @Override
+            public void success(BackupModel backupModel) {
+                showRestoreDataConfirmDialog(activity, backupModel);
+            }
+
+            @Override
+            public void failure(IError error) { }
+        });
     }
 
     /** 显示备份文件列表 */
@@ -245,8 +253,15 @@ public class BackupFileViewModel extends BaseViewModel {
             dialog.dismiss();
             String filePath = fileList.get(which).getAbsolutePath();
             // 弹框确认弹框
-            readDataFromBackupJsonFile(filePath, backupModel ->
-                    showRestoreDataConfirmDialog(activity, backupModel));
+            readDataFromBackupJsonFile(filePath, new SimpleCallback<BackupModel>() {
+                @Override
+                public void success(BackupModel backupModel) {
+                    showRestoreDataConfirmDialog(activity, backupModel);
+                }
+
+                @Override
+                public void failure(IError error) { }
+            });
         });
         builder.setPositiveButton(
                 R.string.dialog_btn_choose_local_file, (dialog, which) -> {
@@ -604,7 +619,7 @@ public class BackupFileViewModel extends BaseViewModel {
     private void updateClearButtonVisibility(TextView textView, ImageView clearButton, long date) {
         // 如果有日期，则显示清除图标（X图标）
         if (date != 0 && !textView.getText().toString().isEmpty()) {
-            clearButton.setImageResource(R.drawable.abc_ic_clear_material);
+            clearButton.setImageResource(androidx.appcompat.R.drawable.abc_ic_clear_material);
             clearButton.setVisibility(View.VISIBLE);
         } else {
             clearButton.setVisibility(View.GONE);

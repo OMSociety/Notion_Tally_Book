@@ -190,12 +190,8 @@ public class TallyChartActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_date_select:
-                mViewModel.onSelectDateClick(this);
-                break;
-            default:
-                break;
+        if (id == R.id.menu_date_select) {
+            mViewModel.onSelectDateClick(this);
         }
         return super.onOptionsItemSelected(item);
     }

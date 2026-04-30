@@ -63,12 +63,8 @@ public class BackupFileActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_manager:
-                mViewModel.onMenuManagerClick(self());
-                break;
-            default:
-                break;
+        if (id == R.id.menu_manager) {
+            mViewModel.onMenuManagerClick(self());
         }
         return super.onOptionsItemSelected(item);
     }

@@ -123,15 +123,11 @@ public class CategorySortActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            case R.id.menu_complete:
-                mViewModel.onSaveClick();
-                break;
-            default:
-                break;
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (id == R.id.menu_complete) {
+            mViewModel.onSaveClick();
         }
         return super.onOptionsItemSelected(item);
     }

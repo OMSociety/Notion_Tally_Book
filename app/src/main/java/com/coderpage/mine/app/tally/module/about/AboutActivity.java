@@ -70,9 +70,7 @@ public class AboutActivity extends BaseActivity {
     }
     private View.OnClickListener mOnClickListener = (v) -> {
         int id = v.getId();
-        switch (id) {
-            // 检查更新
-            case R.id.lyAppInfo:
+        if (id == R.id.lyAppInfo) {
                 // 切换更新源
                 if (mCurrentUpdateSource == 0) {
                     // 使用默认服务器更新
@@ -143,21 +141,20 @@ public class AboutActivity extends BaseActivity {
                         }
                     });
                 }
-                break;
 
             // 用户协议点击
-            case R.id.lyUserAgreement:
+        } else if (id == R.id.lyUserAgreement) {
                 Intent userAgreementIntent = new Intent(this, DocumentActivity.class);
                 userAgreementIntent.putExtra(DocumentActivity.EXTRA_DOCUMENT_TYPE, DocumentActivity.TYPE_USER_AGREEMENT);
                 startActivity(userAgreementIntent);
-                break;
+
 
             // 隐私政策点击
-            case R.id.lyPrivacyPolicy:
+        } else if (id == R.id.lyPrivacyPolicy) {
                 Intent privacyPolicyIntent = new Intent(this, DocumentActivity.class);
                 privacyPolicyIntent.putExtra(DocumentActivity.EXTRA_DOCUMENT_TYPE, DocumentActivity.TYPE_PRIVACY_POLICY);
                 startActivity(privacyPolicyIntent);
-                break;
+
         }
     };
 

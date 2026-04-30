@@ -1,0 +1,461 @@
+================================================================================
+          安全审计报告 — Notion_Tally_Book (Android 记账应用)
+================================================================================
+审计日期: 2026-04-30
+审计范围: /AstrBot/data/workspaces/Notion_Tally_Book (250 个 Java 文件, 3 个 AndroidManifest.xml)
+目标 SDK: 34 (Android 14)
+最低 SDK: 18 (Android 4.3)
+
+问题统计:
+  CRITICAL : 7
+  HIGH     : 4
+  MEDIUM   : 15
+  LOW      : 18
+  总计     : 44
+
+================================================================================
+                        第一部分: CRITICAL 问题 (7 个)
+================================================================================
+
+[C-01] HomeActivity 缺少 android:exported 属性
+  文件: app/src/main/AndroidManifest.xml
+  行号: 36
+  严重程度: CRITICAL
+  描述: HomeActivity 声明了两个 intent-filter (MAIN/LAUNCHER 和 VIEW)，但未设置
+        android:exported 属性。targetSdkVersion=34 要求所有含 intent-filter 的组件
+        必须显式声明 exported。此问题会导致应用在 Android 12+ 设备上无法安装。
+  修复建议: 添加 android:exported="true"（作为启动器 Activity，必须为 true）。
+
+[C-02] ImageReceiverActivity 缺少 android:exported 属性
+  文件: app/src/main/AndroidManifest.xml
+  行号: 51
+  严重程度: CRITICAL
+  描述: ImageReceiverActivity 声明了 ACTION_SEND + image/* 的 intent-filter，但未设置
+        android:exported。应用无法安装于 Android 12+ 设备。
+  修复建议: 添加 android:exported="true"（需要接收外部分享的图片）。
+
+[C-03] SearchActivity 缺少 android:exported 属性
+  文件: app/src/main/AndroidManifest.xml
+  行号: 140
+  严重程度: CRITICAL
+  描述: SearchActivity 声明了 ACTION_SEARCH 的 intent-filter，但未设置 android:exported。
+        应用无法安装于 Android 12+ 设备。
+  修复建议: 添加 android:exported="true"（支持外部搜索意图）。
+
+[C-04] TDAntiCheatingService 缺少 android:exported 属性
+  文件: app/src/main/AndroidManifest.xml
+  行号: 154
+  严重程度: CRITICAL
+  描述: TalkingData SDK 的反作弊服务声明了 intent-filter，但未设置 android:exported。
+        应用无法安装于 Android 12+ 设备。
+  修复建议: 添加 android:exported="false"（内部 SDK 服务，无需外部访问）。
+
+[C-05] AiSettingActivity 编译错误 — 缺少 Log 导入和 TAG 常量
+  文件: app/src/main/java/com/coderpage/mine/app/tally/ai/AiSettingActivity.java
+  行号: 64
+  严重程度: CRITICAL
+  描述: 第 64 行使用了 Log.e(TAG, "保存配置失败", e)，但：
+        (1) 未导入 android.util.Log；
+        (2) 类中未定义 TAG 常量，BaseActivity 父类也未暴露 TAG 字段。
+        两处错误均导致编译失败。
+  修复建议: 添加 import android.util.Log; 并在类中定义 private static final String
+            TAG = "AiSettingActivity";。
+
+[C-06] Backup.java 编译错误 — 多处类型/接口不匹配
+  文件: app/src/main/java/com/coderpage/mine/app/tally/module/backup/Backup.java
+  行号: 415, 472, 489, 499, 504
+  严重程度: CRITICAL
+  描述: 包含 3 个独立的编译错误：
+        (1) 第 499 行: writeExcelFile() 返回 void，但结果被赋值给 boolean 变量。
+            方法签名 private void writeExcelFile(...) 与调用处 boolean writeOk =
+            writeExcelFile(...) 不匹配。
+        (2) 第 472/489/504 行: 调用 onComplete.failure(...)，但 SimpleCallback<T>
+            接口只定义了 success(T t) 方法，没有 failure 方法。
+        (3) 第 415 行: Record.getAmount() 返回 BigDecimal，传入
+            BackupModelRecord.setAmount(double)，Java 不支持 BigDecimal 到 double
+            的隐式转换。
+  修复建议: (1) 将 writeExcelFile 返回值改为 boolean，或重构调用逻辑；
+            (2) 给 SimpleCallback 添加 failure 方法，或使用 Result 类型回调；
+            (3) 使用 entity.getAmount().doubleValue() 显式转换。
+
+[C-07] AiApiConfig.java 编译错误 — 未处理受检异常
+  文件: app/src/main/java/com/coderpage/mine/app/tally/ai/AiApiConfig.java
+  行号: 125
+  严重程度: CRITICAL
+  描述: load() 方法调用 SensitiveDataCipher.decrypt()，该方法声明 throws
+        CipherException（受检异常，继承自 Exception）。但 load() 方法既未声明
+        throws CipherException，也未用 try-catch 包裹，导致编译失败。
+  修复建议: 在 load() 方法中用 try-catch 捕获 CipherException，或在方法签名中
+            声明 throws CipherException。建议在 catch 中返回默认配置并记录错误日志。
+
+================================================================================
+                        第二部分: HIGH 问题 (4 个)
+================================================================================
+
+[H-01] DebugViewModel 资源泄露 — 流未关闭
+  文件: app/src/main/java/com/coderpage/mine/app/tally/module/debug/DebugViewModel.java
+  行号: 68-77
+  严重程度: HIGH
+  描述: copyDatabaseFileToSdcard() 方法存在两处资源泄露：
+        (1) FileOutputStream (第 69 行) 从未关闭 — 整个方法中无 fs.close() 调用。
+        (2) 无 try-with-resources 或 finally 块。若第 68-76 行之间发生异常，
+            FileInputStream (第 68 行) 也因跳过第 77 行的 close() 而泄露。
+        长期运行可能导致文件描述符耗尽。
+  修复建议: 使用 try-with-resources 语法：
+            try (InputStream in = new FileInputStream(oldfile);
+                 FileOutputStream out = new FileOutputStream(newPath)) { ... }
+
+[H-02] SMS 内容泄露到 Logcat
+  文件: app/src/main/java/com/coderpage/mine/app/tally/module/auto/SmsReceiver.java
+  行号: 80
+  严重程度: HIGH
+  描述: 第 80 行 Log.d(TAG, "发件人: " + sender + ", 内容: " + messageBody) 将完整
+        的短信发件人地址和短信正文输出到 logcat。短信通常包含银行交易、验证码等敏感
+        财务信息。在 release 构建中，LogUtils.LOGGING_ENABLED 硬编码为 true（见
+        LogUtils.java:14），且该 Log.d 调用无 BuildConfig.DEBUG 保护，导致敏感数据
+        在生产环境中仍会输出到 logcat。任何具有 ADB 访问权限或 READ_LOGS 权限的应用
+        均可读取。
+  修复建议: 删除该行日志，或至少用 BuildConfig.DEBUG 包裹，且仅记录脱敏后的摘要信息。
+            全局日志开关 LogUtils.LOGGING_ENABLED 应改为 false 或绑定 BuildConfig.DEBUG。
+
+[H-03] SettingActivity 严重 MVVM 违规 — 直接访问数据库和网络
+  文件: app/src/main/java/com/coderpage/mine/app/tally/module/setting/SettingActivity.java
+  行号: 28, 68, 75, 126-131, 133-175, 254-263, 275-287
+  严重程度: HIGH
+  描述: SettingActivity 继承 BaseActivity（View 层），但完全绕过 ViewModel 层，直接：
+        (1) 导入并操作 TallyDatabase（第 28 行）；
+        (2) 创建自己的 ExecutorService（第 68、75 行）；
+        (3) 在后台线程执行 CSV 导入和数据库删除（第 254-263、275-287 行）；
+        (4) 直接读写 NotionConfig（第 126-131 行）；
+        (5) 直接创建和管理 NotionSyncManager 进行网络同步（第 133-175 行）。
+        该 Activity 没有关联的 ViewModel，违反 MVVM 架构原则。
+  修复建议: 创建 SettingViewModel，将数据库操作、网络同步等业务逻辑迁移至 ViewModel。
+            Activity 仅负责 UI 绑定和用户交互。
+
+[H-04] ImageReceiverActivity 严重 MVVM 违规 — 直接数据库和 AI 网络调用
+  文件: app/src/main/java/com/coderpage/mine/app/tally/module/auto/ImageReceiverActivity.java
+  行号: 45, 50, 90, 92-113, 171-179, 200-216
+  严重程度: HIGH
+  描述: ImageReceiverActivity 直接继承 AppCompatActivity，无任何 ViewModel，全部业务
+        逻辑写在 Activity 中：
+        (1) 直接持有 TallyDatabase 引用（第 45、50 行）；
+        (2) 自建 ExecutorService 执行 AI 网络识别调用（第 90、92-113 行）；
+        (3) 直接查询数据库获取分类（第 171-179 行）；
+        (4) 直接通过 RecordRepository 保存记录（第 200-216 行）。
+  修复建议: 创建 ImageRecognizerViewModel，将 AI 调用、数据库查询、记录保存等逻辑
+            迁移至 ViewModel。Activity 仅处理 Intent 数据和 UI 展示。
+
+================================================================================
+                        第三部分: MEDIUM 问题 (15 个)
+================================================================================
+
+[M-01] android:allowBackup="true" 数据泄露风险
+  文件: app/src/main/AndroidManifest.xml
+  行号: 28
+  严重程度: MEDIUM
+  描述: allowBackup=true 允许通过 adb backup 提取应用私有数据，包括 SharedPreferences
+        中的加密 API 密钥、Notion 令牌和数据库内容。对记账类应用，财务记录面临泄露风险。
+  修复建议: 设置 android:allowBackup="false"，或使用 android:fullBackupContent /
+            android:dataExtractionRules 限制备份范围。
+
+[M-02] SmsReceiver exported=true 且 priority=1000
+  文件: app/src/main/AndroidManifest.xml
+  行号: 58-64
+  严重程度: MEDIUM
+  描述: SmsReceiver 设置了 android:exported="true" 和 android:priority="1000"（最高
+        优先级）。虽然 SMS_RECEIVED 是系统广播需要 RECEIVE_SMS 权限，但高优先级可能
+        干扰其他短信处理应用，且 receiver 本身未设置 android:permission 属性保护。
+  修复建议: 降低 priority 值（如 500），或添加自定义 permission 保护 receiver。
+
+[M-03] Release 构建 minifyEnabled=false
+  文件: app/build.gradle (行 38), libbase/build.gradle (行 22), libupdate/build.gradle (行 17)
+  严重程度: MEDIUM
+  描述: 所有三个模块的 release 构建类型均设置 minifyEnabled false。ProGuard/R8 代码
+        混淆和缩减完全禁用，发布 APK 中所有类名/方法名完整保留，极大降低逆向工程难度。
+  修复建议: 在 release 构建中启用 minifyEnabled true，并配置完善的 ProGuard 规则
+            （libbase 和 libupdate 模块当前 ProGuard 规则文件仅含模板注释，需补充）。
+
+[M-04] FastJSON v1.2.83 存在已知反序列化漏洞
+  文件: build.gradle (行 54), app/build.gradle (行 115), libupdate/build.gradle (行 37)
+  严重程度: MEDIUM
+  描述: 项目依赖 com.alibaba:fastjson:1.2.83，该版本存在 CVE-2022-25845 等多个已知
+        反序列化漏洞。FastJSON v1 被认为存在根本性安全问题。项目中有 12+ 个源文件使用
+        了 FastJSON（SearchRepository, Backup, BackupCache, LatestVersionFetcher,
+        GitHubSourceFetcher, GiteeSourceFetcher, 多个 BackupModel 类, BaseResponse 等）。
+  修复建议: 迁移至 FastJSON2 (com.alibaba.fastjson2:fastjson2) 或统一使用 Gson
+            （项目中已作为依赖存在）。
+
+[M-05] 废弃 IntentService (API 30 起废弃)
+  文件: libupdate/src/main/java/com/coderpage/lib/update/DownloadService.java
+  行号: 3, 27
+  严重程度: MEDIUM
+  描述: DownloadService 继承自 android.app.IntentService，该类自 API 30 起标记为废弃。
+        IntentService 不支持前台服务、不处理电池优化豁免，在新版 Android 上行为不可靠。
+  修复建议: 迁移至 JobIntentService 或 WorkManager（推荐）。
+
+[M-06] 废弃 AsyncTask (API 30 起废弃)
+  文件: libupdate/.../Updater.java (行 5, 56-57), app/.../AsyncTaskExecutor.java (行 19)
+  严重程度: MEDIUM
+  描述: AsyncTask 自 API 30 起废弃。项目通过 AsyncTaskExecutor 包装
+        AsyncTask.THREAD_POOL_EXECUTOR，在 UpdateUtils (行 21/31/39/51)、
+        Backup (行 118/150/213/465)、BackupFileViewModel (行 101) 中广泛使用。
+  修复建议: 迁移至 java.util.concurrent.ExecutorService + LiveData/Flow，
+            或使用 Kotlin 协程。
+
+[M-07] LogUtils.LOGGING_ENABLED 硬编码为 true
+  文件: libbase/src/main/java/com/coderpage/base/utils/LogUtils.java
+  行号: 14
+  严重程度: MEDIUM
+  描述: 全局日志开关 public static boolean LOGGING_ENABLED = true 硬编码为 true，
+        从未根据构建类型设置为 false。所有通过 LogUtils 的日志调用在 release 构建中
+        仍会执行，泄露调试信息。
+  修复建议: 改为 LOGGING_ENABLED = BuildConfig.DEBUG; 或在 Application 初始化时
+            根据构建类型设置。
+
+[M-08] SmsReceiver 直接数据库访问（MVVM 违规）
+  文件: app/.../module/auto/SmsReceiver.java
+  行号: 42, 49, 106-108, 124-126, 266-278
+  严重程度: MEDIUM
+  描述: BroadcastReceiver 直接持有 TallyDatabase 和 MineDatabase 引用，在 onReceive
+        中执行多处数据库查询（设置读取、检测名单查询、分类查询）。虽非典型 MVVM 场景，
+        但缺乏数据访问抽象层。
+  修复建议: 引入 Repository 模式封装数据访问，BroadcastReceiver 通过 Repository
+            间接操作数据库。
+
+[M-09] SensitiveDataCipher 使用弱密钥派生算法
+  文件: app/.../security/SensitiveDataCipher.java
+  行号: 114
+  严重程度: MEDIUM
+  描述: 使用 PBKDF2WithHmacSHA1 进行密钥派生，SHA1 已不推荐用于安全场景。且密钥派生
+        使用 Settings.Secure.ANDROID_ID + 包名作为密钥材料，在 root 设备上
+        ANDROID_ID 不是真正秘密的。
+  修复建议: 迁移至 PBKDF2WithHmacSHA256（API 26+），密钥材料改用
+            Android Keystore 生成和存储。
+
+[M-10] release 构建使用 debug 签名配置
+  文件: app/build.gradle
+  行号: 39, 45
+  严重程度: MEDIUM
+  描述: debug 和 release 构建类型均使用 signingConfigs.release（即 debug.keystore）。
+        release APK 使用公开密码的 debug keystore 签名，任何人都能用相同密钥签署
+        恶意更新包。
+  修复建议: 为 release 构建创建独立的签名配置，密钥存储在安全位置（如 CI/CD 密钥库），
+            不提交到代码仓库。
+
+[M-11] debug.keystore 提交到代码仓库
+  文件: debug.keystore (项目根目录)
+  严重程度: MEDIUM
+  描述: 签名密钥库文件提交到版本控制，配合 build.gradle 中硬编码的密码
+        (alias=androiddebugkey, password=android)，任何有仓库访问权的人均可签署 APK。
+  修复建议: 将 debug.keystore 加入 .gitignore，release keystore 使用环境变量注入。
+
+[M-12] 过时依赖 lifecycle-extensions
+  文件: build.gradle
+  行号: 42
+  严重程度: MEDIUM
+  描述: androidx.lifecycle:lifecycle-extensions:2.2.0 已废弃，应使用具体的
+        lifecycle-viewmodel、lifecycle-livedata 等独立组件（项目中已存在）。
+  修复建议: 移除 lifecycle-extensions 依赖，使用已有的细分 lifecycle 组件。
+
+[M-13] 废弃 getResources().getColor() 调用
+  文件: libbase/.../UIUtils.java (行 85), libbase/.../ResUtils.java (行 34),
+        app/.../AboutActivity.java (行 53/84/90/96/108/118/124/130/142),
+        app/.../AiSettingActivity.java (行 117/120)
+  严重程度: MEDIUM
+  描述: getResources().getColor(int) 自 API 23 起废弃（不传 theme 参数版本）。共 13 处
+        调用分布在 4 个文件中。
+  修复建议: 替换为 ContextCompat.getColor(context, colorResId)。
+
+[M-14] SmsMessage.createFromPdu(byte[]) 废弃
+  文件: app/.../module/auto/SmsReceiver.java
+  行号: 74
+  严重程度: MEDIUM
+  描述: createFromPdu(byte[]) 自 API 23 起废弃。虽有版本检查保护 else 分支，但废弃
+        代码路径仍存在。
+  修复建议: 使用 createFromPdu(byte[], String) 替代，或移除 pre-M 分支
+            （minSdk 可考虑提升至 21+）。
+
+[M-15] OkHttp logging-interceptor 作为生产依赖
+  文件: app/build.gradle
+  严重程度: MEDIUM
+  描述: OkHttp logging-interceptor 以 api 方式引入（非 debugImplementation），release
+        APK 中包含完整的 HTTP 日志拦截器类。虽 BODY 级别日志有 BuildConfig.DEBUG 保护，
+        但类本身仍被打包。
+  修复建议: 将 logging-interceptor 改为 debugImplementation 依赖。
+
+================================================================================
+                        第四部分: LOW 问题 (18 个)
+================================================================================
+
+[L-01] 9 处 AboutActivity 废弃 getColor() 调用
+  文件: app/.../module/about/AboutActivity.java
+  行号: 53, 84, 90, 96, 108, 118, 124, 130, 142
+  严重程度: LOW
+  描述: 9 处调用 getResources().getColor(R.color....)，均应使用 ContextCompat.getColor()。
+  修复建议: 批量替换为 ContextCompat.getColor(this, R.color.xxx)。
+
+[L-02] commons-lang:commons-lang:2.6 已停止维护
+  文件: buildSrc/build.gradle
+  行号: 14
+  严重程度: LOW
+  描述: 使用已停止维护的 Apache Commons Lang 2.x，已被 commons-lang3 替代。
+  修复建议: 迁移至 org.apache.commons:commons-lang3。
+
+[L-03] material-calendarview 不再维护
+  文件: build.gradle
+  行号: 51
+  严重程度: LOW
+  描述: com.prolificinteractive:material-calendarview:1.4.3 的 GitHub 仓库已归档。
+  修复建议: 评估替换为活跃维护的日历组件，或 fork 自行维护。
+
+[L-04] tkrefreshlayout 不再维护
+  文件: build.gradle
+  行号: 55
+  严重程度: LOW
+  描述: com.lcodecorex:tkrefreshlayout:1.0.7 缺乏维护。
+  修复建议: 替换为 SwipeRefreshLayout 或其他活跃维护的下拉刷新组件。
+
+[L-05] PowerMock 不再维护
+  文件: build.gradle
+  行号: 74-77
+  严重程度: LOW
+  描述: org.powermock:powermock-*:2.0.9 不支持现代 JDK，已基本停止维护。
+  修复建议: 迁移至 Mockito 4+（内置 inline mock maker）或 MockK。
+
+[L-06] libbase ProGuard 规则为空
+  文件: libbase/proguard-rules.pro
+  严重程度: LOW
+  描述: 仅含模板注释，无项目特定规则。若启用 minify，公开 API 将被混淆导致调用方崩溃。
+  修复建议: 补充 libbase 公开 API 的 keep 规则。
+
+[L-07] libupdate ProGuard 规则为空
+  文件: libupdate/proguard-rules.pro
+  严重程度: LOW
+  描述: 同 L-06，libupdate 模块无 ProGuard 规则。
+  修复建议: 补充 libupdate 公开 API 和 DownloadService 的 keep 规则。
+
+[L-08] app ProGuard 规则缺少 Gson/Room/DataBinding keep 规则
+  文件: app/proguard-rules.pro
+  严重程度: LOW
+  描述: 已有 Bugly/EventBus/OkHttp/Retrofit/FastJSON/ARouter 规则，但缺少：
+        (1) Gson 序列化模型类的 keep 规则
+        (2) Room Entity 和 DAO 的 keep 规则
+        (3) Data Binding 类的 keep 规则
+  修复建议: 补充对应 keep 规则，启用 minify 后进行全量回归测试。
+
+[L-09] minSdkVersion 18 过低
+  文件: build.gradle
+  行号: 27
+  严重程度: LOW
+  描述: minSdkVersion=18 (Android 4.3) 远低于 Google Play 当前要求 (API 21+)，
+        迫使项目携带大量兼容性代码。
+  修复建议: 提升至 minSdkVersion 21，可简化代码并移除 pre-Lollipop 兼容分支。
+
+[L-10] Updater.java 中残留调试日志
+  文件: libupdate/src/main/java/com/coderpage/lib/update/Updater.java
+  行号: 265
+  严重程度: LOW
+  描述: Log.e("TAG", "====" + apkModel.getApkSizeBytes()) 使用硬编码 "TAG" 字符串，
+        明显是开发调试遗留。
+  修复建议: 删除或替换为正式日志。
+
+[L-11] DownloadCache 多处无保护日志调用
+  文件: libupdate/.../DownloadCache.java
+  行号: 55, 78, 101, 119
+  严重程度: LOW
+  描述: 4 处 Log 调用在 release 构建中仍会执行，可能泄露下载缓存路径等信息。
+  修复建议: 用 BuildConfig.DEBUG 或 LogUtils.LOGGING_ENABLED 保护。
+
+[L-12] SyncRepository 多处无保护日志调用
+  文件: app/.../sync/SyncRepository.java
+  行号: 30, 47, 49, 69
+  严重程度: LOW
+  描述: 同步仓库中 4 处 Log 调用，可能泄露同步状态和数据。
+  修复建议: 用日志开关保护。
+
+[L-13] SensitiveDataCipher 中无保护日志调用
+  文件: app/.../security/SensitiveDataCipher.java
+  行号: 58, 84
+  严重程度: LOW
+  描述: 加密工具类中有 2 处 Log 调用。虽然未直接记录密钥内容，但加密操作日志在
+        release 中不应存在。
+  修复建议: 用 BuildConfig.DEBUG 保护或移除。
+
+[L-14] OpenAiRecognizer 多处无保护日志调用
+  文件: app/.../ai/OpenAiRecognizer.java
+  行号: 144, 147, 223, 270, 293, 331
+  严重程度: LOW
+  描述: AI 识别器中 6 处 Log 调用，可能泄露 API 请求/响应内容。
+  修复建议: 用日志开关保护，避免记录 API 密钥和完整响应。
+
+[L-15] CsvImporter 多处无保护日志调用
+  文件: app/.../backup/CsvImporter.java
+  行号: 99, 115, 118
+  严重程度: LOW
+  描述: CSV 导入器中 3 处 Log 调用。
+  修复建议: 用日志开关保护。
+
+[L-16] AutoBackupWorker 多处无保护日志调用
+  文件: app/.../backup/AutoBackupWorker.java
+  行号: 37, 42, 48
+  严重程度: LOW
+  描述: 自动备份 Worker 中 3 处 Log 调用。
+  修复建议: 用日志开关保护。
+
+[L-17] GiteeSourceFetcher 凭证占位符
+  文件: app/.../update/GiteeSourceFetcher.java
+  行号: 58, 63, 68
+  严重程度: LOW
+  描述: 定义了 GITEE_ACCESS_TOKEN、GITEE_USERNAME、GITEE_PASSWORD 空字符串常量。
+        虽当前为空，但此模式鼓励硬编码真实凭证。
+  修复建议: 使用 BuildConfig 字段从 local.properties 或环境变量注入。
+
+[L-18] 多处第三方 SDK 依赖过时
+  文件: build.gradle (多行)
+  严重程度: LOW
+  描述: 包括但不限于：Bugly SDK、TalkingData SDK、ARouter 等第三方依赖版本可能过时。
+        需逐一检查是否有安全更新。
+  修复建议: 定期审查并更新第三方依赖版本。
+
+================================================================================
+                    第五部分: 按优先级排序的修复清单
+================================================================================
+
+优先级 P0 — 立即修复（阻塞编译/安装）:
+  [C-01] HomeActivity 添加 android:exported="true"
+  [C-02] ImageReceiverActivity 添加 android:exported="true"
+  [C-03] SearchActivity 添加 android:exported="true"
+  [C-04] TDAntiCheatingService 添加 android:exported="false"
+  [C-05] AiSettingActivity: 添加 Log 导入和 TAG 常量
+  [C-06] Backup.java: 修复 writeExcelFile 返回值、SimpleCallback 接口、BigDecimal 转换
+  [C-07] AiApiConfig.java: 处理 CipherException 受检异常
+
+优先级 P1 — 尽快修复（安全/隐私风险）:
+  [H-02] SmsReceiver.java:80 — 删除或脱敏 SMS 日志
+  [H-01] DebugViewModel.java:68-77 — 使用 try-with-resources 修复资源泄露
+  [M-01] AndroidManifest.xml:28 — 设置 allowBackup="false"
+  [M-04] build.gradle:54 — 迁移 FastJSON v1 至 v2 或 Gson
+  [M-09] SensitiveDataCipher.java:114 — 升级密钥派生算法
+  [M-10] app/build.gradle:39,45 — release 使用独立签名配置
+  [M-11] debug.keystore — 从仓库移除，加入 .gitignore
+
+优先级 P2 — 计划修复（架构/代码质量）:
+  [H-03] SettingActivity — 重构为 MVVM 架构
+  [H-04] ImageReceiverActivity — 重构为 MVVM 架构
+  [M-03] app/libbase/libupdate build.gradle — 启用 minifyEnabled true
+  [M-05] DownloadService.java — IntentService 迁移至 WorkManager
+  [M-06] Updater.java/AsyncTaskExecutor — AsyncTask 迁移至现代方案
+  [M-07] LogUtils.java:14 — 日志开关绑定 BuildConfig.DEBUG
+  [M-08] SmsReceiver.java — 引入 Repository 模式
+  [M-12] build.gradle:42 — 移除废弃 lifecycle-extensions
+
+优先级 P3 — 择机修复（代码清洁度）:
+  [M-02] SmsReceiver priority 降至合理值
+  [M-13] 全局替换 getResources().getColor() 为 ContextCompat.getColor()
+  [M-14] SmsReceiver createFromPdu 升级
+  [M-15] logging-interceptor 改为 debugImplementation
+  [L-01] ~ [L-18] 废弃依赖清理、日志保护、ProGuard 规则补充等
+
+================================================================================
+                          审计完成 — 2026-04-30
+================================================================================

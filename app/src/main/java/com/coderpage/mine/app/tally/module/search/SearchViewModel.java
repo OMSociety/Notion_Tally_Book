@@ -145,15 +145,26 @@ public class SearchViewModel extends BaseViewModel {
         ArrayUtils.remove(searchHistoryList, item -> CommonUtils.isEqual(item, history));
         // 缓存到本地
         mRepository.saveSearchHistory(searchHistoryList,
-                // 缓存成功，刷新列表
-                v -> loadSearchHistory());
+                new SimpleCallback<Void>() {
+                    @Override
+                    public void success(Void v) { loadSearchHistory(); }
+
+                    @Override
+                    public void failure(IError error) { }
+                });
     }
 
     /** 清除搜索历史点击 */
     public void onClearSearchHistoryClick() {
-        mRepository.saveSearchHistory(new ArrayList<>(), v -> {
-            // 清除完成后 刷新搜索历史记录
-            loadSearchHistory();
+        mRepository.saveSearchHistory(new ArrayList<>(), new SimpleCallback<Void>() {
+            @Override
+            public void success(Void v) {
+                // 清除完成后 刷新搜索历史记录
+                loadSearchHistory();
+            }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 
@@ -173,8 +184,14 @@ public class SearchViewModel extends BaseViewModel {
 
     /** 加载搜索历史记录 */
     private void loadSearchHistory() {
-        mRepository.loadSearchHistory(historyList -> {
-            mSearchHistoryList.setValue(historyList);
+        mRepository.loadSearchHistory(new SimpleCallback<List<String>>() {
+            @Override
+            public void success(List<String> historyList) {
+                mSearchHistoryList.setValue(historyList);
+            }
+
+            @Override
+            public void failure(IError error) { }
         });
     }
 
@@ -196,8 +213,13 @@ public class SearchViewModel extends BaseViewModel {
         }
         // 缓存到本地
         mRepository.saveSearchHistory(searchHistoryList,
-                // 缓存成功，刷新列表
-                v -> loadSearchHistory());
+                new SimpleCallback<Void>() {
+                    @Override
+                    public void success(Void v) { loadSearchHistory(); }
+
+                    @Override
+                    public void failure(IError error) { }
+                });
     }
 
     @Override

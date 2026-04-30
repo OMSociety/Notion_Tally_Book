@@ -266,15 +266,10 @@ public class HomeActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_debug:
-                startActivity(new Intent(this, DebugActivity.class));
-                break;
-            case R.id.menu_search:
-                startActivity(new Intent(this, SearchActivity.class));
-                break;
-            default:
-                break;
+        if (id == R.id.menu_debug) {
+            startActivity(new Intent(this, DebugActivity.class));
+        } else if (id == R.id.menu_search) {
+            startActivity(new Intent(this, SearchActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

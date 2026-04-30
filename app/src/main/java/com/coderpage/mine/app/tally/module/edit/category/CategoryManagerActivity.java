@@ -143,12 +143,8 @@ public class CategoryManagerActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
-            case R.id.menu_sort:
-                mViewModel.onMenuSortClick(self(), mBinding.recyclerView);
-                break;
-            default:
-                break;
+        if (id == R.id.menu_sort) {
+            mViewModel.onMenuSortClick(self(), mBinding.recyclerView);
         }
         return super.onOptionsItemSelected(item);
     }
