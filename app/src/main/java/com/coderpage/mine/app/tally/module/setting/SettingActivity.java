@@ -255,8 +255,7 @@ public class SettingActivity extends BaseActivity {
             mDatabaseExecutor = Executors.newSingleThreadExecutor();
         }
         mDatabaseExecutor.execute(() -> {
-            try {
-                java.io.InputStream inputStream = getContentResolver().openInputStream(uri);
+            try (java.io.InputStream inputStream = getContentResolver().openInputStream(uri)) {
                 if (inputStream == null) {
                     runOnUiThread(() -> Toast.makeText(this, R.string.tally_toast_illegal_path, Toast.LENGTH_SHORT).show());
                     return;

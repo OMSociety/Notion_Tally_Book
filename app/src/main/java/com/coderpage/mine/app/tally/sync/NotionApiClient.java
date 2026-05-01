@@ -41,7 +41,7 @@ public class NotionApiClient {
     }
 
     public static synchronized NotionApiClient getInstance(NotionConfig config) {
-        if (instance == null || instance.config != config) {
+        if (instance == null || !instance.config.equals(config)) {
             instance = new NotionApiClient(config);
         }
         return instance;

@@ -241,13 +241,14 @@ public class TallyChartActivity extends BaseActivity {
             @Override
             public String getFormattedValue(float value, com.github.mikephil.charting.components.AxisBase axis) {
                 String format = "";
-                if (value != 0
-                        && value != axis.mEntryCount - 1
-                        && value != axis.mEntryCount / 2) {
+                int index = (int) value;
+                if (index != 0
+                        && index != axis.mEntryCount - 1
+                        && index != axis.mEntryCount / 2) {
                     return format;
                 }
-                DailyData dailyData = dailyDataList != null && dailyDataList.size() > value ?
-                        dailyDataList.get((int) value) : null;
+                DailyData dailyData = dailyDataList != null && index >= 0 && index < dailyDataList.size() ?
+                        dailyDataList.get(index) : null;
                 if (dailyData != null) {
                     return dailyData.getMonth() + "-" + dailyData.getDayOfMonth();
                 }

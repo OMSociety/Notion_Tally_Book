@@ -75,19 +75,15 @@ public class RecordConverter {
         model.setTime(record.time);
         model.setDesc(record.remark != null ? record.remark : "");
 
-        // 类型转换
-        if ("expense".equals(record.type)) {
-            model.setType(RecordEntity.TYPE_EXPENSE);
-        } else {
-            model.setType(RecordEntity.TYPE_INCOME);
-        }
+        // 类型转换 (支持中文和英文类型)
+        boolean isExpense = "expense".equals(record.type) || "支出".equals(record.type);
+        model.setType(isExpense ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
 
         // 分类
         model.setCategoryUniqueName(record.category != null ? record.category : "");
 
-        // notionPageId 存储在 syncId 中（仅在无现有 syncId 且有 notionPageId 时写入，避免覆盖本地 syncId）
-        if (record.notionPageId != null && !record.notionPageId.isEmpty()
-                && (model.getSyncId() == null || model.getSyncId().isEmpty())) {
+        // notionPageId 存储在 syncId 中（有 notionPageId 时始终写入，确保同步后 ID 正确）
+        if (record.notionPageId != null && !record.notionPageId.isEmpty()) {
             model.setSyncId("notion:" + record.notionPageId);
         }
 

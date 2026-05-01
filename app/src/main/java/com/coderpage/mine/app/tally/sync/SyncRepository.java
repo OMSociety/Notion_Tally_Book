@@ -79,8 +79,7 @@ public class SyncRepository {
         boolean isExpense = "expense".equals(source.type) || "支出".equals(source.type);
         target.setType(isExpense ? RecordEntity.TYPE_EXPENSE : RecordEntity.TYPE_INCOME);
         target.setCategoryUniqueName(source.category != null ? source.category : "");
-        if (source.notionPageId != null && !source.notionPageId.isEmpty()
-                && (target.getSyncId() == null || target.getSyncId().isEmpty())) {
+        if (source.notionPageId != null && !source.notionPageId.isEmpty()) {
             target.setSyncId(makeNotionSyncId(source.notionPageId));
         }
     }
