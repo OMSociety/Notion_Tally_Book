@@ -53,7 +53,7 @@ ext {
     mpAndroidChart = 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     buglyCrashReport = 'com.tencent.bugly:crashreport:3.3.9.2'
     fastjson = 'com.alibaba:fastjson:1.2.83'
-    refreshLayout = 'com.lcodecorex:tkrefreshlayout:1.0.7'
+    refreshLayout = 'com.lcodecore:tkrefreshlayout:1.0.7'
     arounter = 'com.alibaba:arouter-api:1.5.2'
     arounterProcessor = 'com.alibaba:arouter-compiler:1.5.2'
 

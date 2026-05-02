@@ -26,6 +26,7 @@
     <application
         android:name=".MineApp"
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -114,6 +115,12 @@
             android:theme="@style/Theme.Tally" />
         <activity
             android:name=".app.tally.module.setting.LogViewerActivity"
+            android:exported="false"
+            android:label="@string/tally_setting_log_viewer"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Tally" />
+        <activity
+            android:name=".app.tally.module.log.LogViewerActivity"
             android:exported="false"
             android:label="@string/tally_setting_log_viewer"
             android:screenOrientation="portrait"

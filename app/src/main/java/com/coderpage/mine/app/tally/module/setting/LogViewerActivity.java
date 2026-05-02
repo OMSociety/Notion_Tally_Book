@@ -55,9 +55,10 @@ public class LogViewerActivity extends BaseActivity {
             List<String> logLines = new ArrayList<>();
             BufferedReader reader = null;
             try {
-                // 读取 logcat 最近 500 行日志
+                // 只读取本应用的日志 - 使用 PID 过滤
                 Process process = Runtime.getRuntime().exec(new String[]{
-                        "logcat", "-d", "-v", "time", "-t", "500"
+                        "logcat", "-d", "-v", "time", "-t", "300",
+                        "--pid=" + android.os.Process.myPid()
                 });
                 reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;

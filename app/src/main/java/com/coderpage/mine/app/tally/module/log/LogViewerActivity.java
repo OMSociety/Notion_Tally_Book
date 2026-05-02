@@ -17,8 +17,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -46,78 +49,86 @@ public class LogViewerActivity extends BaseActivity {
     }
 
     private void loadLogs() {
-        try {
-            // 获取应用日志目录
-            File logDir = new File(getFilesDir(), "logs");
-            if (!logDir.exists()) {
-                logDir.mkdirs();
-            }
-
-            // 查找最新的日志文件
-            File[] logFiles = logDir.listFiles((dir, name) -> name.endsWith(".log"));
-            if (logFiles == null || logFiles.length == 0) {
-                // 尝试读取系统日志
-                loadSystemLogs();
-                return;
-            }
-
-            // 找到最新的日志文件
-            File latestLog = logFiles[0];
-            for (File file : logFiles) {
-                if (file.lastModified() > latestLog.lastModified()) {
-                    latestLog = file;
-                }
-            }
-
-            // 读取日志内容
+        mLogContent.setText("正在加载日志...");
+        new Thread(() -> {
             StringBuilder logBuilder = new StringBuilder();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-
-            try (BufferedReader reader = new BufferedReader(new FileReader(latestLog))) {
-                String line;
-                int lineCount = 0;
-                while ((line = reader.readLine()) != null && lineCount < 1000) {
-                    logBuilder.append(line).append("\n");
-                    lineCount++;
+            try {
+                // 获取应用日志目录
+                File logDir = new File(getFilesDir(), "logs");
+                if (!logDir.exists()) {
+                    logDir.mkdirs();
                 }
+
+                // 查找最新的日志文件
+                File[] logFiles = logDir.listFiles((dir, name) -> name.endsWith(".log"));
+                if (logFiles != null && logFiles.length > 0) {
+                    // 找到最新的日志文件
+                    File latestLog = logFiles[0];
+                    for (File file : logFiles) {
+                        if (file.lastModified() > latestLog.lastModified()) {
+                            latestLog = file;
+                        }
+                    }
+
+                    // 读取日志内容
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                    try (BufferedReader reader = new BufferedReader(new FileReader(latestLog))) {
+                        String line;
+                        int lineCount = 0;
+                        while ((line = reader.readLine()) != null && lineCount < 1000) {
+                            logBuilder.append(line).append("\n");
+                            lineCount++;
+                        }
+                    }
+                } else {
+                    // 读取系统日志 - 只过滤本应用的
+                    loadAppSystemLogs(logBuilder);
+                }
+            } catch (IOException e) {
+                logBuilder.append("读取日志失败: ").append(e.getMessage());
             }
 
-            mLogContent.setText(logBuilder.toString());
-
-        } catch (IOException e) {
-            mLogContent.setText("读取日志失败: " + e.getMessage());
-            Toast.makeText(this, "读取日志失败", Toast.LENGTH_SHORT).show();
-        }
+            String logText = logBuilder.toString();
+            runOnUiThread(() -> {
+                if (logText.isEmpty()) {
+                    mLogContent.setText("暂无日志记录\n\n应用运行日志将显示在这里。\n\n提示：使用应用过程中产生的日志会自动记录。");
+                } else {
+                    mLogContent.setText(logText);
+                }
+            });
+        }).start();
     }
 
-    private void loadSystemLogs() {
+    private void loadAppSystemLogs(StringBuilder logBuilder) {
+        BufferedReader reader = null;
         try {
-            // 使用 logcat 获取最近的日志
-            Process process = Runtime.getRuntime().exec("logcat -d -t 100");
-            java.io.InputStream inputStream = process.getInputStream();
-            java.io.InputStreamReader inputStreamReader = new java.io.InputStreamReader(inputStream);
-            BufferedReader reader = new BufferedReader(inputStreamReader);
+            // 只获取本应用的日志 - 过滤包名
+            String packageName = getPackageName();
+            Process process = Runtime.getRuntime().exec(new String[]{
+                    "logcat", "-d", "-v", "time", "-t", "200",
+                    "--pid=" + android.os.Process.myPid()
+            });
+            reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-            StringBuilder logBuilder = new StringBuilder();
+            List<String> logLines = new ArrayList<>();
             String line;
-            int lineCount = 0;
-            while ((line = reader.readLine()) != null && lineCount < 100) {
-                logBuilder.append(line).append("\n");
-                lineCount++;
+            while ((line = reader.readLine()) != null) {
+                logLines.add(line);
             }
 
-            reader.close();
-            inputStreamReader.close();
-            inputStream.close();
-
-            if (logBuilder.length() > 0) {
-                mLogContent.setText(logBuilder.toString());
-            } else {
-                mLogContent.setText("暂无日志记录\n\n应用运行日志将显示在这里。\n\n提示：使用应用过程中产生的日志会自动记录。");
+            // 反转使最新日志在最前面
+            for (int i = logLines.size() - 1; i >= 0; i--) {
+                logBuilder.append(logLines.get(i)).append("\n");
             }
-
         } catch (IOException e) {
-            mLogContent.setText("暂无日志记录\n\n应用运行日志将显示在这里。\n\n提示：使用应用过程中产生的日志会自动记录。");
+            // ignore
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 }
